@@ -1,0 +1,34 @@
+"use client";
+import React from 'react';
+import SidebarItem from './SidebarItem';
+import sidebarConfig from '@/config/sidebar';
+import Image from 'next/image';
+
+const Sidebar: React.FC = () => {
+    return (
+        <div className="flex justify-start w-[350px]">
+            <div className="sidebar bg-sidebarcolor p-8 w-full">
+			<Image
+					src="/logo.png"
+					width={500}
+					height={500}
+					alt="Logo"
+					/>
+                <ul>
+                    {sidebarConfig.map((item, index) => (
+                        <li key={index}>
+                            <SidebarItem
+                                title={item.title}
+                                path={item.path}
+                                icon={item.icon}
+                                children={item.children}
+                            />
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        </div>
+    );
+};
+
+export default Sidebar;
