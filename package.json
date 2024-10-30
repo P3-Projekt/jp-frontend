@@ -10,9 +10,11 @@
 		"format": "prettier --write ."
 	},
 	"dependencies": {
+		"clsx": "^2.1.1",
 		"next": "15.0.0",
 		"react": "19.0.0-rc-65a56d0e-20241020",
-		"react-dom": "19.0.0-rc-65a56d0e-20241020"
+		"react-dom": "19.0.0-rc-65a56d0e-20241020",
+		"tailwind-merge": "^2.5.4"
 	},
 	"devDependencies": {
 		"@types/node": "^20",
