@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import "./globals.css";
 import React from 'react';
 import Sidebar from '@/components/Sidebar';
@@ -7,6 +6,13 @@ import Sidebar from '@/components/Sidebar';
 interface LayoutProps {
     children: React.ReactNode;
 }
+
+
+// Metadata
+export const metadata: Metadata = {
+    title: "Test",
+    description: "Test app",
+};
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
     return (

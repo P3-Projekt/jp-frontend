@@ -9,14 +9,14 @@ const Sidebar: React.FC = () => {
     return (
         <div className="flex justify-start w-[350px]">
             <div className="sidebar bg-sidebarcolor p-8 w-full">
-				<Link href="/">
-					<Image
-						src="/logo.png"
-						width={500}
-						height={500}
-						alt="Logo"
-					/>
-				</Link>
+                <Link href="/">
+                    <Image
+                        src="/logo.png"
+                        width={500}
+                        height={500}
+                        alt="Logo"
+                    />
+                </Link>
                 <ul>
                     {sidebarConfig.map((item, index) => (
                         <li key={index}>
@@ -24,8 +24,9 @@ const Sidebar: React.FC = () => {
                                 title={item.title}
                                 path={item.path}
                                 icon={item.icon}
-                                children={item.children}
-                            />
+                            >
+                                {item.children}
+                            </SidebarItem>
                         </li>
                     ))}
                 </ul>

@@ -8,7 +8,7 @@ interface SidebarItemProps {
     title: string;
     path?: string;
     icon?: React.FC;
-    isChild: boolean;
+    isChild?: boolean;
     children?: SidebarItemProps[];
 }
 
@@ -18,7 +18,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ title, path, icon: Icon, chil
     const pathname = usePathname();
     const isActive = pathname === path;
 
-    const toggleSubItems = (e: React.MouseEvent) => {
+    const toggleSubItems = () => {
         if (children) {
             setIsOpen(!isOpen);
         }
