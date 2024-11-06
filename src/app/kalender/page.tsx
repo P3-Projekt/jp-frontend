@@ -57,7 +57,7 @@ const KalenderPage: React.FC = () => {
 			</div>
 			{/* OPGAVER */}
 			<div className="mt-4 flex flex-row justify-center gap-x-3">
-				<div className="flex w-[140px] bg-colorprimary rounded">
+				<div className="grid w-[140px] bg-colorprimary rounded">
 					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center align-bottom">
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
 							<Droplets className="size-7 -mt-0.5" />
