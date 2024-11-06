@@ -2,11 +2,25 @@
 import React, {useState} from 'react';
 import { ChevronLeft, ChevronRight, Droplets, MoveRight, Scissors } from "lucide-react";
 
+
+
+/*
+TODOS:
+- Datoerne skal gøres dynamiske, med uge nummrene.
+- (Måske) skal der tilføjes en reset knap ved uge nummeret. Så man kan komme tilbage til den nuværende uge.
+- (Måske) der kan tilføjet sådan at ugerne kan tages frem og tilbage med piletasterne.
+-
+
+
+*/
+
+
+
 const KalenderPage: React.FC = () => {
 
-	const currentWeekNumber= getWeekNumber(new Date());
+	const currentWeekNumber= getCurrentWeekNumber(new Date());
 
-	const [week, setWeek] = useState(currentWeekNumber);
+	const [weekNumber, setWeekNumber] = useState(currentWeekNumber);
 
 	const BatchIdAmount = 50;
 	const BatchIdSpecies = "Ærter";
@@ -14,25 +28,35 @@ const KalenderPage: React.FC = () => {
 	return (
 		<>
 		{/* UGER */}
-		<div className=" mt-10 flex flex-col justify-center">
+		<div className="h-screen -mt-3 flex flex-col justify-center select-none">
 			<div className="flex flex-row justify-center">
 				<ChevronLeft className="size-10 cursor-pointer hover:scale-110" onClick={() => {
-					setWeek(week - 1);
+					if (weekNumber > 1) {
+						setWeekNumber(weekNumber - 1);
+					} else {
+						// start from 1 in the new year
+						setWeekNumber(52)
+					}
 				}}/>
-				<h1 className="text-colorprimary text-4xl">UGE <u>{week}</u></h1>
+				<h1 className="text-colorprimary text-4xl cursor-default">UGE <span className="underline underline-offset-4">{weekNumber}</span></h1>
 				<ChevronRight className="size-10 hover:cursor-pointer hover:scale-110" onClick={() => {
-					setWeek(week + 1);
+					if (weekNumber < 52) {
+						setWeekNumber(weekNumber + 1);
+					} else {
+						setWeekNumber(1)
+						// start from 1 in the new year
+					}
 				}}/>
 			</div>
 			{/* DAGE */}
-			<div className="mt-9 flex flex-row justify-center gap-x-3 cursor-default">
+			<div className="mt-3 flex flex-row justify-center gap-x-2 cursor-default">
 				<div className="w-[140px] py-2.5 text-center bg-colorprimary rounded content-center">
 					<h1 className="text-xl font-bold">MANDAG</h1>
-					<p className="text-xs text-center">06-10-2024</p>
+					<p className="text-xs text-center">08-10-2024</p>
 				</div>
 				<div className="w-[140px] text-center bg-gray-200 text-black rounded content-center">
 					<h1 className="text-xl font-bold">TIRSDAG</h1>
-					<p className="text-xs text-center">07-10-2024</p>
+					<p className="text-xs text-center">09-10-2024</p>
 				</div>
 				<div className="w-[140px] text-center bg-gray-200 text-black rounded content-center">
 					<h1 className="text-xl font-bold">ONSDAG</h1>
@@ -56,48 +80,48 @@ const KalenderPage: React.FC = () => {
 				</div>
 			</div>
 			{/* OPGAVER */}
-			<div className="mt-4 flex flex-row justify-center gap-x-3">
+			<div className="mt-3 flex flex-row justify-center gap-x-2 h-4/5">
 				<div className="grid w-[140px] bg-colorprimary rounded">
 					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
 							<Droplets className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold"> {BatchIdSpecies} </span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
 							<Scissors className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold"> {BatchIdSpecies} </span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
 							<MoveRight className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold"> {BatchIdSpecies} </span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<Droplets className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold"> {BatchIdSpecies} </span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<Scissors className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold"> {BatchIdSpecies} </span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<MoveRight className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold"> {BatchIdSpecies} </span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<Droplets className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold"> {BatchIdSpecies} </span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<Droplets className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold"> {BatchIdSpecies} </span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<Scissors className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold"> {BatchIdSpecies} </span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<MoveRight className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold"> {BatchIdSpecies} </span> </li>
 						</div>
 					</ul>
 				</div>
@@ -105,43 +129,43 @@ const KalenderPage: React.FC = () => {
 					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
 							<Droplets className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
 							<Scissors className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
 							<MoveRight className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<Droplets className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<Scissors className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<MoveRight className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<Droplets className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<Droplets className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<Scissors className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<MoveRight className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 					</ul>
 				</div>
@@ -149,43 +173,43 @@ const KalenderPage: React.FC = () => {
 					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
 							<Droplets className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
 							<Scissors className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
 							<MoveRight className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<Droplets className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<Scissors className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<MoveRight className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<Droplets className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<Droplets className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<Scissors className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<MoveRight className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 					</ul>
 				</div>
@@ -193,43 +217,43 @@ const KalenderPage: React.FC = () => {
 					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
 							<Droplets className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
 							<Scissors className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
 							<MoveRight className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<Droplets className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<Scissors className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<MoveRight className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<Droplets className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<Droplets className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<Scissors className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<MoveRight className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 					</ul>
 				</div>
@@ -237,43 +261,43 @@ const KalenderPage: React.FC = () => {
 					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
 							<Droplets className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
 							<Scissors className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
 							<MoveRight className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<Droplets className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<Scissors className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<MoveRight className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<Droplets className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<Droplets className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<Scissors className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<MoveRight className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 					</ul>
 				</div>
@@ -281,66 +305,88 @@ const KalenderPage: React.FC = () => {
 					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
 							<Droplets className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
 							<Scissors className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
 							<MoveRight className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<Droplets className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<Scissors className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<MoveRight className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<Droplets className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<Droplets className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<Scissors className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7" />
-							<li className="text-center"> {BatchIdAmount}x {BatchIdSpecies} </li>
+							<MoveRight className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
 						</div>
 					</ul>
 				</div>
-				<div className="w-[140px] bg-gray-200 text-black rounded content-center">
-					<ul className="flex flex-col gap-y-3 divide-y divide-black text-center">
-						<li className="">8</li>
-						<li>9</li>
-
-						<li>10</li>
-						<li>11</li>
-						<li>12</li>
-						<li>13</li>
-						<li>14</li>
-						<li>15</li>
-						<li>16</li>
-						<li>17</li>
-						<li>18</li>
-						<li>19</li>
-						<li>20</li>
-						<li>21</li>
-						<li>22</li>
-						<li>23</li>
-						<li>24</li>
+				<div className="grid w-[140px] bg-gray-200 text-black rounded">
+					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
+						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
+							<Droplets className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
+						</div>
+						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
+							<Scissors className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
+						</div>
+						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
+							<MoveRight className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
+						</div>
+						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
+							<Droplets className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
+						</div>
+						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
+							<Scissors className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
+						</div>
+						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
+							<MoveRight className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
+						</div>
+						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
+							<Droplets className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
+						</div>
+						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
+							<Droplets className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
+						</div>
+						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
+							<Scissors className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
+						</div>
+						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
+							<MoveRight className="size-7 -mt-0.5" />
+							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
+						</div>
 					</ul>
 				</div>
 			</div>
@@ -356,8 +402,9 @@ export default KalenderPage;
  * @param date
  * @returns week number
  */
-function getWeekNumber(date) {
+function getCurrentWeekNumber(date) {
+	const millisecondInDay = 86400000
 	const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
-	const pastDaysOfYear = (date - firstDayOfYear) / 86400000;
+	const pastDaysOfYear = (date - firstDayOfYear) / millisecondInDay;
 	return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
 }
