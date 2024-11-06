@@ -15,7 +15,7 @@ const sidebarConfig: SidebarItem[] = [
 	},
 	{
 		title: 'Kalender',
-		path: '/calendar',
+		path: '/kalender',
 		icon: CalendarDays,
 	},
 	{

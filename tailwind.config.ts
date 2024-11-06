@@ -17,6 +17,17 @@ const config: Config = {
 				sidebarcolor: "#F4F3F0",
 				subbordercolor: "#E6E3DC",
 			},
+			gap: {
+				"19" : "4.75rem",
+				"19.5": "4.875rem",
+			},
+			padding: {
+				"13": "3.291rem",
+			},
+			gridRow: {
+				"17": "17",
+			}
+
 		},
 	},
 	plugins: [],
