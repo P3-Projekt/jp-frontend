@@ -1,4 +1,4 @@
-import { Grid2X2, House, Leaf, SquarePen } from "lucide-react";
+import { Grid2X2, House, Leaf, SquarePen, CalendarDays } from "lucide-react";
 
 interface SidebarItem {
 	title: string;
@@ -12,6 +12,11 @@ const sidebarConfig: SidebarItem[] = [
 		title: 'Hjem',
 		path: '/',
 		icon: House,
+	},
+	{
+		title: 'Kalender',
+		path: '/calendar',
+		icon: CalendarDays,
 	},
 	{
 		title: 'Adminstration',
