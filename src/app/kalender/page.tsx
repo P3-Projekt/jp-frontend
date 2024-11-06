@@ -58,7 +58,7 @@ const KalenderPage: React.FC = () => {
 			{/* OPGAVER */}
 			<div className="mt-4 flex flex-row justify-center gap-x-3">
 				<div className="grid w-[140px] bg-colorprimary rounded">
-					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center align-bottom">
+					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
 							<Droplets className="size-7 -mt-0.5" />
 							<li className="text-center pl-2"> {BatchIdAmount}x {BatchIdSpecies} </li>
@@ -102,7 +102,7 @@ const KalenderPage: React.FC = () => {
 					</ul>
 				</div>
 				<div className="grid w-[140px] bg-gray-200 text-black rounded">
-					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center align-bottom">
+					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
 							<Droplets className="size-7 -mt-0.5" />
 							<li className="text-center pl-2"> {BatchIdAmount}x {BatchIdSpecies} </li>
@@ -146,7 +146,7 @@ const KalenderPage: React.FC = () => {
 					</ul>
 				</div>
 				<div className="grid w-[140px] bg-gray-200 text-black rounded">
-					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center align-bottom">
+					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
 							<Droplets className="size-7 -mt-0.5" />
 							<li className="text-center pl-2"> {BatchIdAmount}x {BatchIdSpecies} </li>
@@ -190,7 +190,7 @@ const KalenderPage: React.FC = () => {
 					</ul>
 				</div>
 				<div className="grid w-[140px] bg-gray-200 text-black rounded">
-					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center align-bottom">
+					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
 							<Droplets className="size-7 -mt-0.5" />
 							<li className="text-center pl-2"> {BatchIdAmount}x {BatchIdSpecies} </li>
@@ -234,7 +234,7 @@ const KalenderPage: React.FC = () => {
 					</ul>
 				</div>
 				<div className="grid w-[140px] bg-gray-200 text-black rounded">
-					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center align-bottom">
+					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
 							<Droplets className="size-7 -mt-0.5" />
 							<li className="text-center pl-2"> {BatchIdAmount}x {BatchIdSpecies} </li>
@@ -278,7 +278,7 @@ const KalenderPage: React.FC = () => {
 					</ul>
 				</div>
 				<div className="grid w-[140px] bg-gray-200 text-black rounded">
-					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center align-bottom">
+					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
 						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
 							<Droplets className="size-7 -mt-0.5" />
 							<li className="text-center pl-2"> {BatchIdAmount}x {BatchIdSpecies} </li>
