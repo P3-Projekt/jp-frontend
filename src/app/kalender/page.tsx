@@ -1,12 +1,13 @@
 'use client';
 import React, {useState} from 'react';
-import { ChevronLeft, ChevronRight, Droplets, MoveRight, Scissors } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import Task from "@/app/kalender/Task";
+import WeekDay from "@/app/kalender/WeekDay";
 
 
 
 /*
 TODOS:
-- Datoerne skal gøres dynamiske, med uge nummrene.
 - (Måske) skal der tilføjes en reset knap ved uge nummeret. Så man kan komme tilbage til den nuværende uge.
 - (Måske) der kan tilføjet sådan at ugerne kan tages frem og tilbage med piletasterne.
 - Opgaver skal kunne åbnes og lukkes. Brug muligvis ShadCN dialog component
@@ -47,343 +48,106 @@ const KalenderPage: React.FC = () => {
 			</div>
 			{/* DAGE */}
 			<div className="mt-3 flex flex-row justify-center gap-x-2 cursor-default">
-				<div className="w-[140px] py-2.5 text-center bg-colorprimary rounded content-center">
-					<h1 className="text-xl font-bold">MANDAG</h1>
-					<p className="text-xs text-center">08-10-2024</p>
-				</div>
-				<div className="w-[140px] text-center bg-gray-200 text-black rounded content-center">
-					<h1 className="text-xl font-bold">TIRSDAG</h1>
-					<p className="text-xs text-center">09-10-2024</p>
-				</div>
-				<div className="w-[140px] text-center bg-gray-200 text-black rounded content-center">
-					<h1 className="text-xl font-bold">ONSDAG</h1>
-					<p className="text-xs text-center">08-10-2024</p>
-				</div>
-				<div className="w-[140px] text-center bg-gray-200 text-black rounded content-center">
-					<h1 className="text-xl font-bold">TORSDAG</h1>
-					<p className="text-xs text-center">09-10-2024</p>
-				</div>
-				<div className="w-[140px] text-center bg-gray-200 text-black rounded content-center">
-					<h1 className="text-xl font-bold">FREDAG</h1>
-					<p className="text-xs text-center">10-10-2024</p>
-				</div>
-				<div className="w-[140px] text-center bg-gray-200 text-black rounded content-center">
-					<h1 className="text-xl font-bold">LØRDAG</h1>
-					<p className="text-xs text-center">11-10-2024</p>
-				</div>
-				<div className="w-[140px] text-center bg-gray-200 text-black rounded content-center">
-					<h1 className="text-xl font-bold">SØNDAG</h1>
-					<p className="text-xs text-center">12-10-2024</p>
-				</div>
+				<WeekDay week={weekNumber}/>
 			</div>
 			{/* OPGAVER */}
-			<div className="mt-3 flex flex-row justify-center gap-x-2 h-4/5">
+			<div className="mt-3 flex flex-row justify-center gap-x-2 h-4/5 transition-all ease-in-out duration-100">
 				<div className="grid w-[140px] bg-colorprimary rounded">
 					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold"> {BatchIdSpecies} </span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Scissors className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold"> {BatchIdSpecies} </span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<MoveRight className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold"> {BatchIdSpecies} </span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold"> {BatchIdSpecies} </span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Scissors className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold"> {BatchIdSpecies} </span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<MoveRight className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold"> {BatchIdSpecies} </span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold"> {BatchIdSpecies} </span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold"> {BatchIdSpecies} </span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Scissors className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold"> {BatchIdSpecies} </span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<MoveRight className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold"> {BatchIdSpecies} </span> </li>
-						</div>
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
 					</ul>
 				</div>
-				<div className="grid w-[140px] bg-gray-200 text-black rounded">
+				<div className="grid w-[140px] bg-sidebarcolor text-black rounded">
 					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Scissors className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<MoveRight className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Scissors className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<MoveRight className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Scissors className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<MoveRight className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
 					</ul>
 				</div>
-				<div className="grid w-[140px] bg-gray-200 text-black rounded">
+				<div className="grid w-[140px] bg-sidebarcolor text-black rounded">
 					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Scissors className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<MoveRight className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Scissors className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<MoveRight className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Scissors className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<MoveRight className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
 					</ul>
 				</div>
-				<div className="grid w-[140px] bg-gray-200 text-black rounded">
+				<div className="grid w-[140px] bg-sidebarcolor text-black rounded">
 					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Scissors className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<MoveRight className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Scissors className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<MoveRight className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Scissors className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<MoveRight className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
 					</ul>
 				</div>
-				<div className="grid w-[140px] bg-gray-200 text-black rounded">
+				<div className="grid w-[140px] bg-sidebarcolor text-black rounded">
 					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Scissors className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<MoveRight className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Scissors className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<MoveRight className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Scissors className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<MoveRight className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
 					</ul>
 				</div>
-				<div className="grid w-[140px] bg-gray-200 text-black rounded">
+				<div className="grid w-[140px] bg-sidebarcolor text-black rounded">
 					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Scissors className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<MoveRight className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Scissors className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<MoveRight className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Scissors className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<MoveRight className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
 					</ul>
 				</div>
-				<div className="grid w-[140px] bg-gray-200 text-black rounded">
+				<div className="grid w-[140px] bg-sidebarcolor text-black rounded">
 					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Scissors className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<MoveRight className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Scissors className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<MoveRight className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Droplets className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<Scissors className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
-						<div className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center">
-							<MoveRight className="size-7 -mt-0.5" />
-							<li className="text-center pl-2"> {BatchIdAmount}x <span className="font-semibold">{BatchIdSpecies}</span> </li>
-						</div>
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
 					</ul>
 				</div>
 			</div>
