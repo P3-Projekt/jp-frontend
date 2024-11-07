@@ -10,10 +10,7 @@ TODOS:
 - (Måske) skal der tilføjes en reset knap ved uge nummeret. Så man kan komme tilbage til den nuværende uge.
 - (Måske) der kan tilføjet sådan at ugerne kan tages frem og tilbage med piletasterne.
 - Opgaver skal kunne åbnes og lukkes. Brug muligvis ShadCN dialog component
-
-
 */
-
 
 
 const KalenderPage: React.FC = () => {
@@ -34,7 +31,7 @@ const KalenderPage: React.FC = () => {
 					if (weekNumber > 1) {
 						setWeekNumber(weekNumber - 1);
 					} else {
-						// start from 1 in the new year
+						// start from 1 in the past year
 						setWeekNumber(52)
 					}
 				}}/>
@@ -43,8 +40,8 @@ const KalenderPage: React.FC = () => {
 					if (weekNumber < 52) {
 						setWeekNumber(weekNumber + 1);
 					} else {
-						setWeekNumber(1)
 						// start from 1 in the new year
+						setWeekNumber(1)
 					}
 				}}/>
 			</div>
