@@ -9,7 +9,7 @@ TODOS:
 - Datoerne skal gøres dynamiske, med uge nummrene.
 - (Måske) skal der tilføjes en reset knap ved uge nummeret. Så man kan komme tilbage til den nuværende uge.
 - (Måske) der kan tilføjet sådan at ugerne kan tages frem og tilbage med piletasterne.
--
+- Opgaver skal kunne åbnes og lukkes. Brug muligvis ShadCN dialog component
 
 
 */
