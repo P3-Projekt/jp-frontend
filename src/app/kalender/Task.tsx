@@ -42,28 +42,18 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType }: TaskProps) => {
 	switch (taskType) {
 		case "harvest":
 			taskIcon = <Scissors className="size-7 -mt-0.5" />;
-			break;
-		case "water":
-			taskIcon = <Droplets className="size-7 -mt-0.5" />;
-			break;
-		case "move":
-			taskIcon = <MoveRight className="size-7 -mt-0.5" />;
-			break;
-		default:
-			taskIcon = <></>;
-	}
-	switch (taskType) {
-		case "harvest":
 			dialogTaskIcon = <Scissors className="size-12" />;
 			break;
 		case "water":
+			taskIcon = <Droplets className="size-7 -mt-0.5" />;
 			dialogTaskIcon = <Droplets className="size-12" />;
 			break;
 		case "move":
+			taskIcon = <MoveRight className="size-7 -mt-0.5" />;
 			dialogTaskIcon = <MoveRight className="size-12 pt-1" />;
 			break;
 		default:
-			dialogTaskIcon = <></>;
+			taskIcon = <></>;
 	}
 
 	return (
