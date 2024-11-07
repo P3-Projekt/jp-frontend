@@ -72,7 +72,7 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType }: TaskProps) => {
 					<DialogHeader>
 						<DialogTitle>
 						<div className="flex flex-row justify-start items-center">
-							<div className="text-black text-5xl uppercase font-bold">
+							<div className="text-black text-5xl uppercase font-bold cursor-default">
 								{type}
 							</div>
 							<div className="text-black">
