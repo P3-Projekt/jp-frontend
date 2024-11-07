@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
     return (
-		<html lang='en'>
+		<html lang='en' className="dark">
 			<body className={cn('min-h-screen font-sans antialiased grainy', inter.className)}>
 				<div className="min-h-screen flex">
 					<Sidebar />

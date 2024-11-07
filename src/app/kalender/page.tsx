@@ -11,6 +11,9 @@ TODOS:
 - (Måske) skal der tilføjes en reset knap ved uge nummeret. Så man kan komme tilbage til den nuværende uge.
 - (Måske) der kan tilføjet sådan at ugerne kan tages frem og tilbage med piletasterne.
 - Opgaver skal kunne åbnes og lukkes. Brug muligvis ShadCN dialog component
+- Hvis der er en opgave på et felt, skal musen laves til en pointer, hvis ikke, skal musen være normal.
+- Som der er nu slettes opgaver fra bunden - Er det okay, eller skal der kunne være tomme felter?
+- I Task.tsx istedet for at knapperne i opgaven fører til et Link skal de først comfirmes eller declines før de fører til et Link.
 */
 
 
@@ -51,7 +54,7 @@ const KalenderPage: React.FC = () => {
 				<WeekDay week={weekNumber}/>
 			</div>
 			{/* OPGAVER */}
-			<div className="mt-3 flex flex-row justify-center gap-x-2 h-4/5 transition-all ease-in-out duration-100">
+			<div className="mt-3 flex flex-row justify-center gap-x-2 h-4/5">
 				<div className="grid w-[140px] bg-colorprimary rounded">
 					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
 						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
@@ -60,10 +63,10 @@ const KalenderPage: React.FC = () => {
 						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
 						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
 						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
 						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
 					</ul>
 				</div>
 				<div className="grid w-[140px] bg-sidebarcolor text-black rounded">
