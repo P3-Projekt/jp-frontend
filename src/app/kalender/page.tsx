@@ -14,6 +14,7 @@ TODOS:
 - Hvis der er en opgave på et felt, skal musen laves til en pointer, hvis ikke, skal musen være normal.
 - Som der er nu slettes opgaver fra bunden - Er det okay, eller skal der kunne være tomme felter?
 - I Task.tsx istedet for at knapperne i opgaven fører til et Link skal de først comfirmes eller declines før de fører til et Link.
+- (Måske) der skal gemmes hvilken uge brugeren er på i stedet for at hente den hver gang. (altså i localstorage eller lign.) så det huske det.
 */
 
 
