@@ -141,14 +141,14 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType }: TaskProps) => {
 					<AlertDialogHeader>
 						<AlertDialogTitle className="text-black text-2xl">Vil du slette denne opgave?</AlertDialogTitle>
 						<AlertDialogDescription className="text-black text-md">
-							Denne handling kan ikke fortrydes. Dette vil fuldføre opgaven og fjerne den fra listen.
+							Denne handling kan ikke fortrydes. Dette vil slette opgaven og fjerne den fra listen.
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter className="grid grid-cols-2 grid-row-1 justify-items-center">
-						<AlertDialogCancel className="max-w-[150px] bg-red-600 border-none hover:bg-red-700 uppercase font-bold" onClick={() => {
+						<AlertDialogCancel className="min-w-[165px] bg-red-600 border-none hover:bg-red-700 uppercase font-bold" onClick={() => {
 							// Delete task
 						}}>Continue</AlertDialogCancel>
-						<AlertDialogAction className="max-w-[150px] bg-zinc-950 border-none text-white uppercase font-bold hover:bg-zinc-800" onClick={() => {
+						<AlertDialogAction className="min-w-[165px] bg-zinc-950 border-none text-white uppercase font-bold hover:bg-zinc-800" onClick={() => {
 							setOpenDeleteAlert(false);
 						}}>Fortryd</AlertDialogAction>
 					</AlertDialogFooter>
@@ -156,16 +156,20 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType }: TaskProps) => {
 			</AlertDialog>
 			{/* Confirm alert */}
 			<AlertDialog open={openConfirmAlert} onOpenChange={setOpenConfirmAlert}>
-				<AlertDialogContent>
+				<AlertDialogContent className="bg-white opacity-100">
 					<AlertDialogHeader>
-						<AlertDialogTitle>Vil du fuldføre denne opgave?</AlertDialogTitle>
-						<AlertDialogDescription>
+						<AlertDialogTitle className="text-black text-2xl">Vil du udføre denne opgave?</AlertDialogTitle>
+						<AlertDialogDescription className="text-black text-md">
 							Denne handling kan ikke fortrydes. Dette vil fuldføre opgaven og fjerne den fra listen.
 						</AlertDialogDescription>
 					</AlertDialogHeader>
-					<AlertDialogFooter>
-						<AlertDialogCancel>Cancel</AlertDialogCancel>
-						<AlertDialogAction>Continue</AlertDialogAction>
+					<AlertDialogFooter className="grid grid-cols-2 grid-row-1 justify-items-center">
+						<AlertDialogCancel className="min-w-[165px] bg-red-600 border-none hover:bg-red-700 uppercase font-bold" onClick={() => {
+							// Complete task
+						}}>Continue</AlertDialogCancel>
+						<AlertDialogAction className="min-w-[165px] bg-zinc-950 border-none text-white uppercase font-bold hover:bg-zinc-800" onClick={() => {
+							setOpenDeleteAlert(false);
+						}}>Fortryd</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>
 			</AlertDialog>
