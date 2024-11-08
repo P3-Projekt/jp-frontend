@@ -8,6 +8,17 @@ import {
 	DialogTitle,
 	DialogFooter
 } from "@/components/ui/dialog";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import {buttonVariants} from "@/components/ui/button";
 import Link from "next/link";
 
@@ -20,6 +31,8 @@ interface TaskProps {
 const Task = ({ batchIdAmount, batchIdSpecies, taskType }: TaskProps) => {
 
 	const [openDialog, setOpenDialog] = useState(false);
+	const [openDeleteAlert, setOpenDeleteAlert] = useState(false);
+	const [openConfirmAlert, setOpenConfirmAlert] = useState(false);
 
 	let taskIcon = <> </>;
 	let dialogTaskIcon = <> </>;
@@ -110,17 +123,52 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType }: TaskProps) => {
 							<div className="w-full flex flex-row justify-between gap-y-4 mt-2">
 									<h1 className={buttonVariants({ variant: "red" })} onClick={() => {
 										// Comfirm delete task
+										setOpenDeleteAlert(true);
 									}}><p className="uppercase font-bold">slet opgave</p></h1>
 									<h1 className={buttonVariants({ variant: "black" })}><p className="uppercase font-bold">vis lokation</p></h1>
 									<h1 className={buttonVariants({ variant: "green" })} onClick={() => {
 										// Comfirm task
+										setOpenConfirmAlert(true);
 									}}><p className="uppercase font-bold">udfør opgave</p></h1>
 							</div>
 						</DialogFooter>
 					</DialogHeader>
 				</DialogContent>
 			</Dialog>
-
+			{/* Delete alert */}
+			<AlertDialog open={openDeleteAlert} onOpenChange={setOpenDeleteAlert}>
+				<AlertDialogContent className="bg-white opacity-100">
+					<AlertDialogHeader>
+						<AlertDialogTitle className="text-black text-2xl">Vil du slette denne opgave?</AlertDialogTitle>
+						<AlertDialogDescription className="text-black text-md">
+							Denne handling kan ikke fortrydes. Dette vil fuldføre opgaven og fjerne den fra listen.
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter className="grid grid-cols-2 grid-row-1 justify-items-center">
+						<AlertDialogCancel className="max-w-[150px] bg-red-600 border-none hover:bg-red-700 uppercase font-bold" onClick={() => {
+							// Delete task
+						}}>Continue</AlertDialogCancel>
+						<AlertDialogAction className="max-w-[150px] bg-zinc-950 border-none text-white uppercase font-bold hover:bg-zinc-800" onClick={() => {
+							setOpenDeleteAlert(false);
+						}}>Fortryd</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
+			{/* Confirm alert */}
+			<AlertDialog open={openConfirmAlert} onOpenChange={setOpenConfirmAlert}>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>Vil du fuldføre denne opgave?</AlertDialogTitle>
+						<AlertDialogDescription>
+							Denne handling kan ikke fortrydes. Dette vil fuldføre opgaven og fjerne den fra listen.
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel>Cancel</AlertDialogCancel>
+						<AlertDialogAction>Continue</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 		</>
 	);
 };
