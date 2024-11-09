@@ -1,4 +1,4 @@
-import { Droplets, MoveRight, Scissors, X } from "lucide-react";
+import {Droplets, MoveRight, Scissors, X, Check, Trash2, Loader} from "lucide-react";
 import React, { useState } from "react";
 import {
 	Dialog,
@@ -11,20 +11,16 @@ import {
 import {
 	AlertDialog,
 	AlertDialogAction,
-	AlertDialogCancel,
 	AlertDialogContent,
 	AlertDialogDescription,
 	AlertDialogFooter,
 	AlertDialogHeader,
 	AlertDialogTitle,
-	AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import {buttonVariants} from "@/components/ui/button";
-import Link from "next/link";
-
 interface TaskProps {
 	batchIdAmount: number;
-	batchIdSpecies: string; // Dette skal laves til kun at være alle de forskellige plantearter
+	batchIdSpecies: "Ærter" | "Solsikke" | "Hvidløg" | "Bønnespirer"; // Dette skal laves til kun at være alle de forskellige plantearter
 	taskType: "harvest" | "water" | "move";
 }
 
@@ -33,6 +29,8 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType }: TaskProps) => {
 	const [openDialog, setOpenDialog] = useState(false);
 	const [openDeleteAlert, setOpenDeleteAlert] = useState(false);
 	const [openConfirmAlert, setOpenConfirmAlert] = useState(false);
+	const [animationStage, setAnimationStage] = useState<"idle" | "loading" | "completed">("idle");
+
 
 	let taskIcon = <> </>;
 	let dialogTaskIcon = <> </>;
@@ -101,7 +99,7 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType }: TaskProps) => {
 						<DialogDescription>
 							<div className="flex flex-row flex-nowrap row-end-2 justify-evenly">
 								<div className="w-full rounded bg-gray-200">
-									<div className="flex flex-col gap-y-2 px-2 py-2 ">
+									<div className="flex flex-col gap-y-2 px-2 py-2">
 										<div className="text-black text-2xl cursor-default">
 											Batch ID:  <span className="font-bold text-colorprimary cursor-text">{/*{batchId}*/}</span>
 										</div>
@@ -125,7 +123,10 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType }: TaskProps) => {
 										// Comfirm delete task
 										setOpenDeleteAlert(true);
 									}}><p className="uppercase font-bold">slet opgave</p></h1>
-									<h1 className={buttonVariants({ variant: "black" })}><p className="uppercase font-bold">vis lokation</p></h1>
+									<h1 className={buttonVariants({ variant: "black" })} onClick={()=> {
+										// Send til kort
+										setOpenDialog(false);
+									}}><p className="uppercase font-bold">vis lokation</p></h1>
 									<h1 className={buttonVariants({ variant: "green" })} onClick={() => {
 										// Comfirm task
 										setOpenConfirmAlert(true);
@@ -145,9 +146,26 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType }: TaskProps) => {
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter className="grid grid-cols-2 grid-row-1 justify-items-center">
-						<AlertDialogCancel className="min-w-[165px] bg-red-600 border-none hover:bg-red-700 uppercase font-bold" onClick={() => {
-							// Delete task
-						}}>Continue</AlertDialogCancel>
+						<AlertDialogAction className="min-w-[165px] bg-red-600 border-none hover:bg-red-700 uppercase font-bold text-white" onClick={(e) => {
+							e.preventDefault();
+							// Animate task completion:
+							setAnimationStage("loading");
+							setTimeout(() => {
+								setAnimationStage("completed");
+								setTimeout(() => {
+									//  Delete the task
+
+
+									setOpenDeleteAlert(false);
+									setOpenDialog(false);
+									setAnimationStage("idle");
+								}, 1000); // Duration for showing the checkmark
+							}, 2000); // Duration for showing the loading spinner (SKAL PASSE MED DATA HENTNING (FETCH)).
+						}}>
+							{animationStage === "idle" && <><Trash2/> Slet opgaven</>}
+							{animationStage === "loading" && <><Loader className="animate-spin" /></>}
+							{animationStage === "completed" && <><Check/></>}
+						</AlertDialogAction>
 						<AlertDialogAction className="min-w-[165px] bg-zinc-950 border-none text-white uppercase font-bold hover:bg-zinc-800" onClick={() => {
 							setOpenDeleteAlert(false);
 						}}>Fortryd</AlertDialogAction>
@@ -164,9 +182,26 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType }: TaskProps) => {
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter className="grid grid-cols-2 grid-row-1 justify-items-center">
-						<AlertDialogCancel className="min-w-[165px] bg-red-600 border-none hover:bg-red-700 uppercase font-bold" onClick={() => {
-							// Complete task
-						}}>Continue</AlertDialogCancel>
+						<AlertDialogAction className="min-w-[165px] bg-green-600 border-none hover:bg-green-700 uppercase font-bold text-white" onClick={(e) => {
+							e.preventDefault();
+							// Animate task completion:
+							setAnimationStage("loading");
+							setTimeout(() => {
+								setAnimationStage("completed");
+								setTimeout(() => {
+									//  Complete the task
+
+									setOpenConfirmAlert(false);
+									setOpenDialog(false);
+									setAnimationStage("idle");
+								}, 1000); // Duration for showing the checkmark
+							}, 2000); // Duration for showing the loading spinner (SKAL PASSE MED DATA HENTNING (FETCH)).
+						}}>
+							{animationStage === "idle" && <><Check/> Udfør opgaven</>}
+							{animationStage === "loading" && <><Loader className="animate-spin" /></>}
+							{animationStage === "completed" && <><Check/></>}
+						</AlertDialogAction>
+
 						<AlertDialogAction className="min-w-[165px] bg-zinc-950 border-none text-white uppercase font-bold hover:bg-zinc-800" onClick={() => {
 							setOpenDeleteAlert(false);
 						}}>Fortryd</AlertDialogAction>

@@ -1,5 +1,5 @@
 'use client';
-import React, {useState} from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Task from "@/app/kalender/Task";
 import WeekDay from "@/app/kalender/WeekDay";
@@ -9,12 +9,15 @@ import WeekDay from "@/app/kalender/WeekDay";
 /*
 TODOS:
 - (Måske) skal der tilføjes en reset knap ved uge nummeret. Så man kan komme tilbage til den nuværende uge.
-- (Måske) der kan tilføjet sådan at ugerne kan tages frem og tilbage med piletasterne.
 - Opgaver skal kunne åbnes og lukkes. Brug muligvis ShadCN dialog component
-- Hvis der er en opgave på et felt, skal musen laves til en pointer, hvis ikke, skal musen være normal.
-- Som der er nu slettes opgaver fra bunden - Er det okay, eller skal der kunne være tomme felter?
-- I Task.tsx istedet for at knapperne i opgaven fører til et Link skal de først comfirmes eller declines før de fører til et Link.
+- Som der er nu slettes opgaver fra bunden - Er det okay, eller skal der kunne være tomme felter mellem opgaver?
 - (Måske) der skal gemmes hvilken uge brugeren er på i stedet for at hente den hver gang. (altså i localstorage eller lign.) så det huske det.
+- Lav alt spacing til at bruge calc i stedet for faste værdier.
+- Lav udfør opave confirm knappen til at være en anden farve end den røde.
+- Brug skeleton loading til at vise at der er noget der loader. når der hentes data. (Der kan bruges noget smart med React suspense component)
+- Fjen funktionaliteten ved confirm og delete knapperne. (Så de ikke gør noget, når der er trykket på dem).
+- Skal laves sådan at opaverne faktisk kan udføres og slettes. (Altså at der sker noget når der trykkes på udfør og slet opgave) (Skal laves senere)
+-
 */
 
 
@@ -27,10 +30,26 @@ const KalenderPage: React.FC = () => {
 	const BatchIdAmount = 50;
 	const BatchIdSpecies = "Ærter";
 
+	// Functionality to change week number with arrow keys
+	useEffect(() => {
+		const handleKeyDown = (event: KeyboardEvent) => {
+			if (event.key === 'ArrowLeft') {
+				setWeekNumber(prevWeekNumber => prevWeekNumber > 1 ? prevWeekNumber - 1 : 52);
+			} else if (event.key === 'ArrowRight') {
+				setWeekNumber(prevWeekNumber => prevWeekNumber < 52 ? prevWeekNumber + 1 : 1);
+			}
+		};
+
+		window.addEventListener('keydown', handleKeyDown);
+		return () => {
+			window.removeEventListener('keydown', handleKeyDown);
+		};
+	}, []);
+
 	return (
 		<>
 		{/* UGER */}
-		<div className="h-screen -mt-3 flex flex-col justify-center select-none">
+		<div className="w-[calc(100%-20px)] h-screen -mt-3 flex flex-col justify-center select-none overflow-hidden">
 			<div className="flex flex-row justify-center">
 				<ChevronLeft className="size-10 cursor-pointer hover:scale-110" onClick={() => {
 					if (weekNumber > 1) {
