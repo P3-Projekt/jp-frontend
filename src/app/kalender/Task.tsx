@@ -140,9 +140,9 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType }: TaskProps) => {
 			<AlertDialog open={openDeleteAlert} onOpenChange={setOpenDeleteAlert}>
 				<AlertDialogContent className="bg-white opacity-100">
 					<AlertDialogHeader>
-						<AlertDialogTitle className="text-black text-2xl">Vil du slette denne opgave?</AlertDialogTitle>
-						<AlertDialogDescription className="text-black text-md">
-							Denne handling kan ikke fortrydes. Dette vil slette opgaven og fjerne den fra listen.
+						<AlertDialogTitle className="text-black text-2xl">Slet denne opgave?</AlertDialogTitle>
+						<AlertDialogDescription className="text-black text-md italic">
+							Denne handling <span className="underline">kan ikke fortrydes</span>. Dette vil slette opgaven og fjerne den fra listen.
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter className="grid grid-cols-2 grid-row-1 justify-items-center">
@@ -176,9 +176,9 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType }: TaskProps) => {
 			<AlertDialog open={openConfirmAlert} onOpenChange={setOpenConfirmAlert}>
 				<AlertDialogContent className="bg-white opacity-100">
 					<AlertDialogHeader>
-						<AlertDialogTitle className="text-black text-2xl">Vil du udføre denne opgave?</AlertDialogTitle>
-						<AlertDialogDescription className="text-black text-md">
-							Denne handling kan ikke fortrydes. Dette vil fuldføre opgaven og fjerne den fra listen.
+						<AlertDialogTitle className="text-black text-2xl">Udfør denne opgave?</AlertDialogTitle>
+						<AlertDialogDescription className="text-black text-md italic">
+							Denne handling <span className="underline">kan ikke fortrydes</span>. Dette vil fuldføre opgaven og fjerne den fra listen.
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter className="grid grid-cols-2 grid-row-1 justify-items-center">
