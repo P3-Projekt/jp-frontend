@@ -1,101 +1,161 @@
-import Image from "next/image";
+"use client";
+import React, { useState, useCallback, useEffect } from 'react';
 
-export default function Home() {
-	return (
-		<div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-			<main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-				<Image
-					className="dark:invert"
-					src="/next.svg"
-					alt="Next.js logo"
-					width={180}
-					height={38}
-					priority
-				/>
-				<ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-					<li className="mb-2">
-						Get started by editing{" "}
-						<code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-							src/app/page.tsx
-						</code>
-						.
-					</li>
-					<li>Save and see your changes instantly.</li>
-				</ol>
-
-				<div className="flex gap-4 items-center flex-col sm:flex-row">
-					<a
-						className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-						href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						<Image
-							className="dark:invert"
-							src="/vercel.svg"
-							alt="Vercel logomark"
-							width={20}
-							height={20}
-						/>
-						Deploy now
-					</a>
-					<a
-						className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-						href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						Read our docs
-					</a>
-				</div>
-			</main>
-			<footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-				<a
-					className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-					href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<Image
-						aria-hidden
-						src="/file.svg"
-						alt="File icon"
-						width={16}
-						height={16}
-					/>
-					Learn
-				</a>
-				<a
-					className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-					href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<Image
-						aria-hidden
-						src="/window.svg"
-						alt="Window icon"
-						width={16}
-						height={16}
-					/>
-					Examples
-				</a>
-				<a
-					className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-					href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<Image
-						aria-hidden
-						src="/globe.svg"
-						alt="Globe icon"
-						width={16}
-						height={16}
-					/>
-					Go to nextjs.org →
-				</a>
-			</footer>
-		</div>
-	);
+interface DraggableBoxProps {
+  initialX: number;
+  initialY: number;
+  color: string;
+  allBoxes: { x: number; y: number; width: number; height: number; }[];
+  onDrag: (x: number, y: number) => void;
+  onSelect: () => void;
+  isSelected: boolean;
+  mouseOffset: { x: number; y: number }; // Flytte offset i forhold til klikposition
 }
+
+const GRID_SIZE = 50;
+
+const snapToGrid = (value: number) => Math.round(value / GRID_SIZE) * GRID_SIZE;
+
+const DraggableBox: React.FC<DraggableBoxProps> = ({
+  initialX, initialY, color, allBoxes, onDrag, onSelect, isSelected, mouseOffset
+}) => {
+  const [position, setPosition] = useState({ x: initialX, y: initialY });
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+	if (isDragging) {
+		setIsDragging(false);
+		return;
+	}
+    e.preventDefault();
+    // Beregn offset fra klikpositionen til boksens aktuelle position
+    const offsetX = e.clientX - position.x;
+    const offsetY = e.clientY - position.y;
+    onSelect();  // Vælg denne boks
+    setIsDragging(true);
+    setPosition({ x: initialX, y: initialY }); // Sæt startpositionen tilbage
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!isDragging) return;
+
+    // Beregn ny position baseret på musepositionen og offset
+    const newX = e.clientX - mouseOffset.x;
+    const newY = e.clientY - mouseOffset.y;
+
+    // Hvis newX eller newY er NaN, så returner tidlig med eksisterende position
+    if (isNaN(newX) || isNaN(newY)) return;
+
+    // Check for overlap
+    const isOverlapping = allBoxes.some(box => {
+      return (
+        newX < box.x + box.width &&
+        newX + 100 > box.x &&
+        newY < box.y + box.height &&
+        newY + 200 > box.y
+      );
+    });
+
+    if (!isOverlapping) {
+      // Opdater boksens position
+	  console.log(e.clientX);
+	  console.log(e.clientY);
+      const snappedX = snapToGrid(e.clientX - 400);
+      const snappedY = snapToGrid(e.clientY - 100);
+		console.log('Not Overlapping');
+		console.log('SnappedX: ' + snappedX);
+		console.log('SnappedY: ' + snappedY);
+      setPosition({ x: snappedX, y: snappedY });
+      onDrag(newX, newY);
+    }
+	else {
+		console.log('Overlapping');
+	}
+  };
+
+
+  // Tilføj event listeners til document for at håndtere mousemove og mouseup
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+    } else {
+      document.removeEventListener('mousemove', handleMouseMove);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [isDragging]);
+
+  return (
+    <div
+      onMouseDown={handleMouseDown}
+      style={{
+        position: 'absolute',
+        left: isNaN(position.x) ? 0 : position.x,  // Sæt default til 0 hvis NaN
+        top: isNaN(position.y) ? 0 : position.y,  // Sæt default til 0 hvis NaN
+        width: 100,
+        height: 200,
+        backgroundColor: color,
+        cursor: isSelected ? 'grabbing' : 'grab',
+        border: isSelected ? '2px solid black' : 'none',
+      }}
+    />
+  );
+};
+
+const CanvasComponent: React.FC = () => {
+  const [boxes, setBoxes] = useState([
+    { x: 50, y: 50, width: 100, height: 200 },
+    { x: 200, y: 50, width: 100, height: 200 },
+    { x: 50, y: 400, width: 100, height: 200 },
+    { x: 200, y: 400, width: 100, height: 200 },
+  ]);
+
+  const [selectedBoxIndex, setSelectedBoxIndex] = useState<number | null>(null);
+  const [mouseOffset, setMouseOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+
+  const handleDrag = useCallback((x: number, y: number, index: number) => {
+    const newBoxes = [...boxes];
+    newBoxes[index] = { ...newBoxes[index], x, y };
+    setBoxes(newBoxes);
+  }, [boxes]);
+
+  const handleSelect = (index: number) => {
+    if (selectedBoxIndex === index) {
+      setSelectedBoxIndex(null);
+    } else {
+      setSelectedBoxIndex(index);
+      // Beregn offset når en boks vælges
+      const selectedBox = boxes[index];
+      //setMouseOffset({ x: selectedBox.x, y: selectedBox.y }); // Beregn offset fra boksens position
+    }
+  };
+
+  return (
+    <div
+      className="relative w-full h-full"
+      style={{
+        backgroundSize: `${GRID_SIZE}px ${GRID_SIZE}px`,
+        backgroundImage: `linear-gradient(to right, #ccc 1px, transparent 1px),
+                          linear-gradient(to bottom, #ccc 1px, transparent 1px)`,
+      }}
+    >
+      {boxes.map((box, index) => (
+        <DraggableBox
+          key={index}
+          initialX={box.x}
+          initialY={box.y}
+          color={['red', 'green', 'blue', 'orange'][index]}
+          allBoxes={boxes.filter((_, i) => i !== index)}  // Send alle bokse undtagen den nuværende
+          onDrag={(x, y) => handleDrag(x, y, index)}  // Opdater boksens position
+          onSelect={() => handleSelect(index)}  // Vælg/deselect boks
+          isSelected={selectedBoxIndex === index}  // Tjek om boksen er valgt
+          mouseOffset={selectedBoxIndex === index ? mouseOffset : { x: 0, y: 0 }} // Beregn offset kun for den valgte boks
+        />
+      ))}
+    </div>
+  );
+};
+
+export default CanvasComponent;
