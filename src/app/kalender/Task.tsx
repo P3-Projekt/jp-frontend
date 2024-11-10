@@ -1,3 +1,4 @@
+"use client";
 import {Droplets, MoveRight, Scissors, X, Check, Trash2, Loader} from "lucide-react";
 import React, { useState } from "react";
 import {
@@ -18,6 +19,9 @@ import {
 	AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import {buttonVariants} from "@/components/ui/button";
+
+import { useToast } from "@/hooks/use-toast";
+
 interface TaskProps {
 	batchIdAmount: number;
 	batchIdSpecies: "Ærter" | "Solsikke" | "Hvidløg" | "Bønnespirer"; // Dette skal laves til kun at være alle de forskellige plantearter
@@ -31,6 +35,8 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType }: TaskProps) => {
 	const [openConfirmAlert, setOpenConfirmAlert] = useState(false);
 	const [animationStage, setAnimationStage] = useState<"idle" | "loading" | "completed">("idle");
 
+
+	const { toast } = useToast()
 
 	let taskIcon = <> </>;
 	let dialogTaskIcon = <> </>;
@@ -159,6 +165,13 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType }: TaskProps) => {
 									setOpenDeleteAlert(false);
 									setOpenDialog(false);
 									setAnimationStage("idle");
+
+									toast({
+										variant: "success",
+										title: "Opgaven er slettet",
+										description: "Opgaven er nu slettet og fjernet fra listen.",
+									})
+
 								}, 1000); // Duration for showing the checkmark
 							}, 2000); // Duration for showing the loading spinner (SKAL PASSE MED DATA HENTNING (FETCH)).
 						}}>
@@ -194,6 +207,13 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType }: TaskProps) => {
 									setOpenConfirmAlert(false);
 									setOpenDialog(false);
 									setAnimationStage("idle");
+
+									toast({
+										variant: "success",
+										title: "Opgaven er fuldført",
+										description: "Opgaven er nu fuldført og fjernet fra listen.",
+									})
+
 								}, 1000); // Duration for showing the checkmark
 							}, 2000); // Duration for showing the loading spinner (SKAL PASSE MED DATA HENTNING (FETCH)).
 						}}>
@@ -208,6 +228,9 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType }: TaskProps) => {
 					</AlertDialogFooter>
 				</AlertDialogContent>
 			</AlertDialog>
+
+
+
 		</>
 	);
 };
