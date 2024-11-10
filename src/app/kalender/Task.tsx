@@ -34,7 +34,7 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType }: TaskProps) => {
 	const [openDeleteAlert, setOpenDeleteAlert] = useState(false);
 	const [openConfirmAlert, setOpenConfirmAlert] = useState(false);
 	const [animationStage, setAnimationStage] = useState<"idle" | "loading" | "completed">("idle");
-
+	const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
 	const { toast } = useToast()
 
@@ -154,6 +154,7 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType }: TaskProps) => {
 					<AlertDialogFooter className="grid grid-cols-2 grid-row-1 justify-items-center">
 						<AlertDialogAction className="min-w-[165px] bg-red-600 border-none hover:bg-red-700 uppercase font-bold text-white" onClick={(e) => {
 							e.preventDefault();
+							setIsButtonDisabled(true);
 							// Animate task completion:
 							setAnimationStage("loading");
 							setTimeout(() => {
@@ -177,9 +178,12 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType }: TaskProps) => {
 											description: err,
 										})
 									}
+									setIsButtonDisabled(false);
 								}, 1000); // Duration for showing the checkmark
 							}, 2000); // Duration for showing the loading spinner (SKAL PASSE MED DATA HENTNING (FETCH)).
-						}}>
+						}}
+						disabled={isButtonDisabled}
+						>
 							{animationStage === "idle" && <><Trash2/> Slet opgaven</>}
 							{animationStage === "loading" && <><Loader className="animate-spin" /></>}
 							{animationStage === "completed" && <><Check/></>}
@@ -202,6 +206,7 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType }: TaskProps) => {
 					<AlertDialogFooter className="grid grid-cols-2 grid-row-1 justify-items-center">
 						<AlertDialogAction className="min-w-[165px] bg-green-600 border-none hover:bg-green-700 uppercase font-bold text-white" onClick={(e) => {
 							e.preventDefault();
+							setIsButtonDisabled(true);
 							// Animate task completion:
 							setAnimationStage("loading");
 							setTimeout(() => {
@@ -226,9 +231,12 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType }: TaskProps) => {
 											description: err,
 										})
 									}
+									setIsButtonDisabled(false);
 								}, 1000); // Duration for showing the checkmark
 							}, 2000); // Duration for showing the loading spinner (SKAL PASSE MED DATA HENTNING (FETCH)).
-						}}>
+						}}
+						disabled={isButtonDisabled}
+						>
 							{animationStage === "idle" && <><Check/> Udfør opgaven</>}
 							{animationStage === "loading" && <><Loader className="animate-spin" /></>}
 							{animationStage === "completed" && <><Check/></>}
