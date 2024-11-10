@@ -160,18 +160,23 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType }: TaskProps) => {
 								setAnimationStage("completed");
 								setTimeout(() => {
 									//  Delete the task
+									try {
+										setOpenDeleteAlert(false);
+										setOpenDialog(false);
+										setAnimationStage("idle");
 
-
-									setOpenDeleteAlert(false);
-									setOpenDialog(false);
-									setAnimationStage("idle");
-
-									toast({
-										variant: "success",
-										title: "Opgaven er slettet",
-										description: "Opgaven er nu slettet og fjernet fra listen.",
-									})
-
+										toast({
+											variant: "success",
+											title: "Opgaven er slettet",
+											description: "Opgaven er nu slettet og fjernet fra listen.",
+										})
+									} catch (err) {
+										toast({
+											variant: "destructive",
+											title: "Noget gik galt",
+											description: err,
+										})
+									}
 								}, 1000); // Duration for showing the checkmark
 							}, 2000); // Duration for showing the loading spinner (SKAL PASSE MED DATA HENTNING (FETCH)).
 						}}>
@@ -203,17 +208,24 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType }: TaskProps) => {
 								setAnimationStage("completed");
 								setTimeout(() => {
 									//  Complete the task
+									try {
+										setOpenConfirmAlert(false);
+										setOpenDialog(false);
+										setAnimationStage("idle");
 
-									setOpenConfirmAlert(false);
-									setOpenDialog(false);
-									setAnimationStage("idle");
+										toast({
+											variant: "success",
+											title: "Opgaven er fuldført",
+											description: "Opgaven er nu fuldført og fjernet fra listen.",
+										})
 
-									toast({
-										variant: "success",
-										title: "Opgaven er fuldført",
-										description: "Opgaven er nu fuldført og fjernet fra listen.",
-									})
-
+									} catch(err) {
+										toast({
+											variant: "destructive",
+											title: "Noget gik galt",
+											description: err,
+										})
+									}
 								}, 1000); // Duration for showing the checkmark
 							}, 2000); // Duration for showing the loading spinner (SKAL PASSE MED DATA HENTNING (FETCH)).
 						}}>

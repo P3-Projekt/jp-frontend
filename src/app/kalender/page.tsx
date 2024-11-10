@@ -17,6 +17,7 @@ TODOS:
 - Brug skeleton loading til at vise at der er noget der loader. når der hentes data. (Der kan bruges noget smart med React suspense component)
 - Fjen funktionaliteten ved confirm og delete knapperne. (Så de ikke gør noget, når der er trykket på dem).
 - Skal laves sådan at opaverne faktisk kan udføres og slettes. (Altså at der sker noget når der trykkes på udfør og slet opgave) (Skal laves senere)
+- Loading tiderne ved at trykke på udfør og slet opgave skal være dynamiske, så de passer med det call der bliver lavet til backend.
 */
 
 
