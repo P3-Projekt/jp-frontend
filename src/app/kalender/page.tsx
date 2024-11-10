@@ -9,13 +9,10 @@ import WeekDay from "@/app/kalender/WeekDay";
 /*
 TODOS:
 - (Måske) skal der tilføjes en reset knap ved uge nummeret. Så man kan komme tilbage til den nuværende uge.
-- Opgaver skal kunne åbnes og lukkes. Brug muligvis ShadCN dialog component
-- Som der er nu slettes opgaver fra bunden - Er det okay, eller skal der kunne være tomme felter mellem opgaver?
 - (Måske) der skal gemmes hvilken uge brugeren er på i stedet for at hente den hver gang. (altså i localstorage eller lign.) så det huske det.
 - Lav alt spacing til at bruge calc i stedet for faste værdier.
-- Lav udfør opave confirm knappen til at være en anden farve end den røde.
 - Brug skeleton loading til at vise at der er noget der loader. når der hentes data. (Der kan bruges noget smart med React suspense component)
-- Skal laves sådan at opaverne faktisk kan udføres og slettes. (Altså at der sker noget når der trykkes på udfør og slet opgave) (Skal laves senere)
+- Skal laves sådan at opaverne faktisk kan udføres og slettes. (Altså at der sker noget når der trykkes på udfør og slet opgave) (Skal bruge backend)
 - Loading tiderne ved at trykke på udfør og slet opgave skal være dynamiske, så de passer med det call der bliver lavet til backend.
 */
 
@@ -48,7 +45,7 @@ const KalenderPage: React.FC = () => {
 	return (
 		<>
 		{/* UGER */}
-		<div className="w-[calc(100%-20px)] h-screen -mt-3 flex flex-col justify-center select-none overflow-hidden">
+		<div className="w-[calc(100%-20px)] h-full -mt-3 flex flex-col justify-center select-none overflow-hidden">
 			<div className="flex flex-row justify-center">
 				<ChevronLeft className="size-10 cursor-pointer hover:scale-110" onClick={() => {
 					if (weekNumber > 1) {
@@ -76,100 +73,100 @@ const KalenderPage: React.FC = () => {
 			<div className="mt-3 flex flex-row justify-center gap-x-2 h-4/5">
 				<div className="grid w-[140px] bg-colorprimary rounded">
 					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<div className="content-center"><Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"></div>
+						<div className="content-center"><Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
 					</ul>
 				</div>
 				<div className="grid w-[140px] bg-sidebarcolor text-black rounded">
 					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<div className="content-center"><Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"></div>
+						<div className="content-center"></div>
+						<div className="content-center"></div>
+						<div className="content-center"></div>
+						<div className="content-center"></div>
+						<div className="content-center"></div>
+						<div className="content-center"></div>
+						<div className="content-center"></div>
+						<div className="content-center"></div>
 					</ul>
 				</div>
 				<div className="grid w-[140px] bg-sidebarcolor text-black rounded">
 					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<div className="content-center"><Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"></div>
+						<div className="content-center"></div>
+						<div className="content-center"></div>
+						<div className="content-center"></div>
+						<div className="content-center"></div>
+						<div className="content-center"></div>
 					</ul>
 				</div>
 				<div className="grid w-[140px] bg-sidebarcolor text-black rounded">
 					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<div className="content-center"><Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
 					</ul>
 				</div>
 				<div className="grid w-[140px] bg-sidebarcolor text-black rounded">
 					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<div className="content-center"><Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
 					</ul>
 				</div>
 				<div className="grid w-[140px] bg-sidebarcolor text-black rounded">
 					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<div className="content-center"><Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
 					</ul>
 				</div>
 				<div className="grid w-[140px] bg-sidebarcolor text-black rounded">
 					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
-						<Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} />
+						<div className="content-center"><Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"move"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"harvest"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
+						<div className="content-center"><Task taskType={"water"} batchIdSpecies={BatchIdSpecies} batchIdAmount={BatchIdAmount} /></div>
 					</ul>
 				</div>
 			</div>

@@ -75,8 +75,9 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType }: TaskProps) => {
 
 	return (
 		<>
+			{/* Task */}
 			<div
-				className="flex flex-grow flex-row row-span-1 text-lg justify-center items-center cursor-pointer"
+				className="flex w-full h-full flex-grow flex-row row-span-1 text-lg justify-center items-center cursor-pointer"
 				onClick={() => setOpenDialog(true)}
 			>
 				{taskIcon}
@@ -84,6 +85,7 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType }: TaskProps) => {
 					{batchIdAmount}x <span className="font-semibold"> {batchIdSpecies} </span>{" "}
 				</li>
 			</div>
+			{/* Popup */}
 			<Dialog open={openDialog} onOpenChange={setOpenDialog}>
 				<DialogContent className="bg-white opacity-100 min-w-[500px] min-h-[300px] [&>button]:hidden">
 					<DialogHeader>
@@ -142,7 +144,7 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType }: TaskProps) => {
 					</DialogHeader>
 				</DialogContent>
 			</Dialog>
-			{/* Delete alert */}
+			{/* Delete confirmation */}
 			<AlertDialog open={openDeleteAlert} onOpenChange={setOpenDeleteAlert}>
 				<AlertDialogContent className="bg-white opacity-100">
 					<AlertDialogHeader>
@@ -194,7 +196,7 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType }: TaskProps) => {
 					</AlertDialogFooter>
 				</AlertDialogContent>
 			</AlertDialog>
-			{/* Confirm alert */}
+			{/* Completion confirm */}
 			<AlertDialog open={openConfirmAlert} onOpenChange={setOpenConfirmAlert}>
 				<AlertDialogContent className="bg-white opacity-100">
 					<AlertDialogHeader>
@@ -248,9 +250,6 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType }: TaskProps) => {
 					</AlertDialogFooter>
 				</AlertDialogContent>
 			</AlertDialog>
-
-
-
 		</>
 	);
 };
