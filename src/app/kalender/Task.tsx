@@ -21,14 +21,16 @@ import {
 import {buttonVariants} from "@/components/ui/button";
 
 import { useToast } from "@/hooks/use-toast";
+import Link from "next/link";
 
 interface TaskProps {
-	batchIdAmount: number;
-	batchIdSpecies: "Ærter" | "Solsikke" | "Hvidløg" | "Bønnespirer"; // Dette skal laves til kun at være alle de forskellige plantearter
-	taskType: "harvest" | "water" | "move";
+	batchIdAmount: number,
+	batchIdSpecies: "Ærter" | "Solsikke" | "Hvidløg" | "Bønnespirer", // Dette skal laves til kun at være alle de forskellige plantearter
+	taskType: "harvest" | "water" | "move",
+	batchId: number,
 }
 
-const Task = ({ batchIdAmount, batchIdSpecies, taskType }: TaskProps) => {
+const Task = ({ batchIdAmount, batchIdSpecies, taskType, batchId }: TaskProps) => {
 
 	const [openDialog, setOpenDialog] = useState(false);
 	const [openDeleteAlert, setOpenDeleteAlert] = useState(false);
@@ -108,16 +110,16 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType }: TaskProps) => {
 							<div className="flex flex-row flex-nowrap row-end-2 justify-evenly">
 								<div className="w-full rounded bg-gray-200">
 									<div className="flex flex-col gap-y-2 px-2 py-2">
-										<div className="text-black text-2xl cursor-default">
+										<div className="text-black text-2xl cursor-default w-fit">
 											Batch ID:  <span className="font-bold text-colorprimary cursor-text">{/*{batchId}*/}</span>
 										</div>
-										<div className="text-black text-2xl cursor-default">
+										<div className="text-black text-2xl cursor-default w-fit">
 											Sort: <span className="font-bold text-colorprimary cursor-text">{batchIdSpecies}</span>
 										</div>
-										<div className="text-black text-2xl cursor-default">
+										<div className="text-black text-2xl cursor-default w-fit">
 											Antal marker:  <span className="font-bold text-colorprimary cursor-text">{batchIdAmount}</span>
 										</div>
-										<div className="text-black text-2xl cursor-default">
+										<div className="text-black text-2xl cursor-default w-fit">
 											Reoler:  <span className="font-bold text-colorprimary cursor-text">{/*{batchIdShelf}*/}</span>
 										</div>
 									</div>
@@ -131,10 +133,10 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType }: TaskProps) => {
 										// Comfirm delete task
 										setOpenDeleteAlert(true);
 									}}><p className="uppercase font-bold">slet opgave</p></h1>
-									<h1 className={buttonVariants({ variant: "black" })} onClick={()=> {
+									<Link href='/' className={buttonVariants({ variant: "black" })} onClick={()=> {
 										// Send til kort
 										setOpenDialog(false);
-									}}><p className="uppercase font-bold">vis lokation</p></h1>
+									}}><p className="uppercase font-bold">vis lokation</p></Link>
 									<h1 className={buttonVariants({ variant: "green" })} onClick={() => {
 										// Comfirm task
 										setOpenConfirmAlert(true);
@@ -190,9 +192,11 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType }: TaskProps) => {
 							{animationStage === "loading" && <><Loader className="animate-spin" /></>}
 							{animationStage === "completed" && <><Check/></>}
 						</AlertDialogAction>
-						<AlertDialogAction className="min-w-[165px] bg-zinc-950 border-none text-white uppercase font-bold hover:bg-zinc-800" onClick={() => {
+						<AlertDialogAction className="min-w-[165px] bg-zinc-950 border-none text-white uppercase font-bold hover:bg-zinc-800" onClick={(e) => {
 							setOpenDeleteAlert(false);
-						}}>Fortryd</AlertDialogAction>
+						}}
+					   disabled={isButtonDisabled}
+						>Fortryd</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>
 			</AlertDialog>
@@ -244,9 +248,11 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType }: TaskProps) => {
 							{animationStage === "completed" && <><Check/></>}
 						</AlertDialogAction>
 
-						<AlertDialogAction className="min-w-[165px] bg-zinc-950 border-none text-white uppercase font-bold hover:bg-zinc-800" onClick={() => {
+						<AlertDialogAction className="min-w-[165px] bg-zinc-950 border-none text-white uppercase font-bold hover:bg-zinc-800" onClick={(e) => {
 							setOpenDeleteAlert(false);
-						}}>Fortryd</AlertDialogAction>
+						}}
+					    disabled={isButtonDisabled}
+						>Fortryd</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>
 			</AlertDialog>
