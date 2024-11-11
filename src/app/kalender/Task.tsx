@@ -192,7 +192,7 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType, batchId }: TaskProps) =
 							{animationStage === "loading" && <><Loader className="animate-spin" /></>}
 							{animationStage === "completed" && <><Check/></>}
 						</AlertDialogAction>
-						<AlertDialogAction className="min-w-[165px] bg-zinc-950 border-none text-white uppercase font-bold hover:bg-zinc-800" onClick={(e) => {
+						<AlertDialogAction className="min-w-[165px] bg-zinc-950 border-none text-white uppercase font-bold hover:bg-zinc-800" onClick={() => {
 							setOpenDeleteAlert(false);
 						}}
 					   disabled={isButtonDisabled}
@@ -248,7 +248,7 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType, batchId }: TaskProps) =
 							{animationStage === "completed" && <><Check/></>}
 						</AlertDialogAction>
 
-						<AlertDialogAction className="min-w-[165px] bg-zinc-950 border-none text-white uppercase font-bold hover:bg-zinc-800" onClick={(e) => {
+						<AlertDialogAction className="min-w-[165px] bg-zinc-950 border-none text-white uppercase font-bold hover:bg-zinc-800" onClick={() => {
 							setOpenDeleteAlert(false);
 						}}
 					    disabled={isButtonDisabled}
