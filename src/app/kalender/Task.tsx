@@ -55,7 +55,7 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType, batchId }: TaskProps) =
 			type = 'flyt';
 			break;
 		default:
-			taskIcon = <></>;
+			type = '';
 	}
 
 	switch (taskType) {
