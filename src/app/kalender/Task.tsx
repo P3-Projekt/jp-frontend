@@ -1,5 +1,5 @@
 "use client";
-import {Droplets, MoveRight, Scissors, X, Check, Trash2, Loader} from "lucide-react";
+import {Droplets, MoveRight, Scissors, X} from "lucide-react";
 import React, { useState } from "react";
 import {
 	Dialog,
@@ -9,18 +9,9 @@ import {
 	DialogTitle,
 	DialogFooter
 } from "@/components/ui/dialog";
-import {
-	AlertDialog,
-	AlertDialogAction,
-	AlertDialogContent,
-	AlertDialogDescription,
-	AlertDialogFooter,
-	AlertDialogHeader,
-	AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+
 import {buttonVariants} from "@/components/ui/button";
 
-import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 
 interface TaskProps {
@@ -33,15 +24,12 @@ interface TaskProps {
 const Task = ({ batchIdAmount, batchIdSpecies, taskType, batchId }: TaskProps) => {
 
 	const [openDialog, setOpenDialog] = useState(false);
-	const [openConfirmAlert, setOpenConfirmAlert] = useState(false);
+	/*const [openConfirmAlert, setOpenConfirmAlert] = useState(false);
 	const [animationStage, setAnimationStage] = useState<"idle" | "loading" | "completed">("idle");
 	const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
-	const { toast } = useToast()
-
-	const formatDate = (date: Date) => {
-		return date.toLocaleDateString("en-GB").replace(/\//g, "-");
-	};
+	 const { toast } = useToast()
+	 */
 
 	let taskIcon = <> </>;
 	let dialogTaskIcon = <> </>;

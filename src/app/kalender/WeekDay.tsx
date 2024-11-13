@@ -7,8 +7,6 @@ interface WeekDayProps {
 
 const WeekDay = ({currentDay, days }: WeekDayProps) => {
 
-	let stylingForCurrentDay;
-
 	const formatDate = (date: Date) => {
 		return date.toLocaleDateString("en-GB").replace(/\//g, "-");
 	};

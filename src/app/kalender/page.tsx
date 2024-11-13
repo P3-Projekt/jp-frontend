@@ -3,7 +3,6 @@ import React, {useState, useEffect} from 'react';
 import {ChevronLeft, ChevronRight, Undo2 } from "lucide-react";
 import Task from "@/app/kalender/Task";
 import WeekDay from "@/app/kalender/WeekDay";
-import { cn } from "../lib/utils";
 
 /*
 TODOS:
