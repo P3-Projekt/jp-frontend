@@ -110,25 +110,26 @@ const PlanterPage: React.FC = () => {
             </div>
           </div>
 
-          {/*Vandings skema check bokser*/}
-          <div className="mt-6">
-            <h3 className="font-semibold">Vandings skema:</h3>
-            <div className="flex justify-evenly items-center gap-10 mt-2 border-2 border-black bg-white mb-2 h-20">
-              {[...Array(numberOfCheckboxes)].map((_, day) => ( //dynamisk visning af vandings skema bokse
-                <label key={day} className="flex flex-col items-center -mt-2">
-                  <span>Dag {day + 1}</span>
-                  <input
-                    type="checkbox"
-                    name="vanding"
-                    value={day + 1}
-                    checked={formData.vanding.includes(day + 1)}
-                    onChange={handleCheckboxChange}
-                    className="w-9 h-9 accent-green-600"
-                  />
-                </label>
-              ))}
-            </div>
-          </div>
+{/* Vandings skema check bokser */}
+<div className="mt-6">
+  <h3 className="font-semibold">Vandings skema:</h3>
+  <div className="grid grid-cols-7 gap-4 mt-2 border-2 border-black bg-white mb-2 p-4 w-2/5 mx-auto">
+    {[...Array(numberOfCheckboxes)].map((_, day) => (
+      <label key={day} className="flex flex-col items-center">
+        <span>Dag {day + 1}</span>
+        <input
+          type="checkbox"
+          name="vanding"
+          value={day + 1}
+          checked={formData.vanding.includes(day + 1)}
+          onChange={handleCheckboxChange}
+          className="w-9 h-9 accent-green-600"
+        />
+      </label>
+    ))}
+  </div>
+</div>
+
 
           {/* submit knap */}
           <button
