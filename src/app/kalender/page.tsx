@@ -3,22 +3,17 @@ import React, {useState, useEffect} from 'react';
 import {ChevronLeft, ChevronRight, Undo2 } from "lucide-react";
 import Task from "@/app/kalender/Task";
 import WeekDay from "@/app/kalender/WeekDay";
-
-
+import { cn } from "../lib/utils";
 
 /*
 TODOS:
 - Lav alt spacing til at bruge calc i stedet for faste værdier.
 - Brug skeleton loading til at vise at der er noget der loader. når der hentes data. (Der kan bruges noget smart med React suspense component)
-- Gør sådan at det kun er den nuværende dato der er markeret med en anden farve.
-- Slet knappen skal slettes
--
 
 Med Backend
 - Loading tiderne ved at trykke på udfør og slet opgave skal være dynamiske, så de passer med det call der bliver lavet til backend.
 - Skal laves sådan at opaverne faktisk kan udføres og slettes. (Altså at der sker noget når der trykkes på udfør og slet opgave) (Skal bruge backend)
 - Skal kunne hente opgaver, med en given batchId, og en given uge. (Skal bruge backend)
--
 */
 
 
@@ -31,10 +26,25 @@ const KalenderPage: React.FC = () => {
 	const [weekNumber, setWeekNumber] = useState(currentWeekNumber);
 	const [year, setYear] = useState(currentYear);
 
-	// Constants for tasks
+	// Constants for tasks skal senere hentes fra backend.
 	const batchIdAmount = 50;
 	const batchIdSpecies = "Ærter";
-	const batchId = 1;
+	const batchId = 1
+
+	const formatDate = (date: Date) => {
+		return date.toLocaleDateString("en-GB").replace(/\//g, "-");
+	};
+
+
+	const currentDay = getCurrentDate(new Date());
+
+	const daysInWeek = getDatesInWeek(weekNumber, year);
+
+
+	const defaultColumnStyle = 'grid w-[140px] bg-sidebarcolor text-black rounded';
+	const currentDayColumnStyle = 'grid w-[140px] bg-colorprimary text-white rounded';
+
+
 
 	// Get week number from local storage
 	useEffect(() => {
@@ -110,11 +120,11 @@ const KalenderPage: React.FC = () => {
 			</div>
 			{/* DAGE */}
 			<div className="mt-3 flex flex-row justify-center gap-x-2 cursor-default">
-				<WeekDay week={weekNumber} year={year}/>
+				<WeekDay currentDay={currentDay} days={daysInWeek}/>
 			</div>
 			{/* OPGAVER */}
 			<div className="mt-3 flex flex-row justify-center gap-x-2 h-4/5">
-				<div className="grid w-[140px] bg-colorprimary rounded">
+				<div className={currentDay === formatDate(daysInWeek[0]) ? currentDayColumnStyle : defaultColumnStyle}>
 					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
 						<div className="content-center"><Task batchId={batchId} taskType={"water"} batchIdSpecies={batchIdSpecies} batchIdAmount={batchIdAmount} /></div>
 						<div className="content-center"><Task batchId={batchId} taskType={"harvest"} batchIdSpecies={batchIdSpecies} batchIdAmount={batchIdAmount} /></div>
@@ -128,7 +138,7 @@ const KalenderPage: React.FC = () => {
 						<div className="content-center"><Task batchId={batchId} taskType={"water"} batchIdSpecies={batchIdSpecies} batchIdAmount={batchIdAmount} /></div>
 					</ul>
 				</div>
-				<div className="grid w-[140px] bg-sidebarcolor text-black rounded">
+				<div className={currentDay === formatDate(daysInWeek[1]) ? currentDayColumnStyle : defaultColumnStyle}>
 					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
 						<div className="content-center"><Task batchId={batchId} taskType={"water"} batchIdSpecies={batchIdSpecies} batchIdAmount={batchIdAmount} /></div>
 						<div className="content-center"></div>
@@ -142,7 +152,7 @@ const KalenderPage: React.FC = () => {
 						<div className="content-center"></div>
 					</ul>
 				</div>
-				<div className="grid w-[140px] bg-sidebarcolor text-black rounded">
+				<div className={currentDay === formatDate(daysInWeek[2]) ? currentDayColumnStyle : defaultColumnStyle}>
 					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
 						<div className="content-center"><Task batchId={batchId} taskType={"water"} batchIdSpecies={batchIdSpecies} batchIdAmount={batchIdAmount} /></div>
 						<div className="content-center"><Task batchId={batchId} taskType={"harvest"} batchIdSpecies={batchIdSpecies} batchIdAmount={batchIdAmount} /></div>
@@ -156,7 +166,7 @@ const KalenderPage: React.FC = () => {
 						<div className="content-center"></div>
 					</ul>
 				</div>
-				<div className="grid w-[140px] bg-sidebarcolor text-black rounded">
+				<div className={currentDay === formatDate(daysInWeek[3]) ? currentDayColumnStyle : defaultColumnStyle}>
 					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
 						<div className="content-center"><Task batchId={batchId} taskType={"water"} batchIdSpecies={batchIdSpecies} batchIdAmount={batchIdAmount} /></div>
 						<div className="content-center"><Task batchId={batchId} taskType={"harvest"} batchIdSpecies={batchIdSpecies} batchIdAmount={batchIdAmount} /></div>
@@ -170,7 +180,7 @@ const KalenderPage: React.FC = () => {
 						<div className="content-center"><Task batchId={batchId} taskType={"water"} batchIdSpecies={batchIdSpecies} batchIdAmount={batchIdAmount} /></div>
 					</ul>
 				</div>
-				<div className="grid w-[140px] bg-sidebarcolor text-black rounded">
+				<div className={currentDay === formatDate(daysInWeek[4]) ? currentDayColumnStyle : defaultColumnStyle}>
 					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
 						<div className="content-center"><Task batchId={batchId} taskType={"water"} batchIdSpecies={batchIdSpecies} batchIdAmount={batchIdAmount} /></div>
 						<div className="content-center"><Task batchId={batchId} taskType={"harvest"} batchIdSpecies={batchIdSpecies} batchIdAmount={batchIdAmount} /></div>
@@ -184,7 +194,7 @@ const KalenderPage: React.FC = () => {
 						<div className="content-center"><Task batchId={batchId} taskType={"water"} batchIdSpecies={batchIdSpecies} batchIdAmount={batchIdAmount} /></div>
 					</ul>
 				</div>
-				<div className="grid w-[140px] bg-sidebarcolor text-black rounded">
+				<div className={currentDay === formatDate(daysInWeek[5]) ? currentDayColumnStyle : defaultColumnStyle}>
 					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
 						<div className="content-center"><Task batchId={batchId} taskType={"water"} batchIdSpecies={batchIdSpecies} batchIdAmount={batchIdAmount} /></div>
 						<div className="content-center"><Task batchId={batchId} taskType={"harvest"} batchIdSpecies={batchIdSpecies} batchIdAmount={batchIdAmount} /></div>
@@ -198,7 +208,7 @@ const KalenderPage: React.FC = () => {
 						<div className="content-center"><Task batchId={batchId} taskType={"water"} batchIdSpecies={batchIdSpecies} batchIdAmount={batchIdAmount} /></div>
 					</ul>
 				</div>
-				<div className="grid w-[140px] bg-sidebarcolor text-black rounded">
+				<div className={currentDay === formatDate(daysInWeek[6]) ? currentDayColumnStyle : defaultColumnStyle}>
 					<ul className="grid grid-rows-10 w-100 h-100 divide-y divide-black text-center">
 						<div className="content-center"><Task batchId={batchId} taskType={"water"} batchIdSpecies={batchIdSpecies} batchIdAmount={batchIdAmount} /></div>
 						<div className="content-center"><Task batchId={batchId} taskType={"harvest"} batchIdSpecies={batchIdSpecies} batchIdAmount={batchIdAmount} /></div>
@@ -231,3 +241,18 @@ function getCurrentWeekNumber(date) {
 	const pastDaysOfYear = (date - firstDayOfYear) / millisecondInDay;
 	return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
 }
+
+function getCurrentDate(date) {
+	return date.toLocaleDateString("en-GB").replace(/\//g, "-");
+}
+
+function getDatesInWeek(week: number, year: number) {
+	const firstDayOfYear = new Date(year, 0, 1);
+	const days = Array.from({ length: 7 }, (_, i) => {
+		const day = new Date(firstDayOfYear.getTime());
+		day.setDate(firstDayOfYear.getDate() + (week - 1) * 7 + i);
+		return day;
+	});
+	return days;
+}
+

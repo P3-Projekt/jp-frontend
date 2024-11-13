@@ -33,12 +33,15 @@ interface TaskProps {
 const Task = ({ batchIdAmount, batchIdSpecies, taskType, batchId }: TaskProps) => {
 
 	const [openDialog, setOpenDialog] = useState(false);
-	const [openDeleteAlert, setOpenDeleteAlert] = useState(false);
 	const [openConfirmAlert, setOpenConfirmAlert] = useState(false);
 	const [animationStage, setAnimationStage] = useState<"idle" | "loading" | "completed">("idle");
 	const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
 	const { toast } = useToast()
+
+	const formatDate = (date: Date) => {
+		return date.toLocaleDateString("en-GB").replace(/\//g, "-");
+	};
 
 	let taskIcon = <> </>;
 	let dialogTaskIcon = <> </>;
@@ -69,7 +72,7 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType, batchId }: TaskProps) =
 			break;
 		case "move":
 			taskIcon = <MoveRight className="size-7 -mt-0.5" />;
-			dialogTaskIcon = <MoveRight className="size-12 pt-1" />;
+			dialogTaskIcon = <MoveRight className=" size-12 pt-1" />;
 			break;
 		default:
 			taskIcon = <></>;
@@ -129,79 +132,27 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType, batchId }: TaskProps) =
 						</DialogDescription>
 						<DialogFooter>
 							<div className="w-full flex flex-row justify-between gap-y-4 mt-2">
-									<h1 className={buttonVariants({ variant: "red" })} onClick={() => {
+								{/*<h1 className={buttonVariants({ variant: "red" })} onClick={() => {
 										// Comfirm delete task
 										setOpenDeleteAlert(true);
-									}}><p className="uppercase font-bold">slet opgave</p></h1>
+									}}><p className="uppercase font-bold">slet opgave</p></h1>*/}
 									<Link href='/' className={buttonVariants({ variant: "black" })} onClick={()=> {
 										// Send til kort
 										setOpenDialog(false);
 									}}><p className="uppercase font-bold">vis lokation</p></Link>
-									<h1 className={buttonVariants({ variant: "green" })} onClick={() => {
+								{/*<h1 className={buttonVariants({ variant: "green" })} onClick={() => {
 										// Comfirm task
 										setOpenConfirmAlert(true);
-									}}><p className="uppercase font-bold">udfør opgave</p></h1>
+									}}><p className="uppercase font-bold">udfør opgave</p></h1>*/}
 							</div>
 						</DialogFooter>
 					</DialogHeader>
 				</DialogContent>
 			</Dialog>
 			{/* Delete confirmation */}
-			<AlertDialog open={openDeleteAlert} onOpenChange={setOpenDeleteAlert}>
-				<AlertDialogContent className="bg-white opacity-100">
-					<AlertDialogHeader>
-						<AlertDialogTitle className="text-black text-2xl">Slet denne opgave?</AlertDialogTitle>
-						<AlertDialogDescription className="text-black text-md italic">
-							Denne handling <span className="underline">kan ikke fortrydes</span>. Dette vil slette opgaven og fjerne den fra listen.
-						</AlertDialogDescription>
-					</AlertDialogHeader>
-					<AlertDialogFooter className="grid grid-cols-2 grid-row-1 justify-items-center">
-						<AlertDialogAction className="min-w-[165px] bg-red-600 border-none hover:bg-red-700 uppercase font-bold text-white" onClick={(e) => {
-							e.preventDefault();
-							setIsButtonDisabled(true);
-							// Animate task completion:
-							setAnimationStage("loading");
-							setTimeout(() => {
-								setAnimationStage("completed");
-								setTimeout(() => {
-									//  Delete the task
-									try {
-										setOpenDeleteAlert(false);
-										setOpenDialog(false);
-										setAnimationStage("idle");
 
-										toast({
-											variant: "success",
-											title: "Opgaven er slettet",
-											description: "Opgaven er nu slettet og fjernet fra listen.",
-										})
-									} catch (err) {
-										toast({
-											variant: "destructive",
-											title: "Noget gik galt",
-											description: err,
-										})
-									}
-									setIsButtonDisabled(false);
-								}, 1000); // Duration for showing the checkmark
-							}, 2000); // Duration for showing the loading spinner (SKAL PASSE MED DATA HENTNING (FETCH)).
-						}}
-						disabled={isButtonDisabled}
-						>
-							{animationStage === "idle" && <><Trash2/> Slet opgaven</>}
-							{animationStage === "loading" && <><Loader className="animate-spin" /></>}
-							{animationStage === "completed" && <><Check/></>}
-						</AlertDialogAction>
-						<AlertDialogAction className="min-w-[165px] bg-zinc-950 border-none text-white uppercase font-bold hover:bg-zinc-800" onClick={() => {
-							setOpenDeleteAlert(false);
-						}}
-					   disabled={isButtonDisabled}
-						>Fortryd</AlertDialogAction>
-					</AlertDialogFooter>
-				</AlertDialogContent>
-			</AlertDialog>
 			{/* Completion confirm */}
-			<AlertDialog open={openConfirmAlert} onOpenChange={setOpenConfirmAlert}>
+			{/* <AlertDialog open={openConfirmAlert} onOpenChange={setOpenConfirmAlert}>
 				<AlertDialogContent className="bg-white opacity-100">
 					<AlertDialogHeader>
 						<AlertDialogTitle className="text-black text-2xl">Udfør denne opgave?</AlertDialogTitle>
@@ -248,14 +199,12 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType, batchId }: TaskProps) =
 							{animationStage === "completed" && <><Check/></>}
 						</AlertDialogAction>
 
-						<AlertDialogAction className="min-w-[165px] bg-zinc-950 border-none text-white uppercase font-bold hover:bg-zinc-800" onClick={() => {
-							setOpenDeleteAlert(false);
-						}}
-					    disabled={isButtonDisabled}
-						>Fortryd</AlertDialogAction>
+						<AlertDialogAction className="min-w-[165px] bg-zinc-950 border-none text-white uppercase font-bold hover:bg-zinc-800" disabled={isButtonDisabled}>
+							Fortryd
+						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>
-			</AlertDialog>
+			</AlertDialog> */}
 		</>
 	);
 };
