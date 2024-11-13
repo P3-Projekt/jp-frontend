@@ -11,8 +11,8 @@ const WeekDay = ({currentDay, days }: WeekDayProps) => {
 		return date.toLocaleDateString("en-GB").replace(/\//g, "-");
 	};
 
-	const defaultStyle = 'w-[140px] py-2 text-center bg-sidebarcolor text-black rounded content-center'
-	const currentDayStyle = 'w-[140px] py-2 text-center bg-colorprimary text-white rounded content-center'
+	const defaultStyle :string = 'w-[140px] py-2 text-center bg-sidebarcolor text-black rounded content-center'
+	const currentDayStyle :string = 'w-[140px] py-2 text-center bg-colorprimary text-white rounded content-center'
 
 	return (
 		<>

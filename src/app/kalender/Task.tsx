@@ -31,7 +31,7 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType, batchId }: TaskProps) =
 	 const { toast } = useToast()
 	 */
 
-	let taskIcon = <> </>;
+	let taskIcon = <></>;
 	let dialogTaskIcon = <> </>;
 	let type = null;
 
@@ -51,7 +51,7 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType, batchId }: TaskProps) =
 
 	switch (taskType) {
 		case "harvest":
-			taskIcon = <Scissors className="size-7 -mt-0.5" />;
+			taskIcon = <Scissors className="size-7 mt-0.5" />;
 			dialogTaskIcon = <Scissors className="size-12" />;
 			break;
 		case "water":
@@ -59,7 +59,7 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType, batchId }: TaskProps) =
 			dialogTaskIcon = <Droplets className="size-12" />;
 			break;
 		case "move":
-			taskIcon = <MoveRight className="size-7 -mt-0.5" />;
+			taskIcon = <MoveRight className="size-7 mt-0.5" />;
 			dialogTaskIcon = <MoveRight className=" size-12 pt-1" />;
 			break;
 		default:
@@ -102,7 +102,7 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType, batchId }: TaskProps) =
 								<div className="w-full rounded bg-gray-200">
 									<div className="flex flex-col gap-y-2 px-2 py-2">
 										<div className="text-black text-2xl cursor-default w-fit">
-											Batch ID:  <span className="font-bold text-colorprimary cursor-text">{/*{batchId}*/}</span>
+											Batch ID:  <span className="font-bold text-colorprimary cursor-text">{batchId}</span>
 										</div>
 										<div className="text-black text-2xl cursor-default w-fit">
 											Sort: <span className="font-bold text-colorprimary cursor-text">{batchIdSpecies}</span>

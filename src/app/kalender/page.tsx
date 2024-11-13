@@ -7,7 +7,6 @@ import WeekDay from "@/app/kalender/WeekDay";
 /*
 TODOS:
 - Lav alt spacing til at bruge calc i stedet for faste værdier.
-- Brug skeleton loading til at vise at der er noget der loader. når der hentes data. (Der kan bruges noget smart med React suspense component)
 
 Med Backend
 - Loading tiderne ved at trykke på udfør og slet opgave skal være dynamiske, så de passer med det call der bliver lavet til backend.
@@ -18,32 +17,24 @@ Med Backend
 
 const KalenderPage: React.FC = () => {
 	// Get current week number
-	const currentWeekNumber = getCurrentWeekNumber(new Date());
-	const currentYear = new Date().getFullYear();
+	const currentWeekNumber :number = getCurrentWeekNumber(new Date());
+	const currentYear :number = new Date().getFullYear();
 
 	// State for week number
 	const [weekNumber, setWeekNumber] = useState(currentWeekNumber);
 	const [year, setYear] = useState(currentYear);
 
 	// Constants for tasks skal senere hentes fra backend.
-	const batchIdAmount = 50;
-	const batchIdSpecies = "Ærter";
-	const batchId = 1
+	const batchIdAmount :number = 50;
+	const batchIdSpecies :"Ærter" | "Spirer" | "Solsikke" | "Hvidløg" = "Ærter";
+	const batchId :number = 1
 
-	const formatDate = (date: Date) => {
-		return date.toLocaleDateString("en-GB").replace(/\//g, "-");
-	};
+	const currentDay :string = getCurrentDate(new Date());
+	const daysInWeek :Date[] = getDatesInWeek(weekNumber, year);
 
-
-	const currentDay = getCurrentDate(new Date());
-
-	const daysInWeek = getDatesInWeek(weekNumber, year);
-
-
-	const defaultColumnStyle = 'grid w-[140px] bg-sidebarcolor text-black rounded';
-	const currentDayColumnStyle = 'grid w-[140px] bg-colorprimary text-white rounded';
-
-
+	// Styles for task columns
+	const defaultColumnStyle :string = 'grid w-[140px] bg-sidebarcolor text-black rounded';
+	const currentDayColumnStyle :string = 'grid w-[140px] bg-colorprimary text-white rounded';
 
 	// Get week number from local storage
 	useEffect(() => {
@@ -241,10 +232,21 @@ function getCurrentWeekNumber(date) {
 	return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
 }
 
+/**
+ * Get the current date in the format DD-MM-YYYY
+ * @param date
+ * @returns current date
+ */
 function getCurrentDate(date) {
 	return date.toLocaleDateString("en-GB").replace(/\//g, "-");
 }
 
+/**
+ * Get the dates in a week
+ * @param week
+ * @param year
+ * @returns dates in a week
+ */
 function getDatesInWeek(week: number, year: number) {
 	const firstDayOfYear = new Date(year, 0, 1);
 	const days = Array.from({ length: 7 }, (_, i) => {
@@ -255,3 +257,11 @@ function getDatesInWeek(week: number, year: number) {
 	return days;
 }
 
+/**
+ * Format date to DD-MM-YYYY
+ * @param date
+ * @returns formatted date
+ */
+function formatDate(date: Date) {
+	return date.toLocaleDateString("en-GB").replace(/\//g, "-");
+}
