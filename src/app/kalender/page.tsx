@@ -20,6 +20,8 @@ const KalenderPage: React.FC = () => {
 	const currentWeekNumber :number = getCurrentWeekNumber(new Date());
 	const currentYear :number = new Date().getFullYear();
 
+	console.log(currentWeekNumber);
+
 	// State for week number
 	const [weekNumber, setWeekNumber] = useState(currentWeekNumber);
 	const [year, setYear] = useState(currentYear);
@@ -29,7 +31,7 @@ const KalenderPage: React.FC = () => {
 	const batchIdSpecies :"Ærter" | "Spirer" | "Solsikke" | "Hvidløg" = "Ærter";
 	const batchId :number = 1
 
-	const currentDay :string = getCurrentDate(new Date());
+	const currentDay :string = formatDate(new Date());
 	const daysInWeek :Date[] = getDatesInWeek(weekNumber, year);
 
 	// Styles for task columns
@@ -221,24 +223,26 @@ const KalenderPage: React.FC = () => {
 export default KalenderPage;
 
 /**
- * Get the week number of the year
+ * Get the current week number
  * @param date
- * @returns week number
+ * @returns current week number
  */
-function getCurrentWeekNumber(date) {
-	const millisecondInDay = 86400000
-	const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
-	const pastDaysOfYear = (date - firstDayOfYear) / millisecondInDay;
-	return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
-}
+function getCurrentWeekNumber(date: Date): number {
+	const msPerDay = 86400000;
 
-/**
- * Get the current date in the format DD-MM-YYYY
- * @param date
- * @returns current date
- */
-function getCurrentDate(date) {
-	return date.toLocaleDateString("en-GB").replace(/\//g, "-");
+	const firstThursday :Date = new Date(date.getFullYear(), 0, 1);
+
+	while (firstThursday.getDay() !== 4) {
+		firstThursday.setDate(firstThursday.getDate() + 1);
+	}
+
+	const currentThursday :Date = new Date(date);
+
+	while (currentThursday.getDay() !== 4) {
+		currentThursday.setDate(currentThursday.getDate() - 1);
+	}
+
+	return Math.ceil(((currentThursday.getTime() - firstThursday.getTime()) / msPerDay + 1) / 7);
 }
 
 /**
