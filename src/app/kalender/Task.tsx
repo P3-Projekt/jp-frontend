@@ -1,5 +1,5 @@
 "use client";
-import {Droplets, MoveRight, Scissors, X} from "lucide-react";
+import { Droplets, MoveRight, Scissors, X } from "lucide-react";
 import React, { useState } from "react";
 import {
 	Dialog,
@@ -7,22 +7,23 @@ import {
 	DialogDescription,
 	DialogHeader,
 	DialogTitle,
-	DialogFooter
+	DialogFooter,
 } from "@/components/ui/dialog";
 
-import {buttonVariants} from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 
 import Link from "next/link";
 
-interface TaskProps {
-	batchIdAmount: number,
-	batchIdSpecies: "Ærter" | "Solsikke" | "Hvidløg" | "Bønnespirer", // Dette skal laves til kun at være alle de forskellige plantearter
-	taskType: "harvest" | "water" | "move",
-	batchId: number,
+export interface TaskProps {
+	taskId: number;
+	fields: number;
+	plantType: number;
+	category: "harvest" | "water" | "move";
+	batchId: number;
+	dueDate: Date;
 }
 
-const Task = ({ batchIdAmount, batchIdSpecies, taskType, batchId }: TaskProps) => {
-
+const Task = ({ fields, plantType, category, batchId }: TaskProps) => {
 	const [openDialog, setOpenDialog] = useState(false);
 	/*const [openConfirmAlert, setOpenConfirmAlert] = useState(false);
 	const [animationStage, setAnimationStage] = useState<"idle" | "loading" | "completed">("idle");
@@ -33,34 +34,38 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType, batchId }: TaskProps) =
 
 	let taskIcon = <></>;
 	let dialogTaskIcon = <> </>;
+	let backgroundColor = "bg-blue-400";
 	let type = null;
+	switch (category) {
 
-	switch (taskType) {
 		case "harvest":
-			type = 'høst';
+			type = "høst";
 			break;
 		case "water":
-			type = 'vand';
+			type = "vand";
 			break;
 		case "move":
-			type = 'flyt';
+			type = "flyt";
 			break;
 		default:
-			type = '';
+			type = "";
 	}
 
-	switch (taskType) {
+	switch (category) {
 		case "harvest":
 			taskIcon = <Scissors className="size-7 mt-0.5" />;
 			dialogTaskIcon = <Scissors className="size-12" />;
+			backgroundColor = "bg-green-500";
 			break;
 		case "water":
 			taskIcon = <Droplets className="size-7 -mt-0.5" />;
 			dialogTaskIcon = <Droplets className="size-12" />;
+			backgroundColor = "bg-blue-500";
 			break;
 		case "move":
 			taskIcon = <MoveRight className="size-7 mt-0.5" />;
 			dialogTaskIcon = <MoveRight className=" size-12 pt-1" />;
+			backgroundColor = "bg-orange-500";
 			break;
 		default:
 			taskIcon = <></>;
@@ -70,68 +75,76 @@ const Task = ({ batchIdAmount, batchIdSpecies, taskType, batchId }: TaskProps) =
 		<>
 			{/* Task */}
 			<div
-				className="flex w-full h-full flex-grow flex-row row-span-1 text-lg justify-center items-center cursor-pointer"
+				className={`text-white flex w-full h-full flex-grow flex-row row-span-1 text-lg justify-center items-center cursor-pointer rounded ${backgroundColor}`}
 				onClick={() => setOpenDialog(true)}
 			>
 				{taskIcon}
-				<li className="text-center pl-2">
-					{batchIdAmount}x <span className="font-semibold"> {batchIdSpecies} </span>{" "}
+				<li className="text-center pl-2 ">
+					{fields}x{" "}
+					<span className="font-semibold"> {plantType} </span>{" "}
 				</li>
+
 			</div>
 			{/* Popup */}
 			<Dialog open={openDialog} onOpenChange={setOpenDialog}>
 				<DialogContent className="bg-white opacity-100 min-w-[500px] min-h-[300px] [&>button]:hidden">
 					<DialogHeader>
 						<DialogTitle>
-						<div className="flex flex-row justify-start items-center">
-							<div className="text-black text-5xl uppercase font-bold cursor-default">
-								{type}
+							<div className="flex flex-row justify-start items-center">
+								<div className="text-black text-5xl uppercase font-bold cursor-default">
+									{type}
+								</div>
+								<div className="text-black">
+									{dialogTaskIcon}
+								</div>
+								<div className="ml-auto -mr-3">
+									<X
+										className="size-14 text-black cursor-pointer"
+										onClick={() => {
+											setOpenDialog(false);
+										}}
+									/>
+								</div>
 							</div>
-							<div className="text-black">
-								{dialogTaskIcon}
-							</div>
-							<div className="ml-auto -mr-3">
-								<X className="size-14 text-black cursor-pointer" onClick={() => {
-									setOpenDialog(false);
-								}}/>
-							</div>
-						</div>
 						</DialogTitle>
 						<DialogDescription>
-							<div className="flex flex-row flex-nowrap row-end-2 justify-evenly">
-								<div className="w-full rounded bg-gray-200">
-									<div className="flex flex-col gap-y-2 px-2 py-2">
-										<div className="text-black text-2xl cursor-default w-fit">
-											Batch ID:  <span className="font-bold text-colorprimary cursor-text">{batchId}</span>
-										</div>
-										<div className="text-black text-2xl cursor-default w-fit">
-											Sort: <span className="font-bold text-colorprimary cursor-text">{batchIdSpecies}</span>
-										</div>
-										<div className="text-black text-2xl cursor-default w-fit">
-											Antal marker:  <span className="font-bold text-colorprimary cursor-text">{batchIdAmount}</span>
-										</div>
-										<div className="text-black text-2xl cursor-default w-fit">
-											Reoler:  <span className="font-bold text-colorprimary cursor-text">{/*{batchIdShelf}*/}</span>
-										</div>
-									</div>
-								</div>
-
-							</div>
+							Batch ID:{" "}
+							<span className="font-bold text-colorprimary cursor-text">
+								{batchId}
+							</span>
+							<br />
+							Sort:{" "}
+							<span className="font-bold text-colorprimary cursor-text">
+								{plantType}
+							</span>
+							<br />
+							Antal marker:{" "}
+							<span className="font-bold text-colorprimary cursor-text">
+								{fields}
+							</span>
+							<br />
+							Reoler:{" "}
+							<span className="font-bold text-colorprimary cursor-text">
+								{/*{batchIdShelf}*/}
+							</span>
+							<br />
 						</DialogDescription>
 						<DialogFooter>
 							<div className="w-full flex flex-row justify-between gap-y-4 mt-2">
-								{/*<h1 className={buttonVariants({ variant: "red" })} onClick={() => {
-										// Comfirm delete task
-										setOpenDeleteAlert(true);
-									}}><p className="uppercase font-bold">slet opgave</p></h1>*/}
-									<Link href='/' className={buttonVariants({ variant: "black" })} onClick={()=> {
-										// Send til kort
+								<Link
+									href="/"
+									className={buttonVariants({
+										variant: "black",
+									})}
+									onClick={() => {
+										// Send til kortF<p
 										setOpenDialog(false);
-									}}><p className="uppercase font-bold">vis lokation</p></Link>
-								{/*<h1 className={buttonVariants({ variant: "green" })} onClick={() => {
-										// Comfirm task
-										setOpenConfirmAlert(true);
-									}}><p className="uppercase font-bold">udfør opgave</p></h1>*/}
+									}}
+								>
+									<p className="uppercase font-bold">
+										vis lokation
+									</p>
+								</Link>
 							</div>
 						</DialogFooter>
 					</DialogHeader>

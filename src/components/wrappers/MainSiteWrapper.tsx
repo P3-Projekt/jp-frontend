@@ -1,5 +1,5 @@
-import { ReactNode } from 'react';
-import { cn } from '@/app/lib/utils';
+import { ReactNode } from "react";
+import { cn } from "@/app/lib/utils";
 
 const MainSiteWrapper = ({
 	className,
@@ -9,9 +9,9 @@ const MainSiteWrapper = ({
 	children: ReactNode;
 }) => {
 	return (
-		<div className={cn('mx-auto w-full max-w-screen-xl  p-4', className)}>
+		<div className={cn("mx-auto w-full max-w-screen-xl  p-4", className)}>
 			{children}
 		</div>
-	)
-}
-export default MainSiteWrapper
+	);
+};
+export default MainSiteWrapper;
