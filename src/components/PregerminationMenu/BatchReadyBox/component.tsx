@@ -7,6 +7,8 @@ interface BatchReadyProps {
 }
 
 const BatchReadyBox: React.FC<BatchReadyProps> = ({plantType, amount}) => {
+    console.log('Rendering ready box')
+
     let locatedAmount = 0;
     const componentRef = useRef<HTMLDivElement>(null);
     const [showLocateBox, setShowLocateBox] = useState(false);
@@ -23,21 +25,33 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({plantType, amount}) => {
 
     useEffect(() => {
         document.addEventListener("mousedown", handleClickOutside);
-    })
+        // Cleanup the event listener when the component is unmounted
+        return () => {
+          document.removeEventListener("mousedown", handleClickOutside);
+        };
+      }, []);
     
     return (
         <div ref={componentRef}>
-            <div className="w-64 h-48 bg-[#606060]" onClick={handleClick}>
-                <p>{plantType}:{amount}</p>
+            <div className={`p-4 mb-4 shadow-md ${showLocateBox ? 'bg-[#44e2ff]' : 'bg-[#ababab]'} cursor-pointer transition-all duration-300`} onClick={handleClick}>
+                <p className="text-black">{plantType}: {amount}</p>
             </div>
             <div>
                 {/* Locate box*/}
                 {showLocateBox && (
-                    <div className="w-64 h-48 bg-[#2a2a2a]">
-                        <div className="w-60 h-12 bg-[#606060]">
-                            <div className="text-white text-2xl font-bold font-['Inter']">Autolokaliser</div>
+                    // Outer background
+                    <div className="p-4 bg-[#2a2a2a]">
+                        {/* "Autolokaliser" background */}
+                        <div className="p-4 mb-4 bg-[#606060] shadow-md">
+                            <div className="text-white text-lg font-bold text-center">Autolokaliser</div>
                         </div>
-                        <div className="text-black text-2xl font-bold font-['Inter']">Lokaliseret: {locatedAmount}/{amount}</div>
+                        
+                        {/* "Lokaliseret" background */}
+                        <div className="p-4 bg-[#606060] shadow-md">
+                            <div className="text-white text-lg font-bold text-center">Lokaliseret: {locatedAmount}/{amount}</div>
+                        </div>
+
+
                     </div>
                 )}
             </div>
@@ -45,4 +59,4 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({plantType, amount}) => {
     );
 };
 
-export default BatchReadyBox
+export default BatchReadyBox;
