@@ -1,4 +1,5 @@
 import React from "react";
+import ShelfBox from "./Shelf";
 
 interface RackProps {
     name: string;
@@ -7,15 +8,26 @@ interface RackProps {
 }
 
 const RackBox: React.FC<RackProps> = ({name, locationX, locationY}) => {
-    console.log('Rendering rack box')
-    
     return (
-        <div className="h-[150px] w-[150px] bg-[#2b4e42] rounded-lg p-1">
-            <div className="bg-[#606060] rounded-lg">
-                <p className="text-center text-black rounded-lg">{name}</p>
+        // Rack container
+        <div className="flex flex-col h-[300px] w-[150px] bg-[#2b4e42] rounded-lg p-1">
+
+            {/* Rack name container */}
+            <div className="bg-[#2b4e42] rounded-lg mb-1">
+                <p className="text-center text-white rounded-lg">{name}</p>
             </div>
-            <div>
-                {/* Shelf container */}
+
+            {/* Shelf container */}
+            <div className="flex flex-1 flex-col space-y-1">
+                <ShelfBox
+                    availableSpace={10}
+                />
+                <ShelfBox
+                    availableSpace={20}
+                />
+                <ShelfBox
+                    availableSpace={30}
+                />
             </div>
         </div>
     );
