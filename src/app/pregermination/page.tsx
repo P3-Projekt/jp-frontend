@@ -1,5 +1,5 @@
 "use client";
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import GerminationBox from "@/components/PregerminationMenu/GerminationBox/index";
 import BatchReadyBox from "@/components/PregerminationMenu/BatchReadyBox/index";
 import RackBox from "@/components/Rack";
@@ -7,10 +7,12 @@ import RackBox from "@/components/Rack";
 const PreGerminationPage: React.FC = () => {
     console.log('Rendering page')
     
+    const [pregerminatingBatches, setPregerminatingBatches] = useState<any[]>([]);
+
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch('http://localhost:8080/pregerminatingbatches');
+                const response = await fetch('http://localhost:8080/PreGerminatingBatches');
 
                 if (!response.ok) {
                     throw new Error('Fetch failed');
@@ -20,11 +22,15 @@ const PreGerminationPage: React.FC = () => {
 
                 console.log(result);
 
+                setPregerminatingBatches(result.needsMorePreGermination);
+
             } catch (error) {
                 alert(error);
             }
         }
-    })
+
+        fetchData();
+    }, []);
 
     return (
         <div className="flex">
