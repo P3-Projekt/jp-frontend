@@ -1,3 +1,16 @@
+/*
+TODO:
+	- Gør sådan at DraggableBox komponenten ikke highlightes hvis der klikkes på den, men derefter ikke flyttes.
+	- Del det hele op i komponenter og importer det.
+	- Få DraggableBox komponenten til at ligne en rack, med hylder.
+	- Få backend op at køre med 2D kortet, sådanne at rackene bliver hentet fra databasen, og vist på de rigtige lokationer.
+	- Gør sådan at alle racks bliver hentet ind fra databasen, hver gang siden bliver tilgået.
+	- (måske) gem i localstorage, alle racks hentet fra databasen, og kun tjek om der er sket ændringre siden sidste gang. Slipper muligvis for at skulle hente alle racks hver gang.
+	- (måske) fix sådan der ikke er en margin rundt om 2D kortet.
+	- Fjern grid linjerne, når vi er færdige med kortet.
+	-
+*/
+
 "use client";
 import React, { useState, useCallback, useEffect } from 'react';
 
