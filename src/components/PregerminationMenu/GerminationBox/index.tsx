@@ -7,10 +7,8 @@ interface GerminationProps {
 }
 
 const GerminationBox: React.FC<GerminationProps> = ({plantType, amount, daysUntilReady}) => {
-    console.log('Rendering germination box')
-    
     return (
-        <div className="p-4 mb-4 bg-[#ababab] shadow-md">
+        <div className="p-4 mb-4 bg-[#f3f2f0] shadow-md rounded-lg">
             <p className="text-black">{plantType}: {amount}, {daysUntilReady} dage tilbage</p>
         </div>
     );
