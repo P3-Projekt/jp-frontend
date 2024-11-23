@@ -104,19 +104,29 @@ const PreGerminationPage: React.FC = () => {
         <div className="flex">
             {/* Grey "Forspiring" background */}
             <div className="w-[250px] fixed h-full bg-[#d9d9d9] left-[350px] flex flex-col">
-                <h1 className="text-black font-bold text-2xl text-center mt-2 mb-2">Forspiring</h1>
+                <div className="bg-[#2b4e42] mb-2">
+                    <h1 className="text-white font-bold text-2xl text-center mt-2 mb-2">Forspiring</h1>
+                </div>
                 
-                {/* "Spire" box for all germinating batches */}
-                <div className="bg-[#2b4e42] p-2 text-center text-white font-bold text-xl">Spirer</div>
-                <div className="bg-[#a5a4a2] p-2 mb-2 flex-1 overflow-y-auto">
+                {/* Centered "Spirer" box with border */}
+                <div className="flex justify-center items-center">
+                    <div className="bg-[#f3f2f0] w-[75%] p-2 text-center text-[#2b4e42] font-bold text-xl rounded-2xl border border-4 border-[#2b4e42]">Spirer</div>
+                </div>
+
+                {/* "Spire" box content */}
+                <div className="bg-[#d9d9d9] p-2 mb-2 flex-1 overflow-y-auto">
                     {pregerminatingBatches.map((batch: Batch, index: number) => (
                         <GerminationBox plantType={batch.plantName} amount={batch.amount} daysUntilReady={batch.daysUntilReady} key={index}/>
                     ))}
                 </div>
+                
+                {/* Centered "Klar" box with border */}
+                <div className="flex justify-center items-center">
+                    <div className="bg-[#f3f2f0] w-[75%] p-2 text-center text-[#2b4e42] font-bold text-xl rounded-2xl border border-4 border-[#2b4e42]">Klar</div>
+                </div>
 
-                {/* "Klar" box for all ready batches */}
-                <div className="bg-[#2b4e42] p-2 text-center text-white font-bold text-xl">Klar</div>
-                <div className="bg-[#a5a4a2] p-2 space-y-2 flex-1 overflow-y-auto">
+                {/* "Klar" box content */}
+                <div className="bg-[#d9d9d9] p-2 space-y-2 flex-1 overflow-y-auto">
                     <ShelfProvider numberOfShelves={0}>
                     {canBePlacedBatches.map((batch: Batch, index: number) => (
                         <BatchReadyBox batchId={batch.batchId} plantType={batch.plantName} amount={batch.amount} key={index}/>
