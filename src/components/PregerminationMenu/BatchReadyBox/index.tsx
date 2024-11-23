@@ -3,6 +3,7 @@ import React, {useState, useRef, useEffect} from "react";
 import { useShelfContext } from "@/app/pregermination/shelfcontext";
 
 interface BatchReadyProps {
+    batchId: number;
     plantType: string;
     amount:  number;
 }
@@ -11,15 +12,17 @@ interface ShelfData {
     [key: string]: number[];
 }
 
-const BatchReadyBox: React.FC<BatchReadyProps> = ({plantType, amount}) => {
+const BatchReadyBox: React.FC<BatchReadyProps> = ({batchId, plantType, amount}) => {
+    const id = batchId;
     let locatedAmount = 0;
     const componentRef = useRef<HTMLDivElement>(null);
     const [showLocateBox, setShowLocateBox] = useState(false);
     const { updateShelfData } = useShelfContext();
     const [shelfData, setShelfData] = useState<ShelfData>({}); 
 
-    const handleClick = () => {
+    const handleClick = async () => {
         setShowLocateBox(true);
+        await fetchMaxBatchesOnShelves(id);
     }
 
     const handleClickOutside = (event: MouseEvent) => {
@@ -41,6 +44,8 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({plantType, amount}) => {
 
             const result = await response.json();
 
+            console.log(result);
+
             setShelfData(result);
             showShelves(result);
 
@@ -52,6 +57,7 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({plantType, amount}) => {
     const showShelves = (data: ShelfData) => {
         Object.entries(data).forEach(([key, value]) => {
             value.forEach((num, index) => {
+                console.log("updating shelf:" + index);
                 updateShelfData(index, {inputVisible: true, availableSpace: num});
             });
         }); 
@@ -66,7 +72,6 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({plantType, amount}) => {
     };
 
     useEffect(() => {
-        document.addEventListener("mousedown", (async () => fetchMaxBatchesOnShelves));
         document.addEventListener("mousedown", handleClickOutside);
         // Cleanup the event listener when the component is unmounted
         return () => {
