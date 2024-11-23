@@ -119,7 +119,7 @@ const PreGerminationPage: React.FC = () => {
                 <div className="bg-[#a5a4a2] p-2 space-y-2 flex-1 overflow-y-auto">
                     <ShelfProvider numberOfShelves={0}>
                     {canBePlacedBatches.map((batch: Batch, index: number) => (
-                        <BatchReadyBox plantType={batch.plantName} amount={batch.amount} key={index}/>
+                        <BatchReadyBox batchId={batch.batchId} plantType={batch.plantName} amount={batch.amount} key={index}/>
                     ))}
                     </ShelfProvider>
                 </div>
