@@ -1,6 +1,6 @@
 "use client";
 import React, {useState, useRef, useEffect} from "react";
-import { useShelfContext } from "@/app/pregermination/shelfcontext";
+import useShelfContext from "@/app/pregermination/context";
 
 interface BatchReadyProps {
     batchId: number;
@@ -8,29 +8,27 @@ interface BatchReadyProps {
     amount:  number;
 }
 
-interface ShelfData {
-    [key: string]: number[];
-}
-
 const BatchReadyBox: React.FC<BatchReadyProps> = ({batchId, plantType, amount}) => {
     const id = batchId;
     let locatedAmount = 0;
     const componentRef = useRef<HTMLDivElement>(null);
     const [showLocateBox, setShowLocateBox] = useState(false);
-    const { updateShelfData } = useShelfContext();
-    const [shelfData, setShelfData] = useState<ShelfData>({}); 
+
+    const { setShelfMap, activeBatchId, setActiveBatchId } = useShelfContext();
 
     const handleClick = async () => {
+        setActiveBatchId(batchId);
         setShowLocateBox(true);
         await fetchMaxBatchesOnShelves(id);
     }
 
     const handleClickOutside = (event: MouseEvent) => {
         if (componentRef.current && !componentRef.current.contains(event.target as Node)) {
-            setShowLocateBox(false);
-        }
-        if (shelfData) {
-            hideShelves(shelfData);
+            if (activeBatchId === batchId) {
+                setShowLocateBox(false);
+                updateShelfMap(new Object());
+                setActiveBatchId(null);
+            }
         }
     }
 
@@ -44,31 +42,16 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({batchId, plantType, amount}) 
 
             const result = await response.json();
 
-            console.log(result);
-
-            setShelfData(result);
-            showShelves(result);
+            updateShelfMap(result);
 
         } catch (error) {
             alert(error);
         }
     };
 
-    const showShelves = (data: ShelfData) => {
-        Object.entries(data).forEach(([key, value]) => {
-            value.forEach((num, index) => {
-                console.log("updating shelf:" + index);
-                updateShelfData(index, {inputVisible: true, availableSpace: num});
-            });
-        }); 
-    };
-
-    const hideShelves = (data: ShelfData) => {
-        Object.entries(data).forEach(([key, value]) => {
-            value.forEach((num, index) => {
-                updateShelfData(index, {inputVisible: false, availableSpace: 0});
-            });
-        }); 
+    const updateShelfMap = (data: object) => {
+        const newShelfMap = new Map<number, number[]>(Object.entries(data).map(([key, value]) => [Number(key), value]));
+        setShelfMap({shelves: newShelfMap});
     };
 
     useEffect(() => {
@@ -77,7 +60,7 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({batchId, plantType, amount}) 
         return () => {
           document.removeEventListener("mousedown", handleClickOutside);
         };
-      }, []);
+      }, [activeBatchId]);
     
     return (
         <div ref={componentRef}>
