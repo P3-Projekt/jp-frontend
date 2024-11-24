@@ -8,32 +8,47 @@ TODO:
 	- (måske) gem i localstorage, alle racks hentet fra databasen, og kun tjek om der er sket ændringre siden sidste gang. Slipper muligvis for at skulle hente alle racks hver gang.
 	- (måske) fix sådan der ikke er en margin rundt om 2D kortet.
 	- Fjern grid linjerne, når vi er færdige med kortet.
-	-
+	- Error handling - tjek om racksene er oven i hindanden, og giv en fejlbesked.
 */
 
 
 import React, { useState, useCallback, useEffect } from 'react';
-import DraggableBox from '../components/DraggableBox';
+import DraggableBox, { RackData } from '../components/DraggableBox';
 
 // Grid size for snapping
 const GRID_SIZE = 50;
 
-fetch('http://localhost:8080/Racks')
-.then(response => response.json())
-.then(data => console.log(data));
-
 // Drag checker
 let isDragChecker = false;
 
+
 // CanvasComponent component
 const CanvasComponent: React.FC = () => {
-  const [boxes, setBoxes] = useState([
-    { x: 400, y: 100, width: 100, height: 200 },
-    { x: 600, y: 100, width: 100, height: 200 },
-    { x: 500, y: 400, width: 100, height: 200 },
-    { x: 350, y: 700, width: 100, height: 200 },
-    { x: 650, y: 700, width: 100, height: 200 },
-  ]);
+
+  const [boxes, setBoxes] = useState<RackData[]>([]);
+
+  // Fetch racks from the backend
+  useEffect(() => {
+    fetch('http://localhost:8080/Racks')
+      .then(response => {
+        
+        // Check if the response is ok
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+
+      // Set the boxes state to the racks
+      .then(racks => {
+        const rackObjects = racks;
+        setBoxes(rackObjects);
+      })
+      // Error handling
+      .catch(err => {
+        console.error('Error getting racks: ' + err);
+      });
+  }, []);
 
   // State for selected box index
   const [selectedBoxIndex, setSelectedBoxIndex] = useState<number | null>(null);
@@ -43,9 +58,13 @@ const CanvasComponent: React.FC = () => {
 
   // Handle dragging a box by updating its position
   const handleDrag = useCallback((x: number, y: number, index: number) => {
+    boxes[index].position.x = x;
+    boxes[index].position.y = y;
+    /*
     const newBoxes = [...boxes];
     newBoxes[index] = { ...newBoxes[index], x, y };
     setBoxes(newBoxes);
+    */
   }, [boxes]);
 
   // Handle selecting a box by toggling the selected state
@@ -114,9 +133,7 @@ const CanvasComponent: React.FC = () => {
         {boxes.map((box, index) => (
           <DraggableBox
             key={index}
-            initialX={box.x}
-            initialY={box.y}
-            color={['red', 'green', 'blue', 'orange', 'blue'][index]}
+            rackData={box}
             allBoxes={boxes.filter((_, i) => i !== index)}
             onDrag={(x, y) => handleDrag(x, y, index)}
             onSelect={() => handleSelect(index)}

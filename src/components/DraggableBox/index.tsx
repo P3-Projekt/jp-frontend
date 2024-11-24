@@ -1,11 +1,25 @@
+"use client";
 import React, { useState, useEffect, useCallback } from 'react';
+import { setRackToBeDisplayed } from '../map/RackDialog';
+
+import { ShelfData, Shelf } from '../map/Shelf';
+
+import RackDialog from '../map/RackDialog';
+
+//Constants
+const width = 100;
+const height = 200;
+
+export interface RackData{
+  id: number;
+  position: {x: number, y: number};
+  shelves: ShelfData[];
+}
 
 // DraggableBox component props
 interface DraggableBoxProps {
-  initialX: number;
-  initialY: number;
-  color: string;
-  allBoxes: { x: number; y: number; width: number; height: number }[];
+  allBoxes: RackData[];
+  rackData : RackData;
   onDrag: (x: number, y: number) => void;
   onSelect: () => void;
   isSelected: boolean;
@@ -14,10 +28,10 @@ interface DraggableBoxProps {
   isDragChecker: boolean;
 }
 
+
+
 const DraggableBox: React.FC<DraggableBoxProps> = ({
-  initialX,
-  initialY,
-  color,
+  rackData,
   allBoxes,
   onDrag,
   onSelect,
@@ -26,55 +40,16 @@ const DraggableBox: React.FC<DraggableBoxProps> = ({
   GRID_SIZE,
   isDragChecker,
 }) => { // State for position and dragging
-  const [position, setPosition] = useState({ x: initialX, y: initialY });
-  const [isDragging, setIsDragging] = useState(false);
-
-  type Batch = {
-    id: string;
-    nextTask: string;
-    nextTaskDue: Date;
-    tray: string;
-    amount: number;
-    plant: string;
-    createdBy: string;
-    harvestDate: Date;
-  };
+  const [position, setPosition] = useState({ x: rackData.position.x, y: rackData.position.y });
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [showDialog, setShowDialog] = useState<boolean>(false);
   
-  type Shelf = {
-    batches: Batch[];
-  };
-  
-  const shelves: Shelf[] = [
-    {
-      batches: [
-        {
-          id: '1',
-          nextTask: 'Plant',
-          nextTaskDue: new Date(),
-          tray: '1',
-          amount: 10,
-          plant: 'Tomato',
-          createdBy: 'John Doe',
-          harvestDate: new Date(),
-        }
-      ]
-    },
-    {
-      batches: [
-        {
-          id: '2',
-          nextTask: 'Plant',
-          nextTaskDue: new Date(),
-          tray: '2',
-          amount: 10,
-          plant: 'Tomato',
-          createdBy: 'John Doe',
-          harvestDate: new Date(),
-        }
-      ]
-    }
-  ];
-
+  /*
+  const [selectedBatch, setSelectedBatch] = useState(-1);
+  const [selectedShelf, setSelectedShelf] = useState(-1);
+  */
+ 
+  const currentDate = new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
 
 // Snap a value to the grid size
 const snapToGrid = (value: number) => Math.round(value / GRID_SIZE) * GRID_SIZE;
@@ -100,16 +75,16 @@ const snapToGrid = (value: number) => Math.round(value / GRID_SIZE) * GRID_SIZE;
     const newX = e.clientX - panOffset.x - 50;
     const newY = e.clientY - panOffset.y - 100;
 
-	console.log(newX, newY);
+	//console.log(newX, newY);
 
     if (isNaN(newX) || isNaN(newY)) return;
 
     // Check for overlap and snap to grid if not overlapping
     const isOverlapping = allBoxes.some((box) => (
-      newX < box.x + box.width &&
-      newX + 100 > box.x &&
-      newY < box.y + box.height &&
-      newY + 200 > box.y
+      newX < rackData.position.x + width &&
+      newX + width > rackData.position.x &&
+      newY < rackData.position.y + height &&
+      newY + height > rackData.position.y
     ));
 
     // Update position if not overlapping
@@ -134,34 +109,29 @@ const snapToGrid = (value: number) => Math.round(value / GRID_SIZE) * GRID_SIZE;
   }, [isDragging, handleMouseMove]);
 
   return (
+    <>
     <div
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
-      className={`absolute flex` + (isSelected ? 'cursor-grabbing border-bla' : 'cursor-grab')}
+      className={`absolute flex` + (isSelected ? 'cursor-grabbing scale-105 border-black' : 'cursor-grab')}
       style={{
         left: position.x, // Adjust for pan offset visually only
         top: position.y,   // Adjust for pan offset visually only
-        width: 100,
-        height: 200,
-        backgroundColor: color,
+        width: width,
+        height: height,
         border: isSelected ? '2px solid black' : 'none',
       }}
     >
       {/* The rack */}
-      <div className="bg-orange-600 w-full h-full">
-        {shelves.map((shelf, index) => (
-          <div key={index}>
-            {shelf.batches.map((batch) => (
-              <div key={batch.id}>
-                <div className="flex w-full h-full text-center bg-gray-600 flex-col gap-x-5 content-center">
-                  hello
-                </div>
-              </div>
-            ))}
-          </div>
+      <div className="border-2 border-black bg-gray-200 w-full h-full flex flex-col divide-y divide-black divide-y-2" onClick={() =>  { setRackToBeDisplayed(rackData); setShowDialog(true) }}>
+        {/* Dynamically adding shelves */}
+        {rackData.shelves.map((shelf, index) => (
+          <Shelf key={index} {...shelf} isFewShelves={rackData.shelves.length <= 3}/>
         ))}
       </div>
     </div>
+    <RackDialog showDialog={showDialog} setShowDialog={setShowDialog} />
+  </>
   );
 };
 
