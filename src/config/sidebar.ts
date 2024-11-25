@@ -9,36 +9,36 @@ interface SidebarItem {
 
 const sidebarConfig: SidebarItem[] = [
 	{
-		title: 'Hjem',
-		path: '/',
+		title: "Hjem",
+		path: "/",
 		icon: House,
 	},
 	{
-		title: 'Adminstration',
+		title: "Adminstration",
 		icon: Leaf,
 		children: [
 			{
-				title: 'Planter',
-				path: '/adminstration/planter',
+				title: "Planter",
+				path: "/adminstration/planter",
 			},
 			{
-				title: 'Bakker',
-				path: '/adminstration/bakker',
+				title: "Bakker",
+				path: "/adminstration/bakker",
 			},
 			{
-				title: 'Hylder',
-				path: '/adminstration/hylder',
+				title: "Hylder",
+				path: "/adminstration/hylder",
 			},
 		],
 	},
 	{
-		title: 'Marker',
-		path: '/settings',
+		title: "Marker",
+		path: "/settings",
 		icon: Grid2X2,
 	},
 	{
-		title: 'Redigeringstilstand',
-		path: '/settings',
+		title: "Redigeringstilstand",
+		path: "/settings",
 		icon: SquarePen,
 	},
 ];
