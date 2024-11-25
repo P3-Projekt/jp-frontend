@@ -23,7 +23,7 @@ const KalenderPage: React.FC = () => {
 	// State for week number
 	const [weekNumber, setWeekNumber] = useState(currentWeekNumber);
 	const [year, setYear] = useState(currentYear);
-	const [tasks, setTasks] = useState<TaskProps[]>([])
+	const [tasks, setTasks] = useState<TaskProps[]>([]);
 
 	const currentDay: string = formatDate(new Date());
 	const daysInWeek: Date[] = getDatesInWeek(weekNumber, year);
@@ -46,47 +46,42 @@ const KalenderPage: React.FC = () => {
 		}
 	}, []);
 
-
-
 	useEffect(() => {
 		// Fetch tasks from backend
 		const fetchTasks = async () => {
-			const data = await fetch(process.env.NEXT_PUBLIC_URL + `Tasks?weekNumber=${weekNumber}`)
+			const data = await fetch(
+				process.env.NEXT_PUBLIC_URL + `Tasks?weekNumber=${weekNumber}`,
+			);
 			setTasks(await data.json());
-		}
+		};
 		fetchTasks();
-	}, [weekNumber])
+	}, [weekNumber]);
 
 	const selectedDayTask = (selectedDay: Date): React.ReactNode => {
 		const normalizedSelectedDay = new Date(selectedDay.setHours(0, 0, 0, 0));
 
 		const filteredTasks = tasks.filter((task) => {
-		  const taskDueDate = new Date(task.dueDate);
-		  const normalizedTaskDate = new Date(taskDueDate.setHours(0, 0, 0, 0));
+			const taskDueDate = new Date(task.dueDate);
+			const normalizedTaskDate = new Date(taskDueDate.setHours(0, 0, 0, 0));
 
-		  return normalizedTaskDate.getTime() === normalizedSelectedDay.getTime();
+			return normalizedTaskDate.getTime() === normalizedSelectedDay.getTime();
 		});
 
 		if (filteredTasks.length === 0) return null;
 
 		return filteredTasks.map((task) => (
 			<div className="content-center" key={task.taskId}>
-
-
-		  <Task
-			taskId={task.taskId}
-			batchId={task.batchId}
-			category={task.category.toLowerCase() as "harvest" | "water" | "move"}
-			plantType={task.plantType}
-			fields={task.fields}
-			dueDate={task.dueDate}
-		  />
-		  </div>
+				<Task
+					taskId={task.taskId}
+					batchId={task.batchId}
+					category={task.category.toLowerCase() as "harvest" | "water" | "move"}
+					plantType={task.plantType}
+					fields={task.fields}
+					dueDate={task.dueDate}
+				/>
+			</div>
 		));
-	  };
-
-
-
+	};
 
 	// Save week number to local storage
 	useEffect(() => {
@@ -142,9 +137,7 @@ const KalenderPage: React.FC = () => {
 						className="text-colorprimary text-4xl cursor-default font-extrabold"
 					>
 						UGE{" "}
-						<span className="underline underline-offset-3">
-							{weekNumber}
-						</span>
+						<span className="underline underline-offset-3">{weekNumber}</span>
 					</h1>
 					<ChevronRight
 						aria-label="Næste uge"
@@ -175,22 +168,21 @@ const KalenderPage: React.FC = () => {
 
 				{/* OPGAVER */}
 				<div className="mt-3 flex flex-row justify-center gap-x-2 h-full">
-				{daysInWeek.map((day, index) => (
-					<div
-					key={index}
-					className={
-						currentDay === formatDate(day)
-						? currentDayColumnStyle
-						: defaultColumnStyle
-					}
-					>
-					<ul className="grid grid-rows-12 w-100 h-full divide-y divide-black text-center m-2">
-					{selectedDayTask(day)}
-					</ul>
-					</div>
-				))}
+					{daysInWeek.map((day, index) => (
+						<div
+							key={index}
+							className={
+								currentDay === formatDate(day)
+									? currentDayColumnStyle
+									: defaultColumnStyle
+							}
+						>
+							<ul className="grid grid-rows-12 w-100 h-full divide-y divide-black text-center m-2">
+								{selectedDayTask(day)}
+							</ul>
+						</div>
+					))}
 				</div>
-
 			</div>
 		</>
 	);
@@ -219,8 +211,7 @@ function getCurrentWeekNumber(date: Date): number {
 	}
 
 	return Math.ceil(
-		((currentThursday.getTime() - firstThursday.getTime()) / msPerDay + 1) /
-			7,
+		((currentThursday.getTime() - firstThursday.getTime()) / msPerDay + 1) / 7,
 	);
 }
 
@@ -248,4 +239,3 @@ function getDatesInWeek(week: number, year: number) {
 function formatDate(date: Date) {
 	return date.toLocaleDateString("en-GB").replace(/\//g, "-");
 }
-

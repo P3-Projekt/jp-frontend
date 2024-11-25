@@ -37,7 +37,6 @@ const Task = ({ fields, plantType, category, batchId }: TaskProps) => {
 	let backgroundColor = "bg-blue-400";
 	let type = null;
 	switch (category) {
-
 		case "harvest":
 			type = "høst";
 			break;
@@ -80,10 +79,8 @@ const Task = ({ fields, plantType, category, batchId }: TaskProps) => {
 			>
 				{taskIcon}
 				<li className="text-center pl-2 ">
-					{fields}x{" "}
-					<span className="font-semibold"> {plantType} </span>{" "}
+					{fields}x <span className="font-semibold"> {plantType} </span>{" "}
 				</li>
-
 			</div>
 			{/* Popup */}
 			<Dialog open={openDialog} onOpenChange={setOpenDialog}>
@@ -94,9 +91,7 @@ const Task = ({ fields, plantType, category, batchId }: TaskProps) => {
 								<div className="text-black text-5xl uppercase font-bold cursor-default">
 									{type}
 								</div>
-								<div className="text-black">
-									{dialogTaskIcon}
-								</div>
+								<div className="text-black">{dialogTaskIcon}</div>
 								<div className="ml-auto -mr-3">
 									<X
 										className="size-14 text-black cursor-pointer"
@@ -141,9 +136,7 @@ const Task = ({ fields, plantType, category, batchId }: TaskProps) => {
 										setOpenDialog(false);
 									}}
 								>
-									<p className="uppercase font-bold">
-										vis lokation
-									</p>
+									<p className="uppercase font-bold">vis lokation</p>
 								</Link>
 							</div>
 						</DialogFooter>

@@ -15,12 +15,12 @@ type ToasterToast = ToastProps & {
 	action?: ToastActionElement;
 };
 
-const actionTypes = {
-	ADD_TOAST: "ADD_TOAST",
-	UPDATE_TOAST: "UPDATE_TOAST",
-	DISMISS_TOAST: "DISMISS_TOAST",
-	REMOVE_TOAST: "REMOVE_TOAST",
-} as const;
+type actionTypes = {
+	ADD_TOAST: "ADD_TOAST";
+	UPDATE_TOAST: "UPDATE_TOAST";
+	DISMISS_TOAST: "DISMISS_TOAST";
+	REMOVE_TOAST: "REMOVE_TOAST";
+};
 
 let count = 0;
 
@@ -29,7 +29,7 @@ function genId() {
 	return count.toString();
 }
 
-type ActionType = typeof actionTypes;
+type ActionType = actionTypes;
 
 type Action =
 	| {
@@ -184,8 +184,7 @@ function useToast() {
 	return {
 		...state,
 		toast,
-		dismiss: (toastId?: string) =>
-			dispatch({ type: "DISMISS_TOAST", toastId }),
+		dismiss: (toastId?: string) => dispatch({ type: "DISMISS_TOAST", toastId }),
 	};
 }
 

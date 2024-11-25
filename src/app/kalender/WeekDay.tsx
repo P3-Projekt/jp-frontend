@@ -19,9 +19,7 @@ const WeekDay = ({ currentDay, days }: WeekDayProps) => {
 		<>
 			<div
 				className={
-					currentDay === formatDate(days[0])
-						? currentDayStyle
-						: defaultStyle
+					currentDay === formatDate(days[0]) ? currentDayStyle : defaultStyle
 				}
 			>
 				<h1 className="text-xl font-bold uppercase">mandag</h1>
@@ -31,9 +29,7 @@ const WeekDay = ({ currentDay, days }: WeekDayProps) => {
 			</div>
 			<div
 				className={
-					currentDay === formatDate(days[1])
-						? currentDayStyle
-						: defaultStyle
+					currentDay === formatDate(days[1]) ? currentDayStyle : defaultStyle
 				}
 			>
 				<h1 className="text-xl font-bold uppercase">tirsdag</h1>
@@ -43,9 +39,7 @@ const WeekDay = ({ currentDay, days }: WeekDayProps) => {
 			</div>
 			<div
 				className={
-					currentDay === formatDate(days[2])
-						? currentDayStyle
-						: defaultStyle
+					currentDay === formatDate(days[2]) ? currentDayStyle : defaultStyle
 				}
 			>
 				<h1 className="text-xl font-bold uppercase">onsdag</h1>
@@ -55,9 +49,7 @@ const WeekDay = ({ currentDay, days }: WeekDayProps) => {
 			</div>
 			<div
 				className={
-					currentDay === formatDate(days[3])
-						? currentDayStyle
-						: defaultStyle
+					currentDay === formatDate(days[3]) ? currentDayStyle : defaultStyle
 				}
 			>
 				<h1 className="text-xl font-bold uppercase">torsdag</h1>
@@ -67,9 +59,7 @@ const WeekDay = ({ currentDay, days }: WeekDayProps) => {
 			</div>
 			<div
 				className={
-					currentDay === formatDate(days[4])
-						? currentDayStyle
-						: defaultStyle
+					currentDay === formatDate(days[4]) ? currentDayStyle : defaultStyle
 				}
 			>
 				<h1 className="text-xl font-bold uppercase">fredag</h1>
@@ -79,9 +69,7 @@ const WeekDay = ({ currentDay, days }: WeekDayProps) => {
 			</div>
 			<div
 				className={
-					currentDay === formatDate(days[5])
-						? currentDayStyle
-						: defaultStyle
+					currentDay === formatDate(days[5]) ? currentDayStyle : defaultStyle
 				}
 			>
 				<h1 className="text-xl font-bold uppercase">lørdag</h1>
@@ -91,9 +79,7 @@ const WeekDay = ({ currentDay, days }: WeekDayProps) => {
 			</div>
 			<div
 				className={
-					currentDay === formatDate(days[6])
-						? currentDayStyle
-						: defaultStyle
+					currentDay === formatDate(days[6]) ? currentDayStyle : defaultStyle
 				}
 			>
 				<h1 className="text-xl font-bold uppercase">søndag</h1>
