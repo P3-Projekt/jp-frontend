@@ -3,6 +3,7 @@ import React, {useEffect, useState, ReactNode} from "react";
 import GerminationBox from "@/components/PregerminationMenu/GerminationBox/index";
 import BatchReadyBox from "@/components/PregerminationMenu/BatchReadyBox/index";
 import { ShelfProvider } from "./context";
+import { PlacedAmountProvider } from "./context";
 import RackBox from "@/components/Rack";
 
 interface Batch {
@@ -102,51 +103,53 @@ const PreGerminationPage: React.FC = () => {
 
     return (
         <ShelfProvider>
-            <div className="flex">
-                {/* Grey "Forspiring" background */}
-                <div className="w-[250px] fixed h-full bg-[#d9d9d9] left-[350px] flex flex-col">
-                    <div className="bg-[#2b4e42] mb-2">
-                        <h1 className="text-white font-bold text-2xl text-center mt-2 mb-2">Forspiring</h1>
-                    </div>
-                    
-                    {/* Centered "Spirer" box with border */}
-                    <div className="flex justify-center items-center">
-                        <div className="bg-[#f3f2f0] w-[75%] p-2 text-center text-[#2b4e42] font-bold text-xl rounded-2xl border border-4 border-[#2b4e42]">Spirer</div>
+            <PlacedAmountProvider>
+                <div className="flex">
+                    {/* Grey "Forspiring" background */}
+                    <div className="w-[250px] fixed h-full bg-[#d9d9d9] left-[350px] flex flex-col">
+                        <div className="bg-[#2b4e42] mb-2">
+                            <h1 className="text-white font-bold text-2xl text-center mt-2 mb-2">Forspiring</h1>
+                        </div>
+                        
+                        {/* Centered "Spirer" box with border */}
+                        <div className="flex justify-center items-center">
+                            <div className="bg-[#f3f2f0] w-[75%] p-2 text-center text-[#2b4e42] font-bold text-xl rounded-2xl border border-4 border-[#2b4e42]">Spirer</div>
+                        </div>
+
+                        {/* "Spire" box content */}
+                        <div className="bg-[#d9d9d9] p-2 mb-2 flex-1 overflow-y-auto">
+                            {pregerminatingBatches.map((batch: Batch, index: number) => (
+                                <GerminationBox plantType={batch.plantName} amount={batch.amount} daysUntilReady={batch.daysUntilReady} key={index}/>
+                            ))}
+                        </div>
+                        
+                        {/* Centered "Klar" box with border */}
+                        <div className="flex justify-center items-center">
+                            <div className="bg-[#f3f2f0] w-[75%] p-2 text-center text-[#2b4e42] font-bold text-xl rounded-2xl border border-4 border-[#2b4e42]">Klar</div>
+                        </div>
+
+                        {/* "Klar" box content */}
+                        <div className="bg-[#d9d9d9] p-2 space-y-2 flex-1 overflow-y-auto">
+                                {canBePlacedBatches.map((batch: Batch, index: number) => (
+                                    <BatchReadyBox batchId={batch.batchId} plantType={batch.plantName} amount={batch.amount} key={index}/>
+                                ))}
+                        </div>
+                        
                     </div>
 
-                    {/* "Spire" box content */}
-                    <div className="bg-[#d9d9d9] p-2 mb-2 flex-1 overflow-y-auto">
-                        {pregerminatingBatches.map((batch: Batch, index: number) => (
-                            <GerminationBox plantType={batch.plantName} amount={batch.amount} daysUntilReady={batch.daysUntilReady} key={index}/>
+                    {/* Container for rack components */}
+                    <div className="left-[900px] top-[50px] fixed space-y-1">
+                        {rackData.map((rack: RackData, index: number) => (
+                            <RackBox
+                                id={rack.id}
+                                numberOfShelves={rack.shelves.length}
+                                locationX={rack.position.x}
+                                locationY={rack.position.y}
+                                key={index}/>
                         ))}
                     </div>
-                    
-                    {/* Centered "Klar" box with border */}
-                    <div className="flex justify-center items-center">
-                        <div className="bg-[#f3f2f0] w-[75%] p-2 text-center text-[#2b4e42] font-bold text-xl rounded-2xl border border-4 border-[#2b4e42]">Klar</div>
-                    </div>
-
-                    {/* "Klar" box content */}
-                    <div className="bg-[#d9d9d9] p-2 space-y-2 flex-1 overflow-y-auto">
-                            {canBePlacedBatches.map((batch: Batch, index: number) => (
-                                <BatchReadyBox batchId={batch.batchId} plantType={batch.plantName} amount={batch.amount} key={index}/>
-                            ))}
-                    </div>
-                    
                 </div>
-
-                {/* Container for rack components */}
-                <div className="left-[900px] top-[50px] fixed space-y-1">
-                    {rackData.map((rack: RackData, index: number) => (
-                        <RackBox
-                            id={rack.id}
-                            numberOfShelves={rack.shelves.length}
-                            locationX={rack.position.x}
-                            locationY={rack.position.y}
-                            key={index}/>
-                    ))}
-                </div>
-            </div>
+            </PlacedAmountProvider>
         </ShelfProvider>
     );
 };
