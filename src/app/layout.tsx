@@ -5,7 +5,6 @@ import Sidebar from "@/components/Sidebar";
 import MainSiteWrapper from "@/components/wrappers/MainSiteWrapper";
 import { cn } from "@/app/lib/utils";
 import { Inter } from "next/font/google";
-import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,7 +20,7 @@ export const metadata: Metadata = {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
 	return (
-		<html lang="en" className="dark">
+		<html lang="en">
 			<body
 				className={cn(
 					"min-h-screen font-sans antialiased grainy",
@@ -30,10 +29,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 			>
 				<div className="min-h-screen flex">
 					<Sidebar />
-					<MainSiteWrapper>
-						{children}
-						<Toaster />
-					</MainSiteWrapper>
+					<MainSiteWrapper>{children}</MainSiteWrapper>
 				</div>
 			</body>
 		</html>
