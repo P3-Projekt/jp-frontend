@@ -1,4 +1,4 @@
-import useShelfContext from "@/app/pregermination/context";
+import { usePlacedAmountContext, useShelfContext } from "@/app/pregermination/context";
 import React, { useEffect, useState } from "react";
 
 export interface ShelfProps {
@@ -8,8 +8,9 @@ export interface ShelfProps {
 
 const ShelfBox: React.FC<ShelfProps> = ({index, rack}) => {
     const { shelfMap } = useShelfContext();
-
-    const [availableSpace, setAvailableSpace] = useState<number>(0);
+    const [previousValue, setPreviousValue] = useState(0);
+    const [availableSpace, setAvailableSpace] = useState(0);
+    const { placedAmount, setPlacedAmount, batchAmount } = usePlacedAmountContext();
 
     useEffect(() => {
         if (shelfMap !== undefined) {
@@ -26,12 +27,44 @@ const ShelfBox: React.FC<ShelfProps> = ({index, rack}) => {
         }
     }, [shelfMap, rack, index]);
 
+    const getMax = (currentlyPlaced: number) => {
+        if (batchAmount !== null) {
+            console.log("Batch amount: " + batchAmount);
+            console.log("Currently placed: " + currentlyPlaced);
+            console.log("placedAmount: " + placedAmount);
+            const leftToBePlaced = batchAmount - placedAmount - 1;
+            return leftToBePlaced + currentlyPlaced < availableSpace ? leftToBePlaced + currentlyPlaced : availableSpace;
+        }
+        return availableSpace;
+    }
+
+    const validateInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+         let input = Number(event.target.value);
+        // const max = getMax(input);
+        // if (input > max) {
+        //     input = max;
+        // }
+        // event.target.value = input.toString();
+
+        console.log("Previous value: " + previousValue + ", placedAmount total: " + placedAmount);
+        const valueDifference = input - previousValue;
+        setPlacedAmount(placedAmount + valueDifference);
+        setPreviousValue(input);
+    }
+
     return (
         // Shelf container
-        <div className="flex-1 flex items-center justify-center rounded-lg bg-[#a5a4a2]">
+        <div className="flex-1 flex items-center justify-center rounded-lg bg-[#d9d9d9]">
             {availableSpace > 0 &&
                 <div className="flex items-center">
-                    <div className="w-6 h-4 bg-[#f3f2f0] rounded border border-[#2b4e42]"/>
+                    <input
+                        type="number"
+                        min={0}
+                        onChange={(e) => {
+                            validateInput(e);
+                        }}
+                        className="w-12 h-5 bg-[#f3f2f0] rounded border border-[#2b4e42] text-black text-center"
+                    />
                     <div className="text-black text-center ml-1">/ {availableSpace}</div>
                 </div>
             }
