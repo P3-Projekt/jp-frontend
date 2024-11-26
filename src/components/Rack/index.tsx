@@ -11,10 +11,10 @@ interface RackProps {
 const RackBox: React.FC<RackProps> = ({id, numberOfShelves, locationX, locationY}) => {
     return (
         // Rack container
-        <div className="flex flex-col h-[300px] w-[150px] bg-[#2b4e42] rounded-lg p-1">
+        <div className="flex flex-col h-[300px] w-[150px] bg-colorprimary rounded-lg p-1">
 
             {/* Rack name container */}
-            <div className="bg-[#2b4e42] rounded-lg mb-1">
+            <div className="bg-colorprimary rounded-lg mb-1">
                 <p className="text-center text-white rounded-lg">{`Reol #${id}`}</p>
             </div>
 
