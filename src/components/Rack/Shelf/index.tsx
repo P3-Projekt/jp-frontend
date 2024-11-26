@@ -62,7 +62,7 @@ const ShelfBox: React.FC<ShelfProps> = ({index, rack}) => {
 
     return (
         // Shelf container
-        <div className="flex-1 flex items-center justify-center rounded-lg bg-darkgrey">
+        <div className="flex-1 flex items-center justify-center rounded-lg bg-lightgrey">
             {availableSpace > 0 &&
                 <div className="flex items-center">
                     <input
