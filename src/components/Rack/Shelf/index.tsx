@@ -7,63 +7,72 @@ export interface ShelfProps {
 }
 
 const ShelfBox: React.FC<ShelfProps> = ({index, rack}) => {
-    const { shelfMap } = useShelfContext();
-    const [previousValue, setPreviousValue] = useState(0);
-    const [availableSpace, setAvailableSpace] = useState(0);
+    const { shelfMap } = useShelfContext(); //Get the shelfMap which tells this shelf how much available space it has
+    const [currentValue, setCurrentValue] = useState(0); //The current input value which becomes the previous when the next input is entered
+    const [availableSpace, setAvailableSpace] = useState(0); //The maximal space available on the shelf
     const { placedAmount, setPlacedAmount, batchAmount } = usePlacedAmountContext();
+    //console.log(`Rendering shelf ${index} on rack ${rack}`);
 
     useEffect(() => {
-        if (shelfMap !== undefined) {
-            const shelfArray = shelfMap.shelves.get(rack);
-            if (shelfArray !== undefined) {
-                const space = shelfArray.at(index);
-                if (space) {
-                    setAvailableSpace(space);
-                }
-            } else {
-                console.log("Setting space to 0");
-                setAvailableSpace(0);
+        setCurrentValue(0);
+        if (shelfMap === undefined) {
+            throw new TypeError("shelfMap from useShelfContext is undefined");
+        }
+        const shelfArray = shelfMap.shelves.get(rack);
+        if (shelfArray !== undefined) {
+            const space = shelfArray.at(index);
+            if (space) {
+                setAvailableSpace(space);
             }
+        } else {
+            //console.log("Setting space to 0");
+            setAvailableSpace(0);
         }
     }, [shelfMap, rack, index]);
 
     const getMax = (currentlyPlaced: number) => {
-        if (batchAmount !== null) {
-            console.log("Batch amount: " + batchAmount);
-            console.log("Currently placed: " + currentlyPlaced);
-            console.log("placedAmount: " + placedAmount);
-            const leftToBePlaced = batchAmount - placedAmount - 1;
-            return leftToBePlaced + currentlyPlaced < availableSpace ? leftToBePlaced + currentlyPlaced : availableSpace;
+        if (batchAmount === null) {
+            throw new TypeError('Expected a non-null value for batchAmount, getMax should only be called when a batch is selected and then batchAmount should not be null')
         }
-        return availableSpace;
+
+        //console.log(`batchAmount: ${batchAmount}, placedAmount: ${placedAmount}, ${currentlyPlaced}`);
+        const valueDifference = currentlyPlaced - currentValue; // Get the difference from the new input and the previous input
+        const leftToBePlaced = batchAmount - placedAmount + currentlyPlaced - valueDifference; // Calculate the amount left to be placed
+        //console.log(`leftToBePlaced: ${leftToBePlaced}`);
+        return leftToBePlaced < availableSpace ? leftToBePlaced : availableSpace; // Return the smaller of leftToBePlaced and availableSpace
     }
+ 
+    const validateAndSetInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+        let input = Number(event.target.value);
+        const max = getMax(input);
+        if (input < 0) { //Input may not be negative
+            input = 0;
+        } else if (input > max) { //Input may not be more than max
+            input = max;
+        }
 
-    const validateInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-         let input = Number(event.target.value);
-        // const max = getMax(input);
-        // if (input > max) {
-        //     input = max;
-        // }
-        // event.target.value = input.toString();
-
-        console.log("Previous value: " + previousValue + ", placedAmount total: " + placedAmount);
-        const valueDifference = input - previousValue;
-        setPlacedAmount(placedAmount + valueDifference);
-        setPreviousValue(input);
+        //console.log("Set input to: " + input + ", max is: " + max);
+        //event.target.value = input.toString();
+        const valueDifference = input - currentValue;
+        const newPlacedAmount = placedAmount + valueDifference;
+        setPlacedAmount(newPlacedAmount);
+        //console.log("Placed amount was before: " + placedAmount + " and is now: " + newPlacedAmount);
+        setCurrentValue(input);
     }
 
     return (
         // Shelf container
-        <div className="flex-1 flex items-center justify-center rounded-lg bg-[#d9d9d9]">
+        <div className="flex-1 flex items-center justify-center rounded-lg bg-darkgrey">
             {availableSpace > 0 &&
                 <div className="flex items-center">
                     <input
                         type="number"
                         min={0}
+                        value={currentValue}
                         onChange={(e) => {
-                            validateInput(e);
+                            validateAndSetInput(e);
                         }}
-                        className="w-12 h-5 bg-[#f3f2f0] rounded border border-[#2b4e42] text-black text-center"
+                        className="w-12 h-5 bg-sidebarcolor rounded border border-colorprimary text-black text-center"
                     />
                     <div className="text-black text-center ml-1">/ {availableSpace}</div>
                 </div>
