@@ -22,6 +22,12 @@ interface DraggableBoxProps {
   panOffset: { x: number; y: number };
 }
 
+export function Home() {
+	return (
+		<div></div>
+	);
+}
+
 // DraggableBox component
 const DraggableBox: React.FC<DraggableBoxProps> = ({
   initialX,
