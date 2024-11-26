@@ -10,18 +10,24 @@ interface BatchReadyProps {
 
 const BatchReadyBox: React.FC<BatchReadyProps> = ({batchId, plantType, amount}) => {
     const { setShelfMap, activeBatchId, setActiveBatchId } = useShelfContext();
-    const { placedAmount, setBatchAmount } = usePlacedAmountContext();
+    const { placedAmount, setBatchAmount, setPlacedAmount } = usePlacedAmountContext();
 
     const handleClick = async () => {
         if (activeBatchId === batchId) {
             updateShelfMap(new Object());
+            setPlacedAmount(0);
             setActiveBatchId(null);
             setBatchAmount(null);
         } else {
+            setPlacedAmount(0);
             setActiveBatchId(batchId);
             setBatchAmount(amount);
             await fetchMaxBatchesOnShelves(batchId);
         }
+    }
+
+    const handlePlaceClick = () => {
+        console.log("Place button clicked");
     }
 
     const fetchMaxBatchesOnShelves = async (batchId: number) => {
@@ -48,23 +54,31 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({batchId, plantType, amount}) 
     
     return (
         <div>
-            <div className={`p-2 mb-2 shadow-md rounded-lg ${activeBatchId === batchId ? 'bg-[#2b4e42]' : 'bg-[#f3f2f0]'} cursor-pointer transition-all duration-300`} onClick={handleClick}>
+            <div className={`p-2 mb-2 shadow-md rounded-lg ${activeBatchId === batchId ? 'bg-colorprimary' : 'bg-sidebarcolor'} cursor-pointer transition-all duration-300`} onClick={handleClick}>
                 <p className={`text-center ${activeBatchId === batchId ? 'text-white' : 'text-black'} cursor-pointer transition-all duration-300`} onClick={handleClick}>{plantType}: {amount}</p>
             </div>
             <div>
                 {/* Locate box*/}
                 {activeBatchId === batchId && (
                     // Outer background
-                    <div className="p-2 bg-[#a5a5a5]">
+                    <div className="p-2 bg-lightgrey">
                         {/* "Autolokaliser" background */}
-                        <div className="p-2 mb-2 bg-[#f3f2f0] shadow-md rounded-lg">
+                        <div className="p-2 mb-2 bg-sidebarcolor shadow-md rounded-lg">
                             <div className="text-black text-lg font-bold text-center">Autolokaliser</div>
                         </div>
-                        
+
                         {/* "Lokaliseret" background */}
-                        <div className="p-2 bg-[#f3f2f0] shadow-md rounded-lg">
-                            <div className="text-black text-lg font-bold text-center">Lokaliseret: {placedAmount}/{amount}</div>
-                        </div>
+                        {placedAmount === amount ? (
+                            // If all plants are placed
+                            <div className="bg-colorprimary p-2 shadow-md rounded-lg cursor-pointer transition-all duration-300" onClick={handlePlaceClick}>
+                                <div className="text-white text-center text-lg font-bold">Bekræft placering</div>
+                            </div>
+                        ) : (
+                            // If not all plants are placed
+                            <div className="bg-sidebarcolor text-black p-2 shadow-md rounded-lg transition-all duration-300">
+                                <div className="text-black text-lg font-bold text-center">Lokaliseret: {placedAmount}/{amount}</div>
+                            </div> 
+                        )}
                     </div>
                 )}
             </div>
