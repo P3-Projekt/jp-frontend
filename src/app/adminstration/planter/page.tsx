@@ -220,7 +220,7 @@ const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                 <td className="p-2 border text-center">
                   <button
                     onClick={() => handleDelete(plante.name)}
-                    className="flex items-center justify-center"
+                    className="flex items-center justify-center w-full h-full"
                     aria-label={`Delete ${plante.name}`}
                   >
                     <Image

@@ -149,7 +149,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   {/* Slet knap */}
                   <button
                     onClick={() => handleDelete(bruger.name)}
-                    className="flex items-center justify-center"
+                    className="flex items-center justify-center w-full h-full"
                     aria-label={`Delete ${bruger.name}`}
                   >
                     <Image

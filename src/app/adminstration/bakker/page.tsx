@@ -5,7 +5,7 @@ import Image from 'next/image';
 
 const BakkerPage = () => {
   const [bakketyper, setBakketyper] = useState([]);
-  const [formData, setFormData] = useState({ name: '', widthCm: '', lengthCm: '' });
+  const [formData, setFormData] = useState({ name: '', lengthCm: '', widthCm: '' });
 
   // hent data fra backend
   useEffect(() => {
@@ -34,7 +34,7 @@ const BakkerPage = () => {
 
       if (response.ok) {
         // nulstil formen
-        setFormData({ name: '', widthCm: '', lengthCm: '' });
+        setFormData({ name: '', lengthCm: '', widthCm: '' });
         // hent ny data fra backend
         const updatedResponse = await fetch('http://localhost:8080/TrayTypes');
         const updatedData = await updatedResponse.json();
@@ -153,7 +153,7 @@ const BakkerPage = () => {
                   {/* slet knap */}
                   <button
                     onClick={() => handleDelete(bakke.name)}
-                    className="flex items-center justify-center"
+                    className="flex items-center justify-center w-full h-full"
                     aria-label={`Delete ${bakke.name}`}
                   >
                     <Image
