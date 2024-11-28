@@ -1,11 +1,22 @@
 "use client";
+/*
+TODO:
+	- Gør sådan at DraggableBox komponenten ikke highlightes hvis der klikkes på den, men derefter ikke flyttes.
+	- Få DraggableBox komponenten til at ligne en rack, med hylder.
+	- Få backend op at køre med 2D kortet, sådanne at racks bliver hentet fra databasen, og vist på de rigtige lokationer.
+	- Gør sådan at alle racks bliver hentet ind fra databasen, hver gang siden bliver tilgået.
+	- (måske) gem i localstorage, alle racks hentet fra databasen, og kun tjek om der er sket ændringre siden sidste gang. Slipper muligvis for at skulle hente alle racks hver gang.
+	- (måske) fix sådan der ikke er en margin rundt om 2D kortet.
+	- Fjern grid linjerne, når vi er færdige med kortet.
+	- Error handling - tjek om racksene er oven i hindanden, og giv en fejlbesked.
+*/
+
+
 import React, { useState, useCallback, useEffect } from 'react';
+import DraggableBox, { RackData } from '../components/map/Rack';
 
 // Grid size for snapping
 const GRID_SIZE = 50;
-
-// Snap a value to the grid size
-const snapToGrid = (value: number) => Math.round(value / GRID_SIZE) * GRID_SIZE;
 
 // Drag checker
 let isDragChecker = false;
@@ -54,69 +65,33 @@ const DraggableBox: React.FC<DraggableBoxProps> = ({
     if (!isDragging) return;
 
 
-    // Convert client position to absolute position by removing pan offset and centering the boxes
-    const newX = e.clientX - panOffset.x - 50;
-    const newY = e.clientY - panOffset.y - 100;
-
-	console.log(newX, newY);
-
-    if (isNaN(newX) || isNaN(newY)) return;
-
-    // Check for overlap and snap to grid if not overlapping
-    const isOverlapping = allBoxes.some((box) => (
-      newX < box.x + box.width &&
-      newX + 100 > box.x &&
-      newY < box.y + box.height &&
-      newY + 200 > box.y
-    ));
-
-    // Update position if not overlapping
-    if (!isOverlapping) {
-      const snappedX = snapToGrid(newX);
-      const snappedY = snapToGrid(newY);
-      setPosition({ x: snappedX, y: snappedY });
-      onDrag(snappedX, snappedY);
-    }
-	}, [isDragging, allBoxes, onDrag, panOffset]);
-
-  // Add event listeners for dragging
-  useEffect(() => {
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', () => setIsDragging(false));
-	  document.addEventListener('mouseup', () => isDragChecker = false);
-    }
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-    };
-  }, [isDragging, handleMouseMove]);
-
-  return (
-    <div
-      onMouseDown={handleMouseDown}
-      style={{
-        position: 'absolute',
-        left: position.x, // Adjust for pan offset visually only
-        top: position.y,   // Adjust for pan offset visually only
-        width: 100,
-        height: 200,
-        backgroundColor: color,
-        cursor: isSelected ? 'grabbing' : 'grab',
-        border: isSelected ? '2px solid black' : 'none',
-      }}
-    />
-  );
-};
-
 // CanvasComponent component
 const CanvasComponent: React.FC = () => {
-  const [boxes, setBoxes] = useState([
-    { x: 400, y: 100, width: 100, height: 200 },
-    { x: 600, y: 100, width: 100, height: 200 },
-    { x: 500, y: 400, width: 100, height: 200 },
-    { x: 350, y: 700, width: 100, height: 200 },
-    { x: 650, y: 700, width: 100, height: 200 },
-  ]);
+
+  const [boxes, setBoxes] = useState<RackData[]>([]);
+
+  // Fetch racks from the backend
+  useEffect(() => {
+    fetch('http://localhost:8080/Racks')
+      .then(response => {
+        
+        // Check if the response is ok
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+
+      // Set the boxes state to the racks
+      .then(racks => {
+        const rackObjects = racks;
+        setBoxes(rackObjects);
+      })
+      // Error handling
+      .catch(err => {
+        console.error('Error getting racks: ' + err);
+      });
+  }, []);
 
   // State for selected box index
   const [selectedBoxIndex, setSelectedBoxIndex] = useState<number | null>(null);
@@ -126,9 +101,13 @@ const CanvasComponent: React.FC = () => {
 
   // Handle dragging a box by updating its position
   const handleDrag = useCallback((x: number, y: number, index: number) => {
+    boxes[index].position.x = x;
+    boxes[index].position.y = y;
+    /*
     const newBoxes = [...boxes];
     newBoxes[index] = { ...newBoxes[index], x, y };
     setBoxes(newBoxes);
+    */
   }, [boxes]);
 
   // Handle selecting a box by toggling the selected state
@@ -176,15 +155,16 @@ const CanvasComponent: React.FC = () => {
     };
   }, [isPanning, panStart, panOffset, handlePanMove, handlePanEnd]);
 
+	// Grid lines
   return (
     <div className="relative w-full h-full overflow-hidden z-1" onMouseDown={handlePanStart}>
       <div
-        className="absolute w-full h-full inset-0 pointer-events-none"
+        className="absolute w-full h-full inset-0 pointer-events-none opacity-40"
         style={{
           backgroundSize: `${GRID_SIZE}px ${GRID_SIZE}px`,
           backgroundPosition: `${panOffset.x % GRID_SIZE}px ${panOffset.y % GRID_SIZE}px`,
-          backgroundImage: `linear-gradient(to right, #ccc 1px, transparent 1px),
-                            linear-gradient(to bottom, #ccc 1px, transparent 1px)`,
+          backgroundImage: `linear-gradient(to right, #ccc 1px, transparent 0.25px),
+                            linear-gradient(to bottom, #ccc 1px, transparent 0.25px)`,
         }}
       />
       <div
@@ -196,14 +176,13 @@ const CanvasComponent: React.FC = () => {
         {boxes.map((box, index) => (
           <DraggableBox
             key={index}
-            initialX={box.x}
-            initialY={box.y}
-            color={['red', 'green', 'blue', 'orange', 'blue'][index]}
+            rackData={box}
             allBoxes={boxes.filter((_, i) => i !== index)}
             onDrag={(x, y) => handleDrag(x, y, index)}
             onSelect={() => handleSelect(index)}
-            isSelected={selectedBoxIndex === index}
             panOffset={panOffset}
+						GRID_SIZE={GRID_SIZE}
+						isDragChecker={isDragChecker}
           />
         ))}
       </div>
