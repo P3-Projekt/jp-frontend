@@ -41,6 +41,11 @@ const sidebarConfig: SidebarItem[] = [
 		path: "/redigeringstilstand",
 		icon: SquarePen,
 	},
+	{
+		title: "Forspiring",
+		path: "/pregermination",
+		icon: SquarePen
+	}
 ];
 
 export default sidebarConfig;

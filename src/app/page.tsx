@@ -21,6 +21,49 @@ const GRID_SIZE = 50;
 // Drag checker
 let isDragChecker = false;
 
+// DraggableBox component props
+interface DraggableBoxProps {
+  initialX: number;
+  initialY: number;
+  color: string;
+  allBoxes: { x: number; y: number; width: number; height: number }[];
+  onDrag: (x: number, y: number) => void;
+  onSelect: () => void;
+  isSelected: boolean;
+  panOffset: { x: number; y: number };
+}
+
+export function Home() {
+	return (
+		<div></div>
+	);
+}
+
+// DraggableBox component
+const DraggableBox: React.FC<DraggableBoxProps> = ({
+  initialX,
+  initialY,
+  color,
+  allBoxes,
+  onDrag,
+  onSelect,
+  isSelected,
+  panOffset,
+}) => { // State for position and dragging
+  const [position, setPosition] = useState({ x: initialX, y: initialY });
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(true);
+	isDragChecker = true;
+    onSelect();
+  };
+
+  // Handle dragging the box by updating its position
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!isDragging) return;
+
 
 // CanvasComponent component
 const CanvasComponent: React.FC = () => {
