@@ -1,5 +1,5 @@
-import { ReactNode } from 'react';
-import { cn } from '@/app/lib/utils';
+import { ReactNode } from "react";
+import { cn } from "@/app/lib/utils";
 
 const MainSiteWrapper = ({
 	className,
