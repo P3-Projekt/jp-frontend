@@ -11,11 +11,11 @@ import {
 } from "@/components/ui/dialog"
 
 import { buttonVariants } from "@/components/ui/button"
-import { RackData } from "@/components/DraggableBox";
+import { RackData } from "@/components/map/Rack";
 import { Droplets, Scissors, X } from 'lucide-react';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import dynamic from 'next/dynamic';
-import { BatchData } from '../Batch';
+import { BatchData } from '../../Batch';
 
 let rackToDisplayUnSynced : RackData | null = null;
 let lastDialogValue = false;
@@ -29,6 +29,11 @@ export function setRackToBeDisplayed(rack: RackData) {
 interface RackDialogProps {
   showDialog: boolean;
   setShowDialog: (show: boolean) => void;
+}
+
+function isTaskDue(dueDate: string) {
+  const currentDate = new Date().toISOString().split('T')[0];
+  return new Date(currentDate) >= new Date(dueDate);
 }
 
 const RackDialog: React.FC<RackDialogProps> = ({
@@ -55,6 +60,11 @@ const RackDialog: React.FC<RackDialogProps> = ({
   const rackToDisplay = rackToDisplayUnSynced;
 
   const currentDate = new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
+
+  function taskIsDue(batch: BatchData) {
+    return new Date(currentDate) >= new Date(batch.nextTask.dueDate);
+  }
+  
 
   return(
     <Dialog open={showDialog} onOpenChange={setShowDialog}>
@@ -104,7 +114,7 @@ const RackDialog: React.FC<RackDialogProps> = ({
               <div className="mt-4 self-center uppercase font-bold">
                 <p
                 className={buttonVariants({
-                  variant: "default",
+                  variant: "green",
                 })}
                 onClick={() => {
 
@@ -126,7 +136,7 @@ const RackDialog: React.FC<RackDialogProps> = ({
                   setShowDialog(false);
                 }}
                 >
-                  TaskType
+                  Udfør opgave
                 </p>
               </div>
             </div>
@@ -154,10 +164,10 @@ const RackDialog: React.FC<RackDialogProps> = ({
                               }}
                             >
                             {batch.plant}
-                            {batch?.nextTask.dueDate === currentDate && (
-                              batch?.nextTask.category === 'Water' ? (
+                            {
+                              batch?.nextTask.category === 'Water' && taskIsDue(batch) ? (
                               <Droplets className={`text-blue-600 border-black size-6 self-center`} />
-                            ) : batch?.nextTask.category === 'Harvest' ? (
+                            ) : batch?.nextTask.category === 'Harvest' && taskIsDue(batch) ? (
                               <Scissors className={`text-green-600 size-6`} />
                             ): <CircularProgressbar
                                 value={batch?.nextTask.progress}
@@ -166,7 +176,7 @@ const RackDialog: React.FC<RackDialogProps> = ({
                                 minValue={0}
                                 maxValue={100}
                               />
-                            )}
+                            }
                             </div>
                            ))}
                           </div>
@@ -187,4 +197,4 @@ const RackDialog: React.FC<RackDialogProps> = ({
 
 export default RackDialog;
 
-
+                      

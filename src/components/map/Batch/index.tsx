@@ -27,16 +27,16 @@ type BatchArguments = BatchData & additionalArgs;
 export const Batch: React.FC<BatchArguments> = (batchArguments : BatchArguments) => {
     const currentDate = new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
 
-    
+    const taskIsDue = new Date(currentDate) >= new Date(batchArguments.nextTask.dueDate);
 
     return(
         <div key={batchArguments.id} className="flex h-full w-full flex-col hover:cursor-pointer">
         <div className="flex text-center bg-gray-200 h-full items-center justify-center">
         {/* Task icons */}
-        {batchArguments.nextTask.dueDate === currentDate && (
-          batchArguments.nextTask.category === 'Water' ? (
+        {
+          taskIsDue && batchArguments.nextTask.category === 'Water' ? (
             <Droplets className={`text-blue-600 size-10 border-black + ${batchArguments.isFewShelves ? 'size-10' : 'size-6'} ${batchArguments.isFewBatches ? 'size-10' : 'size-6'}`} />
-          ) : batchArguments.nextTask.category === 'Harvest' ? (
+          ) : taskIsDue && batchArguments.nextTask.category === 'Harvest' ? (
             <Scissors className={`text-red-600 size-10 ${batchArguments.isFewShelves ? 'size-10' : 'size-6'} ${batchArguments.isFewBatches ? 'size-10' : 'size-6'}`} />
           ) : <CircularProgressbar
               value={batchArguments.nextTask.progress}
@@ -45,7 +45,7 @@ export const Batch: React.FC<BatchArguments> = (batchArguments : BatchArguments)
               minValue={0}
               maxValue={100}
             />
-        )}
+        }
         </div>
       </div>
     );

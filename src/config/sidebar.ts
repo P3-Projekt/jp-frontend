@@ -38,7 +38,7 @@ const sidebarConfig: SidebarItem[] = [
 	},
 	{
 		title: "Redigeringstilstand",
-		path: "/settings",
+		path: "/redigeringstilstand",
 		icon: SquarePen,
 	},
 ];

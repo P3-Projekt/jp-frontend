@@ -13,7 +13,7 @@ TODO:
 
 
 import React, { useState, useCallback, useEffect } from 'react';
-import DraggableBox, { RackData } from '../components/DraggableBox';
+import DraggableBox, { RackData } from '../components/map/Rack';
 
 // Grid size for snapping
 const GRID_SIZE = 50;
@@ -137,7 +137,6 @@ const CanvasComponent: React.FC = () => {
             allBoxes={boxes.filter((_, i) => i !== index)}
             onDrag={(x, y) => handleDrag(x, y, index)}
             onSelect={() => handleSelect(index)}
-            isSelected={selectedBoxIndex === index}
             panOffset={panOffset}
 						GRID_SIZE={GRID_SIZE}
 						isDragChecker={isDragChecker}

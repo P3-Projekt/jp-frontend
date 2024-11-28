@@ -1,10 +1,10 @@
 "use client";
 import React, { useState, useEffect, useCallback } from 'react';
-import { setRackToBeDisplayed } from '../map/RackDialog';
+import { setRackToBeDisplayed } from '../Dialog/RackDialog';
 
-import { ShelfData, Shelf } from '../map/Shelf';
+import { ShelfData, Shelf } from '../Shelf';
 
-import RackDialog from '../map/RackDialog';
+import RackDialog from '../Dialog/RackDialog';
 
 //Constants
 const width = 100;
@@ -22,7 +22,6 @@ interface DraggableBoxProps {
   rackData : RackData;
   onDrag: (x: number, y: number) => void;
   onSelect: () => void;
-  isSelected: boolean;
   panOffset: { x: number; y: number };
   GRID_SIZE: number;
   isDragChecker: boolean;
@@ -35,12 +34,12 @@ const DraggableBox: React.FC<DraggableBoxProps> = ({
   allBoxes,
   onDrag,
   onSelect,
-  isSelected,
   panOffset,
   GRID_SIZE,
   isDragChecker,
 }) => { // State for position and dragging
   const [position, setPosition] = useState({ x: rackData.position.x, y: rackData.position.y });
+  const [isSelected, setIsSelected] = useState<boolean>(false);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [showDialog, setShowDialog] = useState<boolean>(false);
   
@@ -56,14 +55,20 @@ const snapToGrid = (value: number) => Math.round(value / GRID_SIZE) * GRID_SIZE;
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
+    setIsSelected(true);
+    /*
     setIsDragging(true);
 	isDragChecker = true;
     onSelect();
+    */
   };
 
   const handleMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
+    setIsSelected(false);
+    /*
     onSelect();
+    */
   }
 
   // Handle dragging the box by updating its position
