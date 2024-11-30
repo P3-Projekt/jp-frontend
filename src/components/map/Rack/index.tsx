@@ -1,12 +1,10 @@
 "use client";
 import React, { useState, useEffect, useCallback } from 'react';
-import { setRackToBeDisplayed } from '../Dialog/RackDialog';
+import RackDialog, { setRackToBeDisplayed } from '../Dialog/RackDialog';
 
 import { ShelfData, Shelf } from '../Shelf';
 
-import RackDialog from '../Dialog/RackDialog';
-
-import { GRID_SIZE } from '../../../app/page';
+import { setMouseMoveHandler, GRID_SIZE } from '../../../app/page';
 
 //Constants
 const width = 100;
@@ -20,7 +18,8 @@ export interface RackData{
 
 // DraggableBox component props
 interface DraggableBoxProps {
-  allBoxes: RackData[];
+  otherBoxes: RackData[];
+  updateRackData: (rackData: RackData) => void;
   rackData : RackData;
   onDrag: (x: number, y: number) => void;
   panOffset: { x: number; y: number };
@@ -28,116 +27,119 @@ interface DraggableBoxProps {
 }
 
 
-
 const DraggableBox: React.FC<DraggableBoxProps> = ({
   rackData,
-  allBoxes,
+  otherBoxes,
+  updateRackData,
   onDrag,
   panOffset,
   isDragChecker,
 }) => { // State for position and dragging
-  const [position, setPosition] = useState({ x: rackData.position.x, y: rackData.position.y });
   const [isSelected, setIsSelected] = useState<boolean>(false);
-  const [isDragging, setIsDragging] = useState<boolean>(false);
   const [showDialog, setShowDialog] = useState<boolean>(false);
-  
-  /*
-  const [selectedBatch, setSelectedBatch] = useState(-1);
-  const [selectedShelf, setSelectedShelf] = useState(-1);
-  */
  
   const currentDate = new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
 
-// Snap a value to the grid size
-const snapToGrid = (value: number) => Math.round(value / GRID_SIZE) * GRID_SIZE;
+  // Snap a value to the grid size
+  const snapToGrid = (value: number) => Math.round(value / GRID_SIZE) * GRID_SIZE;
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.preventDefault();
     setIsSelected(true);
-    /*
-    setIsDragging(true);
-	isDragChecker = true;
-    onSelect();
-    */
+    setMouseMoveHandler(handleRackDrag);
   };
 
-  const handleMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsSelected(false);
-    /*
-    onSelect();
-    */
-  }
 
   // Handle dragging the box by updating its position
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!isDragging) return;
+  const handleRackDrag = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
 
+    const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
 
     // Convert client position to absolute position by removing pan offset and centering the boxes
-    const newX = e.clientX - panOffset.x - 50;
-    const newY = e.clientY - panOffset.y - 100;
-
-	//console.log(newX, newY);
-
-    if (isNaN(newX) || isNaN(newY)) return;
+    const xCoordinate = snapToGrid(mouseX - panOffset.x - width / 2);
+    const yCoordinate = snapToGrid(mouseY - panOffset.y - height / 2);
 
     // Check for overlap and snap to grid if not overlapping
-    const isOverlapping = allBoxes.some((box) => (
-      newX < rackData.position.x + width &&
-      newX + width > rackData.position.x &&
-      newY < rackData.position.y + height &&
-      newY + height > rackData.position.y
-    ));
+    const isOverlapping = otherBoxes.some((box) => {
+      const xDelta = Math.abs(box.position.x - xCoordinate);
+      const yDelta = Math.abs(box.position.y - yCoordinate);
+      return xDelta < width && yDelta < height;
+    });
 
     // Update position if not overlapping
     if (!isOverlapping) {
-      const snappedX = snapToGrid(newX);
-      const snappedY = snapToGrid(newY);
-      setPosition({ x: snappedX, y: snappedY });
-      onDrag(snappedX, snappedY);
+      const newRackData : RackData = {
+        id: rackData.id,
+        position: { x: xCoordinate, y: yCoordinate },
+        shelves: rackData.shelves
+      }
+      updateRackData(newRackData);
+    } else {
     }
-	}, [isDragging, allBoxes, onDrag, panOffset]);
+	}, [otherBoxes]);
 
-  // Add event listeners for dragging
+  const onMouseUp = useCallback(() => {
+    console.log(isSelected);
+    if(isSelected){
+      console.log("go")
+      fetch('http://localhost:8080/Rack/' + rackData.id + '/Position', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          x: rackData.position.x,
+          y: rackData.position.y
+        }),
+      }).then(response => {
+        if (response.ok) {
+          console.log('Rack position updated');
+        } else {
+          console.error('Error updating rack position. Bad response code');
+        }
+      }).catch(err => {
+        console.error('Error updating rack position: ' + err);
+      });
+    }
+    //setIsSelected(false);
+    setMouseMoveHandler(()=>{});
+  }, [isSelected]);
+
+  // Add event listeners for mouse release
   useEffect(() => {
+    document.addEventListener('mouseup', onMouseUp);
 
-    //Unselect
-    document.addEventListener('mouseup', () => setIsSelected(false));
-
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', () => setIsDragging(false));
-	  document.addEventListener('mouseup', () => isDragChecker = false);
-    }
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
     };
-  }, [isDragging, handleMouseMove]);
+  }, []);
 
   return (
     <>
     <div
       onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
       className={`absolute flex` + (isSelected ? 'cursor-grabbing scale-105 border-black' : 'cursor-grab')}
       style={{
-        left: position.x, // Adjust for pan offset visually only
-        top: position.y,   // Adjust for pan offset visually only
+        left: rackData.position.x, // Adjust for pan offset visually only
+        top: rackData.position.y,   // Adjust for pan offset visually only
         width: width,
         height: height,
         border: isSelected ? '2px solid black' : 'none',
       }}
     >
       {/* The rack */}
-      <div className="border-2 border-black bg-sidebarcolor w-full h-full flex flex-col divide-y divide-black divide-y-2" onClick={() =>  { setRackToBeDisplayed(rackData); setShowDialog(true) }}>
+      <div className="border-2 border-black bg-sidebarcolor w-full h-full flex flex-col divide-y divide-black divide-y-2" 
+        onClick={() =>  { setRackToBeDisplayed(rackData); 
+        setShowDialog(true) }}
+      >
         {/* Dynamically adding shelves */}
         {rackData.shelves.map((shelf, index) => (
           <Shelf key={index} {...shelf} isFewShelves={rackData.shelves.length <= 3}/>
         ))}
       </div>
     </div>
-    <RackDialog showDialog={showDialog} setShowDialog={setShowDialog} />
+    {/*<RackDialog showDialog={showDialog} setShowDialog={setShowDialog} />*/}
   </>
   );
 };

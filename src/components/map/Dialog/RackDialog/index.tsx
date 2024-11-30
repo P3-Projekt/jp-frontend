@@ -21,7 +21,6 @@ let rackToDisplayUnSynced : RackData | null = null;
 let lastDialogValue = false;
 
 export function setRackToBeDisplayed(rack: RackData) {
-  console.log(rack);
   rackToDisplayUnSynced = rack;
 }
 

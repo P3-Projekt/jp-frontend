@@ -21,6 +21,17 @@ export const GRID_SIZE = 50;
 // Drag checker
 let isDragChecker = false;
 
+// Mouse move handler
+let registeredMouseMoveHandler = function(e: React.MouseEvent<HTMLDivElement>){}
+
+export function setMouseMoveHandler(handler: (e: React.MouseEvent<HTMLDivElement>) => void){
+  registeredMouseMoveHandler = handler;
+}
+
+function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+  registeredMouseMoveHandler(e);
+}
+
 
 // CanvasComponent component
 const CanvasComponent: React.FC = () => {
@@ -115,7 +126,10 @@ const CanvasComponent: React.FC = () => {
 
 	// Grid lines
   return (
-    <div className="relative w-full h-full overflow-hidden z-1" onMouseDown={handlePanStart}>
+    <div className="relative w-full h-full overflow-hidden z-1" 
+      onMouseDown={handlePanStart}
+      onMouseMove={handleMouseMove}
+    >
       <div
         className="absolute w-full h-full inset-0 pointer-events-none opacity-40"
         style={{
@@ -132,9 +146,13 @@ const CanvasComponent: React.FC = () => {
       >
         {boxes.map((box, index) => (
           <DraggableBox
-            key={index}
+            key={box.id}
             rackData={box}
-            allBoxes={boxes.filter((_, i) => i !== index)}
+            updateRackData={(rackData : RackData) => {
+              const newBoxes = boxes.map((box, i) => i === index ? { ...box, ...rackData } : box);
+              setBoxes(newBoxes);
+            }}
+            otherBoxes={boxes.filter((_, i) => i !== index)}
             onDrag={(x, y) => handleDrag(x, y, index)}
             panOffset={panOffset}
             isDragChecker={isDragChecker}
