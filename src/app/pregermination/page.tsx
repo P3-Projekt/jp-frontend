@@ -5,6 +5,7 @@ import BatchReadyBox from "@/components/PregerminationMenu/BatchReadyBox/index";
 import { ShelfProvider } from "./context";
 import { PlacedAmountProvider } from "./context";
 import RackBox from "@/components/Rack";
+import MainSiteWrapper from "@/components/wrappers/MainSiteWrapper";
 
 interface Batch {
     batchId: number;
@@ -106,7 +107,7 @@ const PreGerminationPage: React.FC = () => {
             <PlacedAmountProvider>
                 <div className="flex">
                     {/* Grey "Forspiring" background */}
-                    <div className="w-[250px] fixed h-full bg-lightgrey left-[350px] flex flex-col">
+                    <div className="w-[250px] fixed h-full bg-lightgrey flex flex-col">
                         <div className="bg-colorprimary mb-2">
                             <h1 className="text-white font-bold text-2xl text-center mt-2 mb-2">Forspiring</h1>
                         </div>
@@ -137,7 +138,7 @@ const PreGerminationPage: React.FC = () => {
                     </div>
 
                     {/* Container for rack components */}
-                    <div className="left-[900px] top-[50px] fixed space-y-1">
+                    <div className="left-[650px] top-[50px] fixed space-y-1">
                         {rackData.map((rack: RackData, index: number) => (
                             <RackBox
                                 id={rack.id}

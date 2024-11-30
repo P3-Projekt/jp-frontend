@@ -3,12 +3,12 @@
 TODO:
 	- Gør sådan at DraggableBox komponenten ikke highlightes hvis der klikkes på den, men derefter ikke flyttes.
 	- Få DraggableBox komponenten til at ligne en rack, med hylder.
-	- Få backend op at køre med 2D kortet, sådanne at racks bliver hentet fra databasen, og vist på de rigtige lokationer.
 	- Gør sådan at alle racks bliver hentet ind fra databasen, hver gang siden bliver tilgået.
 	- (måske) gem i localstorage, alle racks hentet fra databasen, og kun tjek om der er sket ændringre siden sidste gang. Slipper muligvis for at skulle hente alle racks hver gang.
 	- (måske) fix sådan der ikke er en margin rundt om 2D kortet.
 	- Fjern grid linjerne, når vi er færdige med kortet.
 	- Error handling - tjek om racksene er oven i hindanden, og giv en fejlbesked.
+
 */
 
 
@@ -16,53 +16,10 @@ import React, { useState, useCallback, useEffect } from 'react';
 import DraggableBox, { RackData } from '../components/map/Rack';
 
 // Grid size for snapping
-const GRID_SIZE = 50;
+export const GRID_SIZE = 50;
 
 // Drag checker
 let isDragChecker = false;
-
-// DraggableBox component props
-interface DraggableBoxProps {
-  initialX: number;
-  initialY: number;
-  color: string;
-  allBoxes: { x: number; y: number; width: number; height: number }[];
-  onDrag: (x: number, y: number) => void;
-  onSelect: () => void;
-  isSelected: boolean;
-  panOffset: { x: number; y: number };
-}
-
-export function Home() {
-	return (
-		<div></div>
-	);
-}
-
-// DraggableBox component
-const DraggableBox: React.FC<DraggableBoxProps> = ({
-  initialX,
-  initialY,
-  color,
-  allBoxes,
-  onDrag,
-  onSelect,
-  isSelected,
-  panOffset,
-}) => { // State for position and dragging
-  const [position, setPosition] = useState({ x: initialX, y: initialY });
-  const [isDragging, setIsDragging] = useState(false);
-
-  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDragging(true);
-	isDragChecker = true;
-    onSelect();
-  };
-
-  // Handle dragging the box by updating its position
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!isDragging) return;
 
 
 // CanvasComponent component
@@ -141,6 +98,7 @@ const CanvasComponent: React.FC = () => {
 
   // Add event listeners for panning
   useEffect(() => {
+    // Unselect
     if (isPanning) {
       document.addEventListener('mousemove', handlePanMove);
       document.addEventListener('mouseup', handlePanEnd);
@@ -163,8 +121,7 @@ const CanvasComponent: React.FC = () => {
         style={{
           backgroundSize: `${GRID_SIZE}px ${GRID_SIZE}px`,
           backgroundPosition: `${panOffset.x % GRID_SIZE}px ${panOffset.y % GRID_SIZE}px`,
-          backgroundImage: `linear-gradient(to right, #ccc 1px, transparent 0.25px),
-                            linear-gradient(to bottom, #ccc 1px, transparent 0.25px)`,
+          backgroundImage: `linear-gradient(to right, #ccc 1px, transparent 0.25px), linear-gradient(to bottom, #ccc 1px, transparent 0.25px)`,
         }}
       />
       <div
@@ -179,10 +136,8 @@ const CanvasComponent: React.FC = () => {
             rackData={box}
             allBoxes={boxes.filter((_, i) => i !== index)}
             onDrag={(x, y) => handleDrag(x, y, index)}
-            onSelect={() => handleSelect(index)}
             panOffset={panOffset}
-						GRID_SIZE={GRID_SIZE}
-						isDragChecker={isDragChecker}
+            isDragChecker={isDragChecker}
           />
         ))}
       </div>

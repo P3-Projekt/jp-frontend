@@ -2,7 +2,7 @@ import React from "react";
 
 const RedigeringstilstandPage: React.FC = () => {
 	return (
-		<div className="ml-[350px]">
+		<div className="">
 			<h1>Redigeringstilstand</h1>
 		</div>
 	);

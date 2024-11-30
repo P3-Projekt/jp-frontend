@@ -61,7 +61,7 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({batchId, plantType, amount}) 
                 {/* Locate box*/}
                 {activeBatchId === batchId && (
                     // Outer background
-                    <div className="p-2 bg-lightgrey">
+                    <div className="p-2 bg-darkgrey">
                         {/* "Autolokaliser" background */}
                         <div className="p-2 mb-2 bg-sidebarcolor shadow-md rounded-lg">
                             <div className="text-black text-lg font-bold text-center">Autolokaliser</div>

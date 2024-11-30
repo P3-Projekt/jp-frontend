@@ -31,7 +31,7 @@ export const Batch: React.FC<BatchArguments> = (batchArguments : BatchArguments)
 
     return(
         <div key={batchArguments.id} className="flex h-full w-full flex-col hover:cursor-pointer">
-        <div className="flex text-center bg-gray-200 h-full items-center justify-center">
+        <div className="flex text-center bg-sidebarcolor h-full items-center justify-center">
         {/* Task icons */}
         {
           taskIsDue && batchArguments.nextTask.category === 'Water' ? (

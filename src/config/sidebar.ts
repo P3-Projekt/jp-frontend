@@ -1,4 +1,4 @@
-import { Grid2X2, House, Leaf, SquarePen } from "lucide-react";
+import { Grid2X2, House, Leaf, SquarePen, Shrub } from "lucide-react";
 
 interface SidebarItem {
 	title: string;
@@ -44,7 +44,7 @@ const sidebarConfig: SidebarItem[] = [
 	{
 		title: "Forspiring",
 		path: "/pregermination",
-		icon: SquarePen
+		icon: Shrub
 	}
 ];
 

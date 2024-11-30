@@ -6,6 +6,8 @@ import { ShelfData, Shelf } from '../Shelf';
 
 import RackDialog from '../Dialog/RackDialog';
 
+import { GRID_SIZE } from '../../../app/page';
+
 //Constants
 const width = 100;
 const height = 200;
@@ -21,9 +23,7 @@ interface DraggableBoxProps {
   allBoxes: RackData[];
   rackData : RackData;
   onDrag: (x: number, y: number) => void;
-  onSelect: () => void;
   panOffset: { x: number; y: number };
-  GRID_SIZE: number;
   isDragChecker: boolean;
 }
 
@@ -33,9 +33,7 @@ const DraggableBox: React.FC<DraggableBoxProps> = ({
   rackData,
   allBoxes,
   onDrag,
-  onSelect,
   panOffset,
-  GRID_SIZE,
   isDragChecker,
 }) => { // State for position and dragging
   const [position, setPosition] = useState({ x: rackData.position.x, y: rackData.position.y });
@@ -103,6 +101,10 @@ const snapToGrid = (value: number) => Math.round(value / GRID_SIZE) * GRID_SIZE;
 
   // Add event listeners for dragging
   useEffect(() => {
+
+    //Unselect
+    document.addEventListener('mouseup', () => setIsSelected(false));
+
     if (isDragging) {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', () => setIsDragging(false));
@@ -128,7 +130,7 @@ const snapToGrid = (value: number) => Math.round(value / GRID_SIZE) * GRID_SIZE;
       }}
     >
       {/* The rack */}
-      <div className="border-2 border-black bg-gray-200 w-full h-full flex flex-col divide-y divide-black divide-y-2" onClick={() =>  { setRackToBeDisplayed(rackData); setShowDialog(true) }}>
+      <div className="border-2 border-black bg-sidebarcolor w-full h-full flex flex-col divide-y divide-black divide-y-2" onClick={() =>  { setRackToBeDisplayed(rackData); setShowDialog(true) }}>
         {/* Dynamically adding shelves */}
         {rackData.shelves.map((shelf, index) => (
           <Shelf key={index} {...shelf} isFewShelves={rackData.shelves.length <= 3}/>
