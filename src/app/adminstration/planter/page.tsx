@@ -1,10 +1,19 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 
+//plantetype interface
+interface PlantType {
+  name: string;
+  preGerminationDays: number;
+  growthTimeDays: number;
+  preferredPosition: 'Ligegyldigt' | 'Nederst' | 'Øverst';
+  wateringSchedule: number[];
+}
+
 const PlanterPage: React.FC = () => {
-  const [planterTyper, setPlanterTyper] = useState([]);
+  const [planterTyper, setPlanterTyper] = useState<PlantType[]>([]);
   const [formData, setFormData] = useState({
     navn: '',
     spiring: '',
@@ -12,25 +21,44 @@ const PlanterPage: React.FC = () => {
     position: 'Ligegyldigt',
     vanding: [] as number[],
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // hent plantetyper fra backend
+  // Hent plantetyper fra backend når der skiftes til siden
   useEffect(() => {
-    const fetchPlanterTyper = async () => {
-      try {
-        const response = await fetch('http://localhost:8080/PlantTypes');
-        if (!response.ok) throw new Error(`Failed to fetch: ${response.statusText}`);
-        const data = await response.json();
-        setPlanterTyper(data);
-      } catch (error) {
-        console.error('Error fetching plant types:', error);
-      }
-    };
-
-    fetchPlanterTyper();
+    fetchPlantTypes();
   }, []);
 
-  //Håndter form input ændringer
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  // function til at hente plantetyper fra backend
+  const fetchPlantTypes = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await fetch('http://localhost:8080/PlantTypes', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Kunne ikke hente plantetyper fra database');
+      }
+
+      const data = await response.json();
+      setPlanterTyper(data);
+
+    } catch (error) {
+      setError('Kunne ikke hente plante typer fra database');
+      console.error('Kunne ikke hente plante typer fra database:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Håndtering af ændringer af input
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
@@ -38,76 +66,98 @@ const PlanterPage: React.FC = () => {
     }));
   };
 
-  // Håndter checkbox ændringer (vandings skema)
-const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const { value, checked } = e.target;
-  setFormData((prevData) => {
-    const intValue = parseInt(value);
-    const updatedVanding = checked
-      ? [...prevData.vanding, intValue].sort((a, b) => a - b) // tilføj værdi og sorter array
-      : prevData.vanding.filter((day) => day !== intValue); // fjern værdi hvis ikke checked
-    return {
-      ...prevData,
-      vanding: updatedVanding,
-    };
-  });
-};
+  // Håndtere checkbox ændringer for vandingskemaet
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, checked } = e.target;
+    setFormData((prevData) => {
+      const intValue = parseInt(value);
+      const updatedVanding = checked
+        ? [...prevData.vanding, intValue].sort((a, b) => a - b)
+        : prevData.vanding.filter((day) => day !== intValue);
+      return {
+        ...prevData,
+        vanding: updatedVanding,
+      };
+    });
+  };
 
-  // send form til backend, sørger for at tabelen er opdateret, og reset form input felter
+  // Håndtering af at sende formen til backend
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+    setIsLoading(true);
+    setError(null);
+
+    // får det der sendes til at matche backend
+    const createPlantTypeRequest = {
+      name: formData.navn,
+      preGerminationDays: parseInt(formData.spiring),
+      growthTimeDays: parseInt(formData.groTid),
+      preferredPosition: formData.position,
+      wateringSchedule: formData.vanding,
+    };
+
     try {
       const response = await fetch('http://localhost:8080/PlantType', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: formData.navn,
-          preGerminationDays: parseInt(formData.spiring),
-          growthTimeDays: parseInt(formData.groTid),
-          preferredPosition: formData.position,
-          wateringSchedule: formData.vanding,
-        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(createPlantTypeRequest),
       });
-  
-      if (response.ok) {
 
-        // hent data fra backend
-        const updatedResponse = await fetch('http://localhost:8080/PlantTypes');
-        if (!updatedResponse.ok) throw new Error(`Failed to fetch updated data: ${updatedResponse.statusText}`);
-        const updatedData = await updatedResponse.json();
-        setPlanterTyper(updatedData); // opdatere tabel med ny data
-  
-        // Reset formen
-        setFormData({
-          navn: '',
-          spiring: '',
-          groTid: '',
-          position: 'Ligegyldigt',
-          vanding: [],
-        });
-      } else {
-        console.error(`Error submitting form: ${response.statusText}`);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Kunne ikke skabe plante type');
       }
-    } catch (error) {
-      console.error('Error submitting form:', error);
+
+      // hent plantetyper fra backend igen
+      await fetchPlantTypes();
+
+      // reset af formen
+      setFormData({
+        navn: '',
+        spiring: '',
+        groTid: '',
+        position: 'Ligegyldigt',
+        vanding: [],
+      });
+    } catch (err: any) {
+      if (err.message.includes('already exists')) {
+        setError('Plante typen eksistere allerede');
+      } else {
+        setError('Kunne ikke skabe plante typen');
+      }
+      console.error('Kunne ikke skabe plante typen:', err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // slet plante type fra backend
+  // håndtere sletning af plantetyper
   const handleDelete = async (plantTypeName: string) => {
+    setIsLoading(true);
+    setError(null);
+
     try {
-      const response = await fetch(`/PlantType/${plantTypeName}`, {
+      const response = await fetch(`http://localhost:8080/PlantType/${plantTypeName}`, {
         method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
 
-      if (response.ok) {
-        setPlanterTyper((prev) => prev.filter((plante) => plante.name !== plantTypeName));
-      } else {
-        console.error(`Error deleting plant type: ${response.statusText}`);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Kunne ikke slette plantetype');
       }
-    } catch (error) {
-      console.error('Error deleting plant type:', error);
+
+      // henter plante typer fra backend igen så vi har de nyeste data
+      await fetchPlantTypes();
+    } catch (err) {
+      setError('Kunne ikke slette plante typen');
+      console.error('Kunne ikke slette plante typen:', err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -115,9 +165,22 @@ const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     <div className="p-8">
       <h1 className="text-3xl font-bold mb-6 text-center">PLANTE SORTER</h1>
 
-      <form onSubmit={handleSubmit} className="bg-sidebarcolor p-6 rounded-lg shadow-xl mb-8 border">
+      {/*box til at skrive fejlmedelser i hvis der kommer nogen*/}
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+          {error}
+        </div>
+      )}
+
+      {/*Form til input af data der skal sendes til backend*/}
+      <form 
+      className="bg-sidebarcolor p-6 rounded-lg shadow-xl mb-8 border"
+      onSubmit={handleSubmit}
+      >
         <h2 className="text-lg font-semibold mb-6">OPRET EN PLANTE TYPE</h2>
-        <div className="flex gap-2">
+        <div className="flex gap-6">
+
+          {/*Navne felt*/}
           <div className="flex-col w-1/4">
             <label className="font-semibold mb-2">Navn:</label>
             <input
@@ -125,12 +188,15 @@ const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
               type="text"
               name="navn"
               value={formData.navn}
-              onChange={handleInputChange}
+              onChange={handleChange}
               placeholder="Indsæt navn"
               className="w-full p-2 border border-gray-300 rounded"
               required
+              disabled={isLoading}
             />
           </div>
+
+{/*Spirings felt*/}
           <div className="flex-col w-1/4">
             <label className="font-semibold mb-2">Spiring:</label>
             <input
@@ -138,13 +204,16 @@ const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
               type="number"
               name="spiring"
               value={formData.spiring}
-              onChange={handleInputChange}
+              onChange={handleChange}
               min="0"
               placeholder="Indsæt spirings tid"
               className="w-full p-2 border border-gray-300 rounded"
               required
+              disabled={isLoading}
             />
           </div>
+
+          {/*Gro tids felt*/}
           <div className="flex-col w-1/4">
             <label className="font-semibold mb-2">Gro tid:</label>
             <input
@@ -152,22 +221,26 @@ const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
               type="number"
               name="groTid"
               value={formData.groTid}
-              onChange={handleInputChange}
+              onChange={handleChange}
               min="0"
               placeholder="Indsæt gro tid"
               className="w-full p-2 border border-gray-300 rounded"
               required
+              disabled={isLoading}
             />
           </div>
+
+          {/*Foretrukne positions felt*/}
           <div className="flex-col w-1/4">
             <label className="font-semibold mb-2">Position:</label>
             <select
               id="position"
               name="position"
               value={formData.position}
-              onChange={handleInputChange}
+              onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded"
               required
+              disabled={isLoading}
             >
               <option value="Ligegyldigt">Ligegyldigt</option>
               <option value="Nederst">Nederst</option>
@@ -176,69 +249,87 @@ const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
           </div>
         </div>
 
-                  {/* Vandings skema check bokser */}
-                  <div className="mt-6">
-            <h3 className="font-semibold">Vandings skema:</h3>
-            <div className="grid grid-cols-7 gap-4 mt-2 border-2 border-black bg-white mb-2 p-4 w-2/5 mx-auto">
-              {[...Array(parseInt(formData.groTid) || 0)].map((_, day) => (
-                <label key={day} className="flex flex-col items-center">
-                  <span>Dag {day + 1}</span>
-                  <input
-                    type="checkbox"
-                    name="vanding"
-                    value={day + 1}
-                    checked={formData.vanding.includes(day + 1)}
-                    onChange={handleCheckboxChange}
-                    className="w-9 h-9 accent-green-600"
-                  />
-                </label>
-              ))}
-            </div>
+        {/* checkboxe til vandings skema*/}
+        <div className="mt-6">
+          <h3 className="font-semibold text-center">Vandings skema:</h3>
+          <div className="grid grid-cols-7 gap-4 mt-2 border-2 border-black bg-white mb-2 p-4 w-2/5 mx-auto">
+            {[...Array(parseInt(formData.groTid) || 0)].map((_, day) => (
+              <label key={day} className="flex flex-col items-center">
+                <span>Dag {day + 1}</span>
+                <input
+                  type="checkbox"
+                  name="vanding"
+                  value={day + 1}
+                  checked={formData.vanding.includes(day + 1)}
+                  onChange={handleCheckboxChange}
+                  className="w-9 h-9 accent-green-600"
+                  disabled={isLoading}
+                />
+              </label>
+            ))}
           </div>
+        </div>
 
-        <button type="submit" className="w-full py-2 mt-4 bg-green-600 text-white rounded">
-          OPRET
+        <button
+          type="submit"
+          className="transition w-full bg-green-600 font-semibold hover:bg-green-700 text-white py-2 mt-4 rounded-2xl"
+          
+          disabled={isLoading}
+        >
+          {isLoading ? 'HENTER DATA FRA BACKEND' : 'OPRET'}
         </button>
       </form>
 
-      {/* tabel til at vise plantetyper i database */}
+      {/* Tabel til at se plante typer i database */}
       <div className="bg-sidebarcolor p-6 rounded-lg shadow-xl">
         <h2 className="text-lg font-semibold mb-6">PLANTE TYPE OVERSIGT</h2>
-        <table className="w-full table-auto border-collapse">
-          <thead>
-            <tr className="bg-green-600 text-black">
-              <th className="p-2 border w-1/12">Slet</th> 
-              <th className="p-2 border w-1/4">Sort navn</th>
-              <th className="p-2 border w-1/4">Spiring [dage]</th>
-              <th className="p-2 border w-1/4">Gro tid [dage]</th>
-              <th className="p-2 border w-1/4">Vandings tider [dag(e)]</th>
-            </tr>
-          </thead>
-          <tbody>
-            {planterTyper.map((plante) => (
-              <tr key={plante.name} className="odd:bg-white even:bg-gray-200">
-                <td className="p-2 border text-center">
-                  <button
-                    onClick={() => handleDelete(plante.name)}
-                    className="flex items-center justify-center w-full h-full"
-                    aria-label={`Delete ${plante.name}`}
-                  >
-                    <Image
-                      src="/Deletes.png"
-                      alt="Delete Icon"
-                      width={24}
-                      height={24}
-                    />
-                  </button>
-                </td>
-                <td className="p-2 border">{plante.name}</td>
-                <td className="p-2 border">{plante.preGerminationDays}</td>
-                <td className="p-2 border">{plante.growthTimeDays}</td>
-                <td className="p-2 border">{plante.wateringSchedule.join(', ')}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+<table className="w-full table-auto border-collapse">
+  <thead>
+    <tr className="bg-green-600 text-black">
+      <th className="p-2 border text-center" style={{ width: '60px' }}>Slet</th>
+      <th className="p-2 border w-1/5">Sort navn</th>
+      <th className="p-2 border w-1/5">Spiring [dage]</th>
+      <th className="p-2 border w-1/5">Gro tid [dage]</th>
+      <th className="p-2 border w-1/5">Vandings tider [dage]</th>
+      <th className="p-2 border w-1/5">Position</th>
+    </tr>
+  </thead>
+  <tbody>
+    {isLoading ? (
+      <tr>
+        <td colSpan={6} className="p-4 text-center">
+          Indlæser plante typer...
+        </td>
+      </tr>
+    ) : (
+      planterTyper.map((plante) => (
+        <tr key={plante.name} className="odd:bg-white even:bg-gray-200">
+          <td className="p-2 border text-center">
+            <button
+              onClick={() => handleDelete(plante.name)}
+              className="flex items-center justify-center w-full h-full"
+              aria-label={`Delete ${plante.name}`}
+              disabled={isLoading}
+            >
+              <Image
+                src="/Deletes.png"
+                alt="Delete Icon"
+                width={24}
+                height={24}
+              />
+            </button>
+          </td>
+          <td className="p-2 border text-center">{plante.name}</td>
+          <td className="p-2 border text-center">{plante.preGerminationDays}</td>
+          <td className="p-2 border text-center">{plante.growthTimeDays}</td>
+          <td className="p-2 border text-center">{plante.wateringSchedule.join(', ')}</td>
+          <td className="p-2 border text-center">{plante.preferredPosition}</td>
+        </tr>
+      ))
+    )}
+  </tbody>
+</table>
+      
       </div>
     </div>
   );
