@@ -12,7 +12,7 @@ interface PlantType {
   wateringSchedule: number[];
 }
 
-const PlanterPage: React.FC = () => {
+const PlanterPage = () => {
   const [planterTyper, setPlanterTyper] = useState<PlantType[]>([]);
   const [formData, setFormData] = useState({
     navn: '',

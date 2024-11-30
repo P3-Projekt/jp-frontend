@@ -35,7 +35,7 @@ const BrugereSide = () => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(errorText || 'Kunne ikke hente brugerer fra databasen');
+        throw new Error(errorText || 'Kunne ikke hente brugere fra databasen');
       }
       const data = await response.json();
 
@@ -46,8 +46,8 @@ const BrugereSide = () => {
       setInactiveUsers(notActiveUsers);
 
     } catch (err) {
-      setError('Kunne ikke hente brugerer fra databasen');
-      console.error('Kunne ikke hente brugerer fra databasen:', err);
+      setError('Kunne ikke hente brugere fra databasen');
+      console.error('Kunne ikke hente brugere fra databasen:', err);
     } finally {
       setIsLoading(false);
     }
@@ -85,7 +85,7 @@ const BrugereSide = () => {
         throw new Error(errorData || 'Kunne ikke skabe brugeren');
       }
 
-      // Genopfrist listen af brugerer
+      // Genopfrist listen af brugere
       await fetchUsers();
 
       // nulstil formen
@@ -102,7 +102,7 @@ const BrugereSide = () => {
     }
   };
 
-  //funktion til reaktivering af brugerer
+  //funktion til reaktivering af brugere
   const handleReactivate = async (name: string) => {
     setIsLoading(true);
     setError(null);
@@ -130,7 +130,7 @@ const BrugereSide = () => {
     }
   };
 
-    //funktion til inaktivering af brugerer
+    //funktion til inaktivering af brugere
     const handleDelete = async (name: string) => {
       setIsLoading(true);
       setError(null);
@@ -168,7 +168,7 @@ const BrugereSide = () => {
         </div>
       )}
 
-      {/*Form til at lave nye brugerer */}
+      {/*Form til at lave nye brugere */}
       <form
         className="bg-sidebarcolor p-6 rounded-lg mb-8 shadow-xl border"
         onSubmit={handleSubmit}
@@ -222,7 +222,7 @@ const BrugereSide = () => {
 
       {/*Tabel til at vise aktive brugere*/}
       <div className="bg-sidebarcolor p-6 rounded-lg shadow-xl border mb-8">
-        <h2 className="text-xl font-semibold mb-6">OVERSIGT OVER AKTIVE BRUGERER</h2>
+        <h2 className="text-xl font-semibold mb-6">OVERSIGT OVER AKTIVE BRUGERE</h2>
           <table className="w-full table-auto border-collapse">
           <thead>
             <tr className="bg-green-700 text-white">
@@ -268,7 +268,7 @@ const BrugereSide = () => {
 
       {/*Tabel til at vise inaktive brugere*/}
       <div className="bg-sidebarcolor p-6 rounded-lg shadow-xl border">
-        <h2 className="text-xl font-semibold mb-6">OVERSIGT OVER INAKTIVE BRUGERER</h2>
+        <h2 className="text-xl font-semibold mb-6">OVERSIGT OVER INAKTIVE BRUGERE</h2>
           <table className="w-full table-auto border-collapse">
           <thead>
             <tr className="bg-red-700 text-white">
