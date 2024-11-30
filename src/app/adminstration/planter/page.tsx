@@ -272,7 +272,7 @@ const PlanterPage: React.FC = () => {
 
         <button
           type="submit"
-          className="transition w-full bg-green-600 font-semibold hover:bg-green-700 text-white py-2 mt-4 rounded-2xl"
+          className="transition w-full bg-green-700 font-semibold hover:bg-green-800 text-white py-2 mt-4 rounded-2xl"
           
           disabled={isLoading}
         >
@@ -285,7 +285,7 @@ const PlanterPage: React.FC = () => {
         <h2 className="text-lg font-semibold mb-6">PLANTE TYPE OVERSIGT</h2>
 <table className="w-full table-auto border-collapse">
   <thead>
-    <tr className="bg-green-600 text-black">
+    <tr className="bg-green-700 text-white">
       <th className="p-2 border text-center" style={{ width: '60px' }}>Slet</th>
       <th className="p-2 border w-1/5">Sort navn</th>
       <th className="p-2 border w-1/5">Spiring [dage]</th>
