@@ -12,7 +12,10 @@ interface User {
 const BrugereSide = () => {
   const [users, setUsers] = useState([]);
   const [inactiveUsers, setInactiveUsers] = useState([]);
-  const [formData, setFormData] = useState({ name: '', role: 'Gardener' });
+  const [formData, setFormData] = useState({
+     name: '', 
+     role: 'Gardener' 
+    });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
