@@ -8,9 +8,16 @@ interface PlantType {
   name: string;
   preGerminationDays: number;
   growthTimeDays: number;
-  preferredPosition: 'Ligegyldigt' | 'Nederst' | 'Øverst';
+  preferredPosition: 'NoPreferred' | 'Low' | 'High';
   wateringSchedule: number[];
 }
+
+//mapping til at konvertere til visning a positioner
+const positionDisplayMap = {
+  'NoPreferred': 'Ligegyldigt',
+  'Low': 'Nederst',
+  'High': 'Øverst'
+};
 
 const PlanterPage = () => {
   const [planterTyper, setPlanterTyper] = useState<PlantType[]>([]);
@@ -18,7 +25,7 @@ const PlanterPage = () => {
     navn: '',
     spiring: '',
     groTid: '',
-    position: 'Ligegyldigt',
+    position: 'NoPreferred',
     vanding: [] as number[],
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -118,7 +125,7 @@ const PlanterPage = () => {
         navn: '',
         spiring: '',
         groTid: '',
-        position: 'Ligegyldigt',
+        position: 'NoPreferred',
         vanding: [],
       });
     } catch (err: any) {
@@ -173,9 +180,9 @@ const PlanterPage = () => {
       )}
 
       {/*Form til input af data der skal sendes til backend*/}
-      <form 
-      className="bg-sidebarcolor p-6 rounded-lg shadow-xl mb-8 border"
-      onSubmit={handleSubmit}
+      <form
+        className="bg-sidebarcolor p-6 rounded-lg shadow-xl mb-8 border"
+        onSubmit={handleSubmit}
       >
         <h2 className="text-lg font-semibold mb-6">OPRET EN PLANTE TYPE</h2>
         <div className="flex gap-6">
@@ -196,7 +203,7 @@ const PlanterPage = () => {
             />
           </div>
 
-{/*Spirings felt*/}
+          {/*Spirings felt*/}
           <div className="flex-col w-1/4">
             <label className="font-semibold mb-2">Spiring:</label>
             <input
@@ -242,9 +249,9 @@ const PlanterPage = () => {
               required
               disabled={isLoading}
             >
-              <option value="Ligegyldigt">Ligegyldigt</option>
-              <option value="Nederst">Nederst</option>
-              <option value="Øverst">Øverst</option>
+              <option value="NoPreferred">Ligegyldigt</option>
+              <option value="Low">Nederst</option>
+              <option value="High">Øverst</option>
             </select>
           </div>
         </div>
@@ -273,7 +280,7 @@ const PlanterPage = () => {
         <button
           type="submit"
           className="transition w-full bg-green-700 font-semibold hover:bg-green-800 text-white py-2 mt-4 rounded-2xl"
-          
+
           disabled={isLoading}
         >
           {isLoading ? 'HENTER DATA FRA BACKEND' : 'OPRET'}
@@ -283,53 +290,53 @@ const PlanterPage = () => {
       {/* Tabel til at se plante typer i database */}
       <div className="bg-sidebarcolor p-6 rounded-lg shadow-xl">
         <h2 className="text-lg font-semibold mb-6">PLANTE TYPE OVERSIGT</h2>
-<table className="w-full table-auto border-collapse">
-  <thead>
-    <tr className="bg-green-700 text-white">
-      <th className="p-2 border text-center" style={{ width: '60px' }}>Slet</th>
-      <th className="p-2 border w-1/5">Sort navn</th>
-      <th className="p-2 border w-1/5">Spiring [dage]</th>
-      <th className="p-2 border w-1/5">Gro tid [dage]</th>
-      <th className="p-2 border w-1/5">Vandings tider [dage]</th>
-      <th className="p-2 border w-1/5">Position</th>
-    </tr>
-  </thead>
-  <tbody>
-    {isLoading ? (
-      <tr>
-        <td colSpan={6} className="p-4 text-center">
-          Indlæser plante typer...
-        </td>
-      </tr>
-    ) : (
-      planterTyper.map((plante) => (
-        <tr key={plante.name} className="odd:bg-white even:bg-gray-200">
-          <td className="p-2 border text-center">
-            <button
-              onClick={() => handleDelete(plante.name)}
-              className="flex items-center justify-center w-full h-full"
-              aria-label={`Delete ${plante.name}`}
-              disabled={isLoading}
-            >
-              <Image
-                src="/Deletes.png"
-                alt="Delete Icon"
-                width={24}
-                height={24}
-              />
-            </button>
-          </td>
-          <td className="p-2 border text-center">{plante.name}</td>
-          <td className="p-2 border text-center">{plante.preGerminationDays}</td>
-          <td className="p-2 border text-center">{plante.growthTimeDays}</td>
-          <td className="p-2 border text-center">{plante.wateringSchedule.join(', ')}</td>
-          <td className="p-2 border text-center">{plante.preferredPosition}</td>
-        </tr>
-      ))
-    )}
-  </tbody>
-</table>
-      
+        <table className="w-full table-auto border-collapse">
+          <thead>
+            <tr className="bg-green-700 text-white">
+              <th className="p-2 border text-center" style={{ width: '60px' }}>Slet</th>
+              <th className="p-2 border w-1/5">Sort navn</th>
+              <th className="p-2 border w-1/5">Spiring [dage]</th>
+              <th className="p-2 border w-1/5">Gro tid [dage]</th>
+              <th className="p-2 border w-1/5">Vandings tider [dage]</th>
+              <th className="p-2 border w-1/5">Position</th>
+            </tr>
+          </thead>
+          <tbody>
+            {isLoading ? (
+              <tr>
+                <td colSpan={6} className="p-4 text-center">
+                  Indlæser plante typer...
+                </td>
+              </tr>
+            ) : (
+              planterTyper.map((plante) => (
+                <tr key={plante.name} className="odd:bg-white even:bg-gray-200">
+                  <td className="p-2 border text-center">
+                    <button
+                      onClick={() => handleDelete(plante.name)}
+                      className="flex items-center justify-center w-full h-full"
+                      aria-label={`Delete ${plante.name}`}
+                      disabled={isLoading}
+                    >
+                      <Image
+                        src="/Deletes.png"
+                        alt="Delete Icon"
+                        width={24}
+                        height={24}
+                      />
+                    </button>
+                  </td>
+                  <td className="p-2 border text-center">{plante.name}</td>
+                  <td className="p-2 border text-center">{plante.preGerminationDays}</td>
+                  <td className="p-2 border text-center">{plante.growthTimeDays}</td>
+                  <td className="p-2 border text-center">{plante.wateringSchedule.join(', ')}</td>
+                  <td className="p-2 border text-center">{positionDisplayMap[plante.preferredPosition]}</td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+
       </div>
     </div>
   );
