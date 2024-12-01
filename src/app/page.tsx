@@ -13,30 +13,40 @@ TODO:
 
 
 import React, { useState, useCallback, useEffect } from 'react';
-import DraggableBox, { RackData } from '../components/map/Rack';
+import DraggableBox, { RackData, rackHeight, rackWidth } from '../components/map/Rack';
+
 
 // Grid size for snapping
-export const GRID_SIZE = 50;
+const GRID_SIZE = 50;
 
-// Drag checker
-let isDragChecker = false;
+// Helper function to snap moving rack coordinates to grid
+const snapToGrid = (value: number) => Math.round(value / GRID_SIZE) * GRID_SIZE;
 
-// Mouse move handler
-let registeredMouseMoveHandler = function(e: React.MouseEvent<HTMLDivElement>){}
+async function updateRackPosition(rackData : RackData){
+  try{
+    const response = await fetch('http://localhost:8080/Rack/' + rackData.id + '/Position', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(rackData.position),
+    });
 
-export function setMouseMoveHandler(handler: (e: React.MouseEvent<HTMLDivElement>) => void){
-  registeredMouseMoveHandler = handler;
+    if (!response.ok) {
+      throw new Error('Bad response code');
+    }
+  } catch(e){
+    console.error('Error updating rack position: ' + e);
+  }
 }
-
-function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
-  registeredMouseMoveHandler(e);
-}
-
 
 // CanvasComponent component
 const CanvasComponent: React.FC = () => {
 
-  const [boxes, setBoxes] = useState<RackData[]>([]);
+  const [racks, setRacks] = useState<RackData[]>([]);
+  const [selectedRackIndex, setSelectedRackIndex] = useState<number | null>(null);
+  const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
+  const [hasBeenMoved, setHasBeenMoved] = useState(false);
 
   // Fetch racks from the backend
   useEffect(() => {
@@ -53,7 +63,7 @@ const CanvasComponent: React.FC = () => {
       // Set the boxes state to the racks
       .then(racks => {
         const rackObjects = racks;
-        setBoxes(rackObjects);
+        setRacks(rackObjects);
       })
       // Error handling
       .catch(err => {
@@ -61,12 +71,15 @@ const CanvasComponent: React.FC = () => {
       });
   }, []);
 
-  // State for selected box index
-  const [selectedBoxIndex, setSelectedBoxIndex] = useState<number | null>(null);
+
+
+  /*
   const [isPanning, setIsPanning] = useState(false);
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
 
+
+  /*
   // Handle dragging a box by updating its position
   const handleDrag = useCallback((x: number, y: number, index: number) => {
     boxes[index].position.x = x;
@@ -75,13 +88,15 @@ const CanvasComponent: React.FC = () => {
     const newBoxes = [...boxes];
     newBoxes[index] = { ...newBoxes[index], x, y };
     setBoxes(newBoxes);
-    */
   }, [boxes]);
+
 
   // Handle selecting a box by toggling the selected state
   const handleSelect = (index: number) => {
     setSelectedBoxIndex(selectedBoxIndex === index ? null : index);
   };
+  
+
 
   // Handle panning the canvas by setting the pan start position
   const handlePanStart = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -92,6 +107,7 @@ const CanvasComponent: React.FC = () => {
     }
   };
 
+  /*
   // Handle panning the canvas by adjusting the pan offset
   const handlePanMove = useCallback((e: MouseEvent) => {
     if (!isPanning) return;
@@ -106,9 +122,63 @@ const CanvasComponent: React.FC = () => {
   const handlePanEnd = useCallback(() => {
     setIsPanning(false);
   }, []);
+  */
 
+  const handleMouseMove = useCallback(function(event: React.MouseEvent<HTMLDivElement>) {
+    if(selectedRackIndex === null) return;
+
+    const rect = (event.currentTarget as HTMLDivElement).getBoundingClientRect();
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+
+    // Convert client position to absolute position by removing pan offset and centering the boxes
+    const xCoordinate = snapToGrid(mouseX - panOffset.x - rackWidth / 2);
+    const yCoordinate = snapToGrid(mouseY - panOffset.y - rackHeight / 2);
+
+    // Check for overlap and snap to grid if not overlapping
+    const isOverlapping = racks.some((box, index) => {
+      if (index === selectedRackIndex) return false;
+      const xDelta = Math.abs(box.position.x - xCoordinate);
+      const yDelta = Math.abs(box.position.y - yCoordinate);
+      return xDelta < rackWidth && yDelta < rackHeight;
+    });
+
+    // Determind if a rack has been moved
+    const hasRackBeenMoved = xCoordinate !== racks[selectedRackIndex].position.x || yCoordinate !== racks[selectedRackIndex].position.y;
+
+    // Update position if not overlapping and has changed
+    if (!isOverlapping && hasRackBeenMoved) {
+      setHasBeenMoved(true);
+      const newRacks = racks.map((box, i) => i === selectedRackIndex ? { ...box, position:{x: xCoordinate, y: yCoordinate} } : box);
+      setRacks(newRacks);
+    }
+
+  }, [selectedRackIndex, racks, panOffset]);
+
+  const handleMouseUp = useCallback(function(event: MouseEvent){
+    if(selectedRackIndex !== null && hasBeenMoved){
+      console.log("Update position", racks[selectedRackIndex].position);
+    }
+    setSelectedRackIndex(null);
+  }, [hasBeenMoved, selectedRackIndex]);
+
+  const rackMouseDownHandler = function(rack : RackData, index: number, event : React.MouseEvent<HTMLDivElement>) {
+    setSelectedRackIndex(index);
+    console.log("Rack clicked: " + rack.id);
+  }
+
+  useEffect(() => {
+    document.addEventListener('mouseup', handleMouseUp);
+    
+    return () => {
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [hasBeenMoved, selectedRackIndex]);
+
+  /*
   // Add event listeners for panning
   useEffect(() => {
+    
     // Unselect
     if (isPanning) {
       document.addEventListener('mousemove', handlePanMove);
@@ -123,12 +193,13 @@ const CanvasComponent: React.FC = () => {
       document.removeEventListener('mouseup', handlePanEnd);
     };
   }, [isPanning, panStart, panOffset, handlePanMove, handlePanEnd]);
+  */
+
 
 	// Grid lines
   return (
-    <div className="relative w-full h-full overflow-hidden z-1" 
-      onMouseDown={handlePanStart}
-      onMouseMove={handleMouseMove}
+    <div className="relative w-full h-full overflow-hidden z-1"
+    onMouseMove={handleMouseMove}
     >
       <div
         className="absolute w-full h-full inset-0 pointer-events-none opacity-40"
@@ -144,18 +215,12 @@ const CanvasComponent: React.FC = () => {
         }}
         className="absolute inset-0"
       >
-        {boxes.map((box, index) => (
+        {racks.map((box, index) => (
           <DraggableBox
             key={box.id}
             rackData={box}
-            updateRackData={(rackData : RackData) => {
-              const newBoxes = boxes.map((box, i) => i === index ? { ...box, ...rackData } : box);
-              setBoxes(newBoxes);
-            }}
-            otherBoxes={boxes.filter((_, i) => i !== index)}
-            onDrag={(x, y) => handleDrag(x, y, index)}
-            panOffset={panOffset}
-            isDragChecker={isDragChecker}
+            isSelected={selectedRackIndex === index}
+            mouseDownHandler={(event: React.MouseEvent<HTMLDivElement>) => {rackMouseDownHandler(box, index, event)}}
           />
         ))}
       </div>
