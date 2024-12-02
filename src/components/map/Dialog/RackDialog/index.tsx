@@ -45,11 +45,6 @@ interface RackDialogProps {
   setShowDialog: (show: boolean) => void;
 }
 
-function isTaskDue(dueDate: string) {
-  const currentDate = new Date().toISOString().split('T')[0];
-  return new Date(currentDate) >= new Date(dueDate);
-}
-
 const RackDialog: React.FC<RackDialogProps> = ({
  showDialog,
  setShowDialog
@@ -58,6 +53,8 @@ const RackDialog: React.FC<RackDialogProps> = ({
   const [selectedBatch, setSelectedBatch] = useState<BatchData | null>(null);
   const [taskCompleting, setTaskCompleting] = useState<boolean>(false);
   const [completeConfirm, setCompleteConfirm] = useState<boolean>(false);
+
+  const user = "Victor";
 
   const taskTranslate : {[key: string] : string} = {
     "Water": "Vanding",
@@ -128,66 +125,14 @@ const RackDialog: React.FC<RackDialogProps> = ({
               <div className="">
                 Høstdato: <span className="font-semibold text-lg">{selectedBatch?.harvestDate}</span>
               </div>
-              <div className="mt-4 self-center uppercase font-bold">
+              <div className={`mt-4 self-center uppercase font-bold ${(selectedBatch !== null && taskIsDue(selectedBatch) ? "" : "hidden")}`}>
                 <Button
-                className={`hover:cursor-pointer font-bold` + (taskCompleting == true) ? "disabled" : "null" + buttonVariants({
+                disabled={taskCompleting}
+                className={`hover:cursor-pointer font-bold` + buttonVariants({
                   variant: "green",
                 })}
                 onClick={() => {
-                  try {
-                    if (selectedBatch?.nextTask.id == null || selectedBatch?.nextTask.id == undefined) {
-                      toast({
-                        variant: "destructive",
-                        title: "Noget gik galt",
-                        description: "Vælg en batch for at gennemføre den.",
-                      })
-                    } else {
-
-                      setCompleteConfirm(true);
-                      setTaskCompleting(true);
-                      // Udfør opgave
-                      /*
-                      fetch(`http://localhost:8080/Task/${selectedBatch?.nextTask.id}/Complete`, {
-                        method: 'PUT',
-                        headers: {
-                          'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({username: "Victor"}),
-                      })
-                      .then(response => {
-                      // Check if the response is ok
-                      if (!response.ok) {
-                        toast({
-                          variant: "destructive",
-                          title: "Noget gik galt",
-                          description: "Opgaven kunne ikke gennemføres - prøv igen.",
-                        })
-                        throw new Error('Network response was not ok');
-                      } else {
-                        window.location.reload();
-                      }
-                    })
-                      // Error handling
-                      .catch(err => {
-                        toast({
-                          variant: "destructive",
-                          title: "Noget gik galt",
-                          description: "Opgaven kunne ikke gennemføres - prøv igen.",
-                        })
-                        console.error('Error deleting shelf: ' + err);
-                      });
-                      */
-                  }
-
-                     // Vis en ShadCN Toast som confirmation
-                  } catch (err) {
-                    // Vis en ShadCN toast som fejl.
-
-                    console.error('Fejl under udføring af opgave: ' + err);
-                    setShowDialog(false);
-                  }
-                  setTaskCompleting(false);
-                  setShowDialog(false);
+                  setCompleteConfirm(true);
                 }}
                 >
                   {taskCompleting == false ? "Udfør opgave" : <Loader2 className="animate-spin" />}
@@ -245,17 +190,80 @@ const RackDialog: React.FC<RackDialogProps> = ({
     </DialogContent>
   </Dialog>
 
-  <Dialog open={completeConfirm} >
-  <DialogContent>
-    <DialogHeader>
-      <DialogTitle>Are you absolutely sure?</DialogTitle>
-      <DialogDescription>
-        This action cannot be undone. This will permanently delete your account
-        and remove your data from our servers.
-      </DialogDescription>
-    </DialogHeader>
-  </DialogContent>
-</Dialog>
+  <AlertDialog open={completeConfirm}>
+    <AlertDialogContent>
+      <AlertDialogHeader>
+        <AlertDialogTitle>Vil du udføre denne opgave?</AlertDialogTitle>
+        <AlertDialogDescription>
+          Det anbefales at du fysisk har udført upgaven inden dette bekræftes.
+        </AlertDialogDescription>
+      </AlertDialogHeader>
+      <AlertDialogFooter>
+        <Button 
+          className={`` + buttonVariants({variant: "cancel"})}
+          onClick={() => {
+          // Cancel completion
+          setCompleteConfirm(false);
+        }}>
+          Annuller
+        </Button>
+        <Button
+          disabled={taskCompleting}
+          className={`` + buttonVariants({variant: "green"})}
+          onClick={() => {
+            setTaskCompleting(true);
+            // Udfør opgaven
+            try {
+              fetch(`http://localhost:8080/Task/${selectedBatch?.nextTask.id}/Complete`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({username: user}),
+              })
+              .then(response => {
+              // Check if the response is ok
+              if (!response.ok) {
+                toast({
+                  variant: "destructive",
+                  title: "Noget gik galt",
+                  description: "Opgaven kunne ikke gennemføres - prøv igen.",
+                })
+                throw new Error('Network response was not ok');
+              } else {
+                window.location.reload();
+              }
+            })
+              // Error handling
+              .catch(err => {
+                toast({
+                  variant: "destructive",
+                  title: "Noget gik galt",
+                  description: "Opgaven kunne ikke gennemføres - prøv igen.",
+                })
+                console.error('Error deleting shelf: ' + err);
+                setTaskCompleting(false);
+                setCompleteConfirm(false);
+              });
+            } catch (err) {
+              toast({
+                variant: "destructive",
+                title: "Noget gik galt",
+                description: "Opgaven kunne ikke gennemføres - prøv igen.",
+              })
+              console.error('Fejl under udføring af opgave: ' + err);
+              setTaskCompleting(false);
+              setCompleteConfirm(false);
+            }
+          setTaskCompleting(false);
+          setCompleteConfirm(false);
+          setShowDialog(false);
+        }}>
+          {taskCompleting == false ? "Bekræft" : <Loader2 className='animate-spin'/>}
+        </Button>
+      </AlertDialogFooter>
+    </AlertDialogContent>
+</AlertDialog>
 </>
   )
 
@@ -263,5 +271,3 @@ const RackDialog: React.FC<RackDialogProps> = ({
 }
 
 export default RackDialog;
-
-                      

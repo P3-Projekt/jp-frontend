@@ -7,7 +7,7 @@ TODO:
 */
 
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, forwardRef, useImperativeHandle } from 'react';
 import DraggableBox, { RackData, rackHeight, rackWidth } from '@/components/map/Rack';
 import RackDialog, { setRackToBeDisplayed } from '@/components/map/Dialog/RackDialog';
 
@@ -19,7 +19,7 @@ export enum DisplayMode {view, edit, input}
 const GRID_SIZE = 50;
 
 // Helper function to snap moving rack coordinates to grid
-const snapToGrid = (value: number) => Math.round(value / GRID_SIZE) * GRID_SIZE;
+export const snapToGrid = (value: number) => Math.abs(Math.round(value / GRID_SIZE) * GRID_SIZE);
 
 async function updateRackPosition(rackData : RackData){
   try{
@@ -39,12 +39,17 @@ async function updateRackPosition(rackData : RackData){
   }
 }
 
-// CanvasComponent component
-const CanvasComponent: React.FC<{ 
+interface CanvasComponentProps {
   displayMode: DisplayMode
-}> = (
-  {displayMode}
-) => {
+}
+
+export interface CanvasComponentMethods {
+  newRack: (x: number, y: number) => void;
+}
+
+// CanvasComponent component
+const CanvasComponent = forwardRef<CanvasComponentMethods, CanvasComponentProps>(
+  ({ displayMode }, ref) => {
 
   const [racks, setRacks] = useState<RackData[]>([]);
   const [selectedRackIndex, setSelectedRackIndex] = useState<number | null>(null);
@@ -73,7 +78,11 @@ const CanvasComponent: React.FC<{
       });
   }, []);
 
-
+  /*
+  React.useImperativeHandle(ref, () => ({
+    callSomeFunction: () => console.log("Hello from canvas"),
+  }));
+  */
 
   /*
   const [isPanning, setIsPanning] = useState(false);
@@ -125,6 +134,23 @@ const CanvasComponent: React.FC<{
     setIsPanning(false);
   }, []);
   */
+
+
+  const newRack = useCallback((xPosition: number, yPosition: number) => {
+    setRacks([...racks, {
+      id: -1,
+      position: { x: xPosition, y: yPosition },
+      shelves: [],
+    }]);
+  }, [racks]);
+
+  useEffect(() => {console.log("ref", ref)}, [ref]);
+
+  useImperativeHandle(ref, () => {
+    return {
+      newRack: newRack,
+    }
+  });
 
   const updateRack = useCallback((rack : RackData, index : number) => {
     const newRacks = racks.map((box, i) => i === index ? { ...box, ...rack } : box);
@@ -234,6 +260,6 @@ const CanvasComponent: React.FC<{
       </div>
     </div>
   );
-};
+});
 
 export default CanvasComponent;
