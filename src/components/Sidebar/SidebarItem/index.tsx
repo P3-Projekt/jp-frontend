@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import React, { useCallback, useEffect, useState } from "react";
+import { redirect, usePathname } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 
 interface SidebarItemProps {
@@ -24,11 +24,15 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
 	const pathname = usePathname();
 	const isActive = pathname === path;
 
-	const toggleSubItems = () => {
+	const clickHandler = useCallback(() => {
 		if (children) {
 			setIsOpen(!isOpen);
+		} else if(path){
+			redirect(path);
 		}
-	};
+	}, [isOpen])
+
+
 
 	useEffect(() => {
 		let isActiveChild = false;
@@ -49,17 +53,16 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
 		>
 			<div
 				className={`p-2.5 rounded ${isActive || isParentActive ? ` ${isChild ? "bg-subbordercolor hover:bg-colorsecondary" : "bg-colorprimary text-white"} ` : "hover:bg-colorsecondary"} cursor-pointer flex justify-between items-center text-textcolor transition-all duration-300 ease-in-out`}
-				onClick={toggleSubItems}
+				onClick={clickHandler}
 			>
 				{path ? (
-					<Link
-						href={path}
+					<div
 						className="flex items-center gap-2 w-full"
-						onClick={(e) => e.stopPropagation()}
 					>
 						{Icon && <Icon />}
 						<span>{title}</span>
-					</Link>
+						
+					</div>
 				) : (
 					<div className="flex items-center gap-2">
 						{Icon && <Icon />}

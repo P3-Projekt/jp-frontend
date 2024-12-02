@@ -10,12 +10,27 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 
-import { buttonVariants } from "@/components/ui/button"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+
+import { Button, buttonVariants } from "@/components/ui/button"
 import { RackData } from "@/components/map/Rack";
-import { Droplets, Scissors, X } from 'lucide-react';
+import { Droplets, Loader2, Scissors, X } from 'lucide-react';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import dynamic from 'next/dynamic';
 import { BatchData } from '../../Batch';
+import { toast } from '@/hooks/use-toast';
+
+import ConfirmTask from "../ConfirmTask/index"
 
 let rackToDisplayUnSynced : RackData | null = null;
 let lastDialogValue = false;
@@ -41,8 +56,10 @@ const RackDialog: React.FC<RackDialogProps> = ({
 }) => {
 
   const [selectedBatch, setSelectedBatch] = useState<BatchData | null>(null);
+  const [taskCompleting, setTaskCompleting] = useState<boolean>(false);
+  const [completeConfirm, setCompleteConfirm] = useState<boolean>(false);
 
-  const taskTranslate : {[key: string] : string} ={
+  const taskTranslate : {[key: string] : string} = {
     "Water": "Vanding",
     "Harvest": "Høst",
     "Plant": "Plantning"
@@ -66,6 +83,7 @@ const RackDialog: React.FC<RackDialogProps> = ({
   
 
   return(
+    <>
     <Dialog open={showDialog} onOpenChange={setShowDialog}>
     <DialogContent className="bg-white opacity-100 min-w-[700px] min-h-[500px] [&>button]:hidden">
       <DialogHeader>
@@ -105,25 +123,61 @@ const RackDialog: React.FC<RackDialogProps> = ({
                 Batch id: <span className="font-semibold">{selectedBatch?.id}</span>
               </div>
               <div className="mt-3">
-                Oprettet af: <span className="font-semibold">{selectedBatch?.amount}</span>
+                Oprettet af: <span className="font-semibold">{selectedBatch?.createdBy}</span>
               </div>
               <div className="">
                 Høstdato: <span className="font-semibold text-lg">{selectedBatch?.harvestDate}</span>
               </div>
               <div className="mt-4 self-center uppercase font-bold">
-                <p
-                className={buttonVariants({
+                <Button
+                className={`hover:cursor-pointer font-bold` + (taskCompleting == true) ? "disabled" : "null" + buttonVariants({
                   variant: "green",
                 })}
                 onClick={() => {
-
                   try {
-                     // Udfør opgave
+                    if (selectedBatch?.nextTask.id == null || selectedBatch?.nextTask.id == undefined) {
+                      toast({
+                        variant: "destructive",
+                        title: "Noget gik galt",
+                        description: "Vælg en batch for at gennemføre den.",
+                      })
+                    } else {
 
-
-
-                     // lav kanppen disabled og lav den til en spinner
-
+                      setCompleteConfirm(true);
+                      setTaskCompleting(true);
+                      // Udfør opgave
+                      /*
+                      fetch(`http://localhost:8080/Task/${selectedBatch?.nextTask.id}/Complete`, {
+                        method: 'PUT',
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({username: "Victor"}),
+                      })
+                      .then(response => {
+                      // Check if the response is ok
+                      if (!response.ok) {
+                        toast({
+                          variant: "destructive",
+                          title: "Noget gik galt",
+                          description: "Opgaven kunne ikke gennemføres - prøv igen.",
+                        })
+                        throw new Error('Network response was not ok');
+                      } else {
+                        window.location.reload();
+                      }
+                    })
+                      // Error handling
+                      .catch(err => {
+                        toast({
+                          variant: "destructive",
+                          title: "Noget gik galt",
+                          description: "Opgaven kunne ikke gennemføres - prøv igen.",
+                        })
+                        console.error('Error deleting shelf: ' + err);
+                      });
+                      */
+                  }
 
                      // Vis en ShadCN Toast som confirmation
                   } catch (err) {
@@ -132,11 +186,12 @@ const RackDialog: React.FC<RackDialogProps> = ({
                     console.error('Fejl under udføring af opgave: ' + err);
                     setShowDialog(false);
                   }
+                  setTaskCompleting(false);
                   setShowDialog(false);
                 }}
                 >
-                  Udfør opgave
-                </p>
+                  {taskCompleting == false ? "Udfør opgave" : <Loader2 className="animate-spin" />}
+                </Button>
               </div>
             </div>
             {/* Batch information */}
@@ -148,11 +203,11 @@ const RackDialog: React.FC<RackDialogProps> = ({
                       <div className="text-xl text-black font-bold self-center">
                         {index + 1}
                       </div>
-                        <div className="h-full w-full ml-2 bg-gray-200 justify-between content-center pl-2 pr-2 self-center border-black border-2">
+                        <div className="h-full w-full overflow-x-scroll ml-2 bg-gray-200 justify-between content-center pl-2 pr-2 self-center border-black border-2">
                           <div className="h-4/5 w-full flex flex-row items-center gap-x-4">
                             {/* Dynamiclly adding batches */}
                             {shelf.batches.map((batch) => (
-                            <div key={batch.id} className={`flex flex-row h-full w-wit content-center items-center self-center pl-1 pr-1 text-black border-black border rounded  font-semibold hover:cursor-pointer ${selectedBatch === batch ? 'bg-blue-200' : ''}`}
+                            <div key={batch.id} className={`flex flex-row h-full content-center items-center self-center pl-1 pr-1 text-black border-black border rounded  font-semibold hover:cursor-pointer ${selectedBatch === batch ? 'bg-blue-200' : ''}`}
                               onClick={() => {
                                 // Her vælges den specifikke batch:
                                 if (selectedBatch === batch) {
@@ -189,6 +244,19 @@ const RackDialog: React.FC<RackDialogProps> = ({
       </DialogHeader>
     </DialogContent>
   </Dialog>
+
+  <Dialog open={completeConfirm} >
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>Are you absolutely sure?</DialogTitle>
+      <DialogDescription>
+        This action cannot be undone. This will permanently delete your account
+        and remove your data from our servers.
+      </DialogDescription>
+    </DialogHeader>
+  </DialogContent>
+</Dialog>
+</>
   )
 
   

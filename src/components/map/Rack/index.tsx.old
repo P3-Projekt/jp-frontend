@@ -1,0 +1,62 @@
+"use client";
+import React, { useState, useEffect, useCallback } from 'react';
+import RackDialog, { setRackToBeDisplayed } from '../Dialog/RackDialog';
+
+import { ShelfData, Shelf } from '../Shelf';
+
+//Constants
+export const rackWidth = 100;
+export const rackHeight = 200;
+
+export interface RackData{
+  id: number;
+  position: {x: number, y: number};
+  shelves: ShelfData[];
+}
+
+// DraggableBox component props
+interface DraggableBoxProps {
+  rackData : RackData;
+  isSelected: boolean | undefined;
+  mouseDownHandler: (e: React.MouseEvent<HTMLDivElement>) => void | undefined;
+}
+
+const DraggableBox: React.FC<DraggableBoxProps> = ({
+  rackData,
+  isSelected,
+  mouseDownHandler
+
+}) => { // State for position and dragging
+  const [showDialog, setShowDialog] = useState<boolean>(false);
+
+  
+  return (
+    <>
+    <div
+      onMouseDown={mouseDownHandler}
+      className={`absolute flex` + (isSelected ? 'cursor-grabbing scale-105 border-black' : 'cursor-grab')}
+      style={{
+        left: rackData.position.x, // Adjust for pan offset visually only
+        top: rackData.position.y,   // Adjust for pan offset visually only
+        width: rackWidth,
+        height: rackHeight,
+        border: isSelected ? '2px solid black' : 'none',
+      }}
+    >
+      {/* The rack */}
+      <div className="border-2 border-black bg-sidebarcolor w-full h-full flex flex-col divide-y divide-black divide-y-2" 
+        onClick={() =>  { setRackToBeDisplayed(rackData); 
+        setShowDialog(true) }}
+      >
+        {/* Dynamically adding shelves */}
+        {rackData.shelves.map((shelf, index) => (
+          <Shelf key={index} {...shelf} isFewShelves={rackData.shelves.length <= 3}/>
+        ))}
+      </div>
+    </div>
+    {/*<RackDialog showDialog={showDialog} setShowDialog={setShowDialog} />*/}
+  </>
+  );
+};
+
+export default DraggableBox;

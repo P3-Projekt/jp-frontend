@@ -1,5 +1,6 @@
 "use client";
 import { BatchData, Batch } from "../Batch";
+import { DisplayMode } from "../CanvasComponent";
 
 
 export interface ShelfData{
@@ -9,23 +10,30 @@ export interface ShelfData{
 
 interface additionalArgs{
     isFewShelves: boolean;
+    displayMode: DisplayMode;
 }
 
 type ShelfArguments = ShelfData & additionalArgs;
 
-export const Shelf: React.FC<ShelfArguments> = ({id, batches, isFewShelves}) => {
+export const Shelf: React.FC<ShelfArguments> = (
+    {id, batches, isFewShelves, displayMode}
+) => {
     
     return(
-        <div className={`h-full w-full justify-evenly flex ${batches.length > 1 ? 'flex-row' : 'flex-col'}`}>
-        {/* Dymanically adding batches */}
-        {batches.map((batch, index) => (
-            <Batch 
-                key={index}
-                {...batch} 
-                isFewBatches={batches.length <= 2}
-                isFewShelves={isFewShelves}
-            />
-        ))}
-      </div>
+        <div className="flex-1 flex items-center justify-center rounded-lg bg-zinc-100 rounded">
+            <div className="flex items-center">
+                {displayMode !== DisplayMode.input ? 
+                    batches.map((batch, index) => (
+                        <Batch 
+                            key={index}
+                            {...batch} 
+                            isFewBatches={batches.length <= 2}
+                            isFewShelves={isFewShelves}
+                        />
+                )) : null}
+            
+                <div className="text-black text-center ml-1"></div>
+            </div>
+        </div>
     );
 }
