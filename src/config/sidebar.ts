@@ -26,8 +26,8 @@ const sidebarConfig: SidebarItem[] = [
 				path: "/adminstration/bakker",
 			},
 			{
-				title: 'Brugere',
-				path: '/adminstration/Brugere',
+				title: "Brugere",
+				path: "/adminstration/Brugere",
 			},
 		],
 	},
