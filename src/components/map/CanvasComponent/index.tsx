@@ -73,11 +73,10 @@ const CanvasComponent = forwardRef<
 	const [selectedRackIndex, setSelectedRackIndex] = useState<number | null>(
 		null,
 	);
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
 	const [hasBeenMoved, setHasBeenMoved] = useState(false);
 	const [loadingRackIndexes, setLoadingRackIndexes] = useState<number[]>([]);
-
-	setPanOffset({ x: 0, y: 0 });
 
 	// Fetch racks from the backend
 	useEffect(() => {
@@ -100,70 +99,8 @@ const CanvasComponent = forwardRef<
 			});
 	}, []);
 
-	/*
-  React.useImperativeHandle(ref, () => ({
-    callSomeFunction: () => console.log("Hello from canvas"),
-  }));
-  */
-
-	/*
-  const [isPanning, setIsPanning] = useState(false);
-  const [panStart, setPanStart] = useState({ x: 0, y: 0 });
-  const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
-
-
-  /*
-  // Handle dragging a box by updating its position
-  const handleDrag = useCallback((x: number, y: number, index: number) => {
-    boxes[index].position.x = x;
-    boxes[index].position.y = y;
-    /*
-    const newBoxes = [...boxes];
-    newBoxes[index] = { ...newBoxes[index], x, y };
-    setBoxes(newBoxes);
-  }, [boxes]);
-
-
-  // Handle selecting a box by toggling the selected state
-  const handleSelect = (index: number) => {
-    setSelectedBoxIndex(selectedBoxIndex === index ? null : index);
-  };
-  
-
-
-  // Handle panning the canvas by setting the pan start position
-  const handlePanStart = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.button === 1) { // Middle mouse button
-		if (isDragChecker) return;
-      setIsPanning(true);
-      setPanStart({ x: e.clientX, y: e.clientY });
-    }
-  };
-
-  /*
-  // Handle panning the canvas by adjusting the pan offset
-  const handlePanMove = useCallback((e: MouseEvent) => {
-    if (!isPanning) return;
-
-    const deltaX = e.clientX - panStart.x;
-    const deltaY = e.clientY - panStart.y;
-
-    setPanOffset({ x: panOffset.x + deltaX, y: panOffset.y + deltaY });
-    setPanStart({ x: e.clientX, y: e.clientY });
-  }, [isPanning, panStart, panOffset]);
-
-  const handlePanEnd = useCallback(() => {
-    setIsPanning(false);
-  }, []);
-  */
-
 	const addNewRackFetch = useCallback(
-		async (
-			xCoordinate: number,
-			yCoordinate: number,
-			newRacks: RackData[],
-			index: number,
-		) => {
+		async (xCoordinate: number, yCoordinate: number, index: number) => {
 			try {
 				setLoadingRackIndexes([...loadingRackIndexes, index]);
 				const response = await fetch("http://localhost:8080/Rack", {
@@ -208,9 +145,9 @@ const CanvasComponent = forwardRef<
 				},
 			];
 			setRacks(newRacks);
-			addNewRackFetch(xPosition, yPosition, newRacks, newRackIndex);
+			addNewRackFetch(xPosition, yPosition, newRackIndex);
 		},
-		[racks, addNewRackFetch],
+		[addNewRackFetch, racks],
 	);
 
 	useEffect(() => {
@@ -273,7 +210,14 @@ const CanvasComponent = forwardRef<
 				);
 			}
 		},
-		[selectedRackIndex, racks, panOffset, displayMode, updateRack],
+		[
+			selectedRackIndex,
+			displayMode,
+			panOffset.x,
+			panOffset.y,
+			racks,
+			updateRack,
+		],
 	);
 
 	const handleMouseUp = useCallback(
