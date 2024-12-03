@@ -9,9 +9,15 @@ const MainSiteWrapper = ({
 	children: ReactNode;
 }) => {
 	return (
-		<div className={cn("mx-auto w-full max-w-screen-xl p-4", className)}>
+		<div
+			className={cn(
+				"mx-auto w-full max-w-screen max-h-screen pl-[350px]",
+				className,
+			)}
+		>
 			{children}
 		</div>
 	);
 };
+
 export default MainSiteWrapper;
