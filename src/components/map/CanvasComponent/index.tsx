@@ -55,6 +55,7 @@ const CanvasComponent = forwardRef<CanvasComponentMethods, CanvasComponentProps>
   const [selectedRackIndex, setSelectedRackIndex] = useState<number | null>(null);
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const [hasBeenMoved, setHasBeenMoved] = useState(false);
+  const [loadingRackIndexes, setLoadingRackIndexes] = useState<number[]>([]);
 
   // Fetch racks from the backend
   useEffect(() => {
@@ -136,12 +137,41 @@ const CanvasComponent = forwardRef<CanvasComponentMethods, CanvasComponentProps>
   */
 
 
+  const addNewRackFetch = useCallback(async (xCoordinate: number, yCoordinate: number, newRacks: RackData[], index: number) => {
+    try {
+      setLoadingRackIndexes([...loadingRackIndexes, index]);
+      const response = await fetch('http://localhost:8080/Rack', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({xCoordinate: xCoordinate, yCoordinate: yCoordinate}),
+      });
+
+      if (!response.ok) {
+        throw new Error('Bad response code');
+      }
+
+      const newRack : RackData = await response.json();
+      console.log("New rack", newRack);
+      console.log(racks.length);
+      const newRacks : RackData[] = racks.map((box, i) => i === index ? newRack : box);
+      setRacks(newRacks);
+      setLoadingRackIndexes(loadingRackIndexes.filter(i => i !== index));
+    } catch (e) {
+      console.error('Error adding new rack: ' + e);
+    }
+  }, [racks]);
+
   const newRack = useCallback((xPosition: number, yPosition: number) => {
-    setRacks([...racks, {
+    const newRackIndex = racks.length;
+    const newRacks = [...racks, {
       id: -1,
       position: { x: xPosition, y: yPosition },
       shelves: [],
-    }]);
+    }];
+    setRacks(newRacks);
+    addNewRackFetch(xPosition, yPosition, newRacks, newRackIndex);
   }, [racks]);
 
   useEffect(() => {console.log("ref", ref)}, [ref]);
@@ -254,6 +284,7 @@ const CanvasComponent = forwardRef<CanvasComponentMethods, CanvasComponentProps>
             displayMode={displayMode}
             rackData={box}
             isSelected={selectedRackIndex === index}
+            isLoading={loadingRackIndexes.some(i => i === index)}
             mouseDownHandler={(event: React.MouseEvent<HTMLDivElement>) => {rackMouseDownHandler(box, index, event)}}
           />
         ))}

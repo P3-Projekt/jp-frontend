@@ -27,13 +27,15 @@ interface DraggableBoxProps {
   isSelected: boolean | undefined;
   mouseDownHandler: ((e: React.MouseEvent<HTMLDivElement>) => void) | undefined;
   displayMode: DisplayMode
+  isLoading: boolean;
 }
 
 const DraggableBox: React.FC<DraggableBoxProps> = ({
   rackData,
   isSelected,
   mouseDownHandler,
-  displayMode
+  displayMode,
+  isLoading
 
 }) => { // State for position and dragging
   const [showDialog, setShowDialog] = useState<boolean>(false);
@@ -183,6 +185,7 @@ const DraggableBox: React.FC<DraggableBoxProps> = ({
 
           {/* Shelf container */}
           <div className="flex flex-1 flex-col space-y-1 hover:cursor-pointer">
+          {isLoading ? (<p className='text-white'>Is loading</p>) : null}
           {rackShelves.map((shelf, index) =>
             displayMode != DisplayMode.input ? (
               <Shelf
