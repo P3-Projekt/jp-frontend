@@ -22,6 +22,9 @@ const buttonVariants = cva(
 					"text-white uppercase font-bold bg-green-500 hover:bg-green-600 text-lg border-2 border-black",
 				cancel:
 					"text-white uppercase font-bold bg-red-500 hover:bg-red-600 text-lg border-2 border-black",
+				black:
+					"bg-zinc-950 text-white hover:bg-zinc-900  rounded px-4 py-2 cursor-pointer",
+				red: "bg-red-600 text-white text-lg hover:bg-red-700 rounded px-4 py-2 cursor-pointer",
 			},
 			size: {
 				default: "h-10 px-4 py-2",

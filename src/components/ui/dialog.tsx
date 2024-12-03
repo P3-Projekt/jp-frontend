@@ -55,6 +55,7 @@ DialogContent.displayName = DialogPrimitive.Content.displayName;
 
 const DialogHeader = ({
 	className,
+	children,
 	...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
 	<div
@@ -63,8 +64,11 @@ const DialogHeader = ({
 			className,
 		)}
 		{...props}
-	/>
+	>
+		{children}
+	</div>
 );
+
 DialogHeader.displayName = "DialogHeader";
 
 const DialogFooter = ({
@@ -99,13 +103,20 @@ DialogTitle.displayName = DialogPrimitive.Title.displayName;
 const DialogDescription = React.forwardRef<
 	React.ElementRef<typeof DialogPrimitive.Description>,
 	React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>
->(({ className, ...props }, ref) => (
-	<DialogPrimitive.Description
-		ref={ref}
-		className={cn("text-sm text-muted-foreground", className)}
-		{...props}
-	/>
+>(({ className, children, ...props }, ref) => (
+	<div className="w-full rounded bg-gray-200">
+		<div className="flex flex-col gap-y-2 px-2 py-2">
+			<DialogPrimitive.Description
+				ref={ref}
+				className={cn("text-2xl text-muted-foreground", className)}
+				{...props}
+			>
+				{children}
+			</DialogPrimitive.Description>
+		</div>
+	</div>
 ));
+
 DialogDescription.displayName = DialogPrimitive.Description.displayName;
 
 export {
