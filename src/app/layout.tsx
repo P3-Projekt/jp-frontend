@@ -5,8 +5,7 @@ import Sidebar from "@/components/Sidebar";
 import MainSiteWrapper from "@/components/wrappers/MainSiteWrapper";
 import { cn } from "@/app/lib/utils";
 import { Inter } from "next/font/google";
-import { Toaster } from '@/components/ui/toaster';
-
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 

@@ -1,5 +1,4 @@
 "use client";
-import Link from "next/link";
 import React, { useCallback, useEffect, useState } from "react";
 import { redirect, usePathname } from "next/navigation";
 import { ChevronDown } from "lucide-react";
@@ -27,12 +26,10 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
 	const clickHandler = useCallback(() => {
 		if (children) {
 			setIsOpen(!isOpen);
-		} else if(path){
+		} else if (path) {
 			redirect(path);
 		}
-	}, [isOpen])
-
-
+	}, [isOpen, children, path]);
 
 	useEffect(() => {
 		let isActiveChild = false;
@@ -56,12 +53,9 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
 				onClick={clickHandler}
 			>
 				{path ? (
-					<div
-						className="flex items-center gap-2 w-full"
-					>
+					<div className="flex items-center gap-2 w-full">
 						{Icon && <Icon />}
 						<span>{title}</span>
-						
 					</div>
 				) : (
 					<div className="flex items-center gap-2">

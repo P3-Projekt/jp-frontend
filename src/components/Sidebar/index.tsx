@@ -10,21 +10,12 @@ const Sidebar: React.FC = () => {
 		<div className="flex justify-start w-[350px] z-10 fixed h-full">
 			<div className="sidebar bg-sidebarcolor p-8 w-full">
 				<Link href="/">
-					<Image
-						src="/logo.png"
-						width={500}
-						height={500}
-						alt="Logo"
-					/>
+					<Image src="/logo.png" width={500} height={500} alt="Logo" />
 				</Link>
 				<ul>
 					{sidebarConfig.map((item, index) => (
 						<li key={index}>
-							<SidebarItem
-								title={item.title}
-								path={item.path}
-								icon={item.icon}
-							>
+							<SidebarItem title={item.title} path={item.path} icon={item.icon}>
 								{item.children}
 							</SidebarItem>
 						</li>

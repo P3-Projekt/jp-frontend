@@ -44,8 +44,8 @@ const sidebarConfig: SidebarItem[] = [
 	{
 		title: "Forspiring",
 		path: "/pregermination",
-		icon: Shrub
-	}
+		icon: Shrub,
+	},
 ];
 
 export default sidebarConfig;

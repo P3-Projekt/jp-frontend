@@ -6,86 +6,107 @@ TODO:
 
 */
 
+import React, {
+	useState,
+	useCallback,
+	useEffect,
+	forwardRef,
+	useImperativeHandle,
+} from "react";
+import DraggableBox, {
+	RackData,
+	rackHeight,
+	rackWidth,
+} from "@/components/map/Rack";
 
-import React, { useState, useCallback, useEffect, forwardRef, useImperativeHandle } from 'react';
-import DraggableBox, { RackData, rackHeight, rackWidth } from '@/components/map/Rack';
-import RackDialog, { setRackToBeDisplayed } from '@/components/map/Dialog/RackDialog';
-
-
-export enum DisplayMode {view, edit, input}
-
+export enum DisplayMode {
+	view,
+	edit,
+	input,
+}
 
 // Grid size for snapping
 const GRID_SIZE = 50;
 
 // Helper function to snap moving rack coordinates to grid
-export const snapToGrid = (value: number) => Math.abs(Math.round(value / GRID_SIZE) * GRID_SIZE);
+export const snapToGrid = (value: number) =>
+	Math.abs(Math.round(value / GRID_SIZE) * GRID_SIZE);
 
-async function updateRackPosition(rackData : RackData){
-  try{
-    const response = await fetch('http://localhost:8080/Rack/' + rackData.id + '/Position', {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({xCoordinate: rackData.position.x, yCoordinate: rackData.position.y}),
-    });
+async function updateRackPosition(rackData: RackData) {
+	try {
+		const response = await fetch(
+			"http://localhost:8080/Rack/" + rackData.id + "/Position",
+			{
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					xCoordinate: rackData.position.x,
+					yCoordinate: rackData.position.y,
+				}),
+			},
+		);
 
-    if (!response.ok) {
-      throw new Error('Bad response code');
-    }
-  } catch(e){
-    console.error('Error updating rack position: ' + e);
-  }
+		if (!response.ok) {
+			throw new Error("Bad response code");
+		}
+	} catch (e) {
+		console.error("Error updating rack position: " + e);
+	}
 }
 
 interface CanvasComponentProps {
-  displayMode: DisplayMode
+	displayMode: DisplayMode;
 }
 
 export interface CanvasComponentMethods {
-  newRack: (x: number, y: number) => void;
+	newRack: (x: number, y: number) => void;
 }
 
 // CanvasComponent component
-const CanvasComponent = forwardRef<CanvasComponentMethods, CanvasComponentProps>(
-  ({ displayMode }, ref) => {
+const CanvasComponent = forwardRef<
+	CanvasComponentMethods,
+	CanvasComponentProps
+>(({ displayMode }, ref) => {
+	const [racks, setRacks] = useState<RackData[]>([]);
+	const [selectedRackIndex, setSelectedRackIndex] = useState<number | null>(
+		null,
+	);
+	const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
+	const [hasBeenMoved, setHasBeenMoved] = useState(false);
+	const [loadingRackIndexes, setLoadingRackIndexes] = useState<number[]>([]);
 
-  const [racks, setRacks] = useState<RackData[]>([]);
-  const [selectedRackIndex, setSelectedRackIndex] = useState<number | null>(null);
-  const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
-  const [hasBeenMoved, setHasBeenMoved] = useState(false);
-  const [loadingRackIndexes, setLoadingRackIndexes] = useState<number[]>([]);
+	setPanOffset({ x: 0, y: 0 });
 
-  // Fetch racks from the backend
-  useEffect(() => {
-    fetch('http://localhost:8080/Racks')
-      .then(response => {
-        
-        // Check if the response is ok
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
+	// Fetch racks from the backend
+	useEffect(() => {
+		fetch("http://localhost:8080/Racks")
+			.then((response) => {
+				// Check if the response is ok
+				if (!response.ok) {
+					throw new Error("Network response was not ok");
+				}
+				return response.json();
+			})
 
-      // Set the boxes state to the racks
-      .then(racks => {        
-        setRacks(racks);
-      })
-      // Error handling
-      .catch(err => {
-        console.error('Error getting racks: ' + err);
-      });
-  }, []);
+			// Set the boxes state to the racks
+			.then((racks) => {
+				setRacks(racks);
+			})
+			// Error handling
+			.catch((err) => {
+				console.error("Error getting racks: " + err);
+			});
+	}, []);
 
-  /*
+	/*
   React.useImperativeHandle(ref, () => ({
     callSomeFunction: () => console.log("Hello from canvas"),
   }));
   */
 
-  /*
+	/*
   const [isPanning, setIsPanning] = useState(false);
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
@@ -136,109 +157,150 @@ const CanvasComponent = forwardRef<CanvasComponentMethods, CanvasComponentProps>
   }, []);
   */
 
+	const addNewRackFetch = useCallback(
+		async (
+			xCoordinate: number,
+			yCoordinate: number,
+			newRacks: RackData[],
+			index: number,
+		) => {
+			try {
+				setLoadingRackIndexes([...loadingRackIndexes, index]);
+				const response = await fetch("http://localhost:8080/Rack", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						xCoordinate: xCoordinate,
+						yCoordinate: yCoordinate,
+					}),
+				});
 
-  const addNewRackFetch = useCallback(async (xCoordinate: number, yCoordinate: number, newRacks: RackData[], index: number) => {
-    try {
-      setLoadingRackIndexes([...loadingRackIndexes, index]);
-      const response = await fetch('http://localhost:8080/Rack', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({xCoordinate: xCoordinate, yCoordinate: yCoordinate}),
-      });
+				if (!response.ok) {
+					throw new Error("Bad response code");
+				}
 
-      if (!response.ok) {
-        throw new Error('Bad response code');
-      }
+				const newRack: RackData = await response.json();
+				console.log("New rack", newRack);
+				console.log(racks.length);
+				const newRacks: RackData[] = racks.map((box, i) =>
+					i === index ? newRack : box,
+				);
+				setRacks(newRacks);
+				setLoadingRackIndexes(loadingRackIndexes.filter((i) => i !== index));
+			} catch (e) {
+				console.error("Error adding new rack: " + e);
+			}
+		},
+		[racks, loadingRackIndexes],
+	);
 
-      const newRack : RackData = await response.json();
-      console.log("New rack", newRack);
-      console.log(racks.length);
-      const newRacks : RackData[] = racks.map((box, i) => i === index ? newRack : box);
-      setRacks(newRacks);
-      setLoadingRackIndexes(loadingRackIndexes.filter(i => i !== index));
-    } catch (e) {
-      console.error('Error adding new rack: ' + e);
-    }
-  }, [racks]);
+	const newRack = useCallback(
+		(xPosition: number, yPosition: number) => {
+			const newRackIndex = racks.length;
+			const newRacks = [
+				...racks,
+				{
+					id: -1,
+					position: { x: xPosition, y: yPosition },
+					shelves: [],
+				},
+			];
+			setRacks(newRacks);
+			addNewRackFetch(xPosition, yPosition, newRacks, newRackIndex);
+		},
+		[racks, addNewRackFetch],
+	);
 
-  const newRack = useCallback((xPosition: number, yPosition: number) => {
-    const newRackIndex = racks.length;
-    const newRacks = [...racks, {
-      id: -1,
-      position: { x: xPosition, y: yPosition },
-      shelves: [],
-    }];
-    setRacks(newRacks);
-    addNewRackFetch(xPosition, yPosition, newRacks, newRackIndex);
-  }, [racks]);
+	useEffect(() => {
+		console.log("ref", ref);
+	}, [ref]);
 
-  useEffect(() => {console.log("ref", ref)}, [ref]);
+	useImperativeHandle(ref, () => {
+		return {
+			newRack: newRack,
+		};
+	});
 
-  useImperativeHandle(ref, () => {
-    return {
-      newRack: newRack,
-    }
-  });
+	const updateRack = useCallback(
+		(rack: RackData, index: number) => {
+			const newRacks = racks.map((box, i) =>
+				i === index ? { ...box, ...rack } : box,
+			);
+			setRacks(newRacks);
+		},
+		[racks],
+	);
 
-  const updateRack = useCallback((rack : RackData, index : number) => {
-    const newRacks = racks.map((box, i) => i === index ? { ...box, ...rack } : box);
-    setRacks(newRacks);
-  }, [racks]);
+	const handleMouseMove = useCallback(
+		function (event: React.MouseEvent<HTMLDivElement>) {
+			if (selectedRackIndex === null || displayMode !== DisplayMode.edit)
+				return;
 
-  const handleMouseMove = useCallback(function(event: React.MouseEvent<HTMLDivElement>) {
-    if(selectedRackIndex === null || displayMode !== DisplayMode.edit) return;
+			const rect = (
+				event.currentTarget as HTMLDivElement
+			).getBoundingClientRect();
+			const mouseX = event.clientX - rect.left;
+			const mouseY = event.clientY - rect.top;
 
-    const rect = (event.currentTarget as HTMLDivElement).getBoundingClientRect();
-    const mouseX = event.clientX - rect.left;
-    const mouseY = event.clientY - rect.top;
+			// Convert client position to absolute position by removing pan offset and centering the boxes
+			const xCoordinate = snapToGrid(mouseX - panOffset.x - rackWidth / 2);
+			const yCoordinate = snapToGrid(mouseY - panOffset.y - rackHeight / 2);
 
-    // Convert client position to absolute position by removing pan offset and centering the boxes
-    const xCoordinate = snapToGrid(mouseX - panOffset.x - rackWidth / 2);
-    const yCoordinate = snapToGrid(mouseY - panOffset.y - rackHeight / 2);
+			// Check for overlap and snap to grid if not overlapping
+			const isOverlapping = racks.some((box, index) => {
+				if (index === selectedRackIndex) return false;
+				const xDelta = Math.abs(box.position.x - xCoordinate);
+				const yDelta = Math.abs(box.position.y - yCoordinate);
+				return xDelta < rackWidth && yDelta < rackHeight;
+			});
 
-    // Check for overlap and snap to grid if not overlapping
-    const isOverlapping = racks.some((box, index) => {
-      if (index === selectedRackIndex) return false;
-      const xDelta = Math.abs(box.position.x - xCoordinate);
-      const yDelta = Math.abs(box.position.y - yCoordinate);
-      return xDelta < rackWidth && yDelta < rackHeight;
-    });
+			// Determind if a rack has been moved
+			const hasRackBeenMoved =
+				xCoordinate !== racks[selectedRackIndex].position.x ||
+				yCoordinate !== racks[selectedRackIndex].position.y;
 
-    // Determind if a rack has been moved
-    const hasRackBeenMoved = xCoordinate !== racks[selectedRackIndex].position.x || yCoordinate !== racks[selectedRackIndex].position.y;
+			// Update position if not overlapping and has changed
+			if (!isOverlapping && hasRackBeenMoved) {
+				setHasBeenMoved(true);
+				updateRack(
+					{
+						...racks[selectedRackIndex],
+						position: { x: xCoordinate, y: yCoordinate },
+					},
+					selectedRackIndex,
+				);
+			}
+		},
+		[selectedRackIndex, racks, panOffset, displayMode, updateRack],
+	);
 
-    // Update position if not overlapping and has changed
-    if (!isOverlapping && hasRackBeenMoved) {
-      setHasBeenMoved(true);
-      updateRack({...racks[selectedRackIndex], position:{x: xCoordinate, y: yCoordinate}}, selectedRackIndex);
-    }
+	const handleMouseUp = useCallback(
+		function () {
+			if (selectedRackIndex !== null && hasBeenMoved) {
+				updateRackPosition(racks[selectedRackIndex]);
 
-  }, [selectedRackIndex, racks, panOffset]);
+				console.log("Update position", racks[selectedRackIndex].position);
+			}
+			setSelectedRackIndex(null);
+		},
+		[hasBeenMoved, selectedRackIndex, racks],
+	);
 
-  const handleMouseUp = useCallback(function(event: MouseEvent){
-    if(selectedRackIndex !== null && hasBeenMoved){
-      updateRackPosition(racks[selectedRackIndex]);
+	const rackMouseDownHandler = function (index: number) {
+		setSelectedRackIndex(index);
+	};
 
-      console.log("Update position", racks[selectedRackIndex].position);
-    }
-    setSelectedRackIndex(null);
-  }, [hasBeenMoved, selectedRackIndex, racks]);
+	useEffect(() => {
+		document.addEventListener("mouseup", handleMouseUp);
 
-  const rackMouseDownHandler = function(rack : RackData, index: number, event : React.MouseEvent<HTMLDivElement>) {
-    setSelectedRackIndex(index);
-  }
+		return () => {
+			document.removeEventListener("mouseup", handleMouseUp);
+		};
+	}, [hasBeenMoved, selectedRackIndex, racks, handleMouseUp]);
 
-  useEffect(() => {
-    document.addEventListener('mouseup', handleMouseUp);
-    
-    return () => {
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [hasBeenMoved, selectedRackIndex, racks]);
-
-  /*
+	/*
   // Add event listeners for panning
   useEffect(() => {
     
@@ -258,39 +320,42 @@ const CanvasComponent = forwardRef<CanvasComponentMethods, CanvasComponentProps>
   }, [isPanning, panStart, panOffset, handlePanMove, handlePanEnd]);
   */
 
-
 	// Grid lines
-  return (
-    <div className="relative w-full h-full overflow-hidden z-1"
-    onMouseMove={handleMouseMove}
-    >
-      <div
-        className="absolute w-full h-full inset-0 pointer-events-none opacity-40"
-        style={{
-          backgroundSize: `${GRID_SIZE}px ${GRID_SIZE}px`,
-          backgroundPosition: `${panOffset.x % GRID_SIZE}px ${panOffset.y % GRID_SIZE}px`,
-          backgroundImage: `linear-gradient(to right, #ccc 1px, transparent 0.25px), linear-gradient(to bottom, #ccc 1px, transparent 0.25px)`,
-        }}
-      />
-      <div
-        style={{
-          transform: `translate(${panOffset.x}px, ${panOffset.y}px)`,
-        }}
-        className="absolute inset-0"
-      >
-        {racks.map((box, index) => (
-          <DraggableBox
-            key={box.id}
-            displayMode={displayMode}
-            rackData={box}
-            isSelected={selectedRackIndex === index}
-            isLoading={loadingRackIndexes.some(i => i === index)}
-            mouseDownHandler={(event: React.MouseEvent<HTMLDivElement>) => {rackMouseDownHandler(box, index, event)}}
-          />
-        ))}
-      </div>
-    </div>
-  );
+	return (
+		<div
+			className="relative w-full h-full overflow-hidden z-1"
+			onMouseMove={handleMouseMove}
+		>
+			<div
+				className="absolute w-full h-full inset-0 pointer-events-none opacity-40"
+				style={{
+					backgroundSize: `${GRID_SIZE}px ${GRID_SIZE}px`,
+					backgroundPosition: `${panOffset.x % GRID_SIZE}px ${panOffset.y % GRID_SIZE}px`,
+					backgroundImage: `linear-gradient(to right, #ccc 1px, transparent 0.25px), linear-gradient(to bottom, #ccc 1px, transparent 0.25px)`,
+				}}
+			/>
+			<div
+				style={{
+					transform: `translate(${panOffset.x}px, ${panOffset.y}px)`,
+				}}
+				className="absolute inset-0"
+			>
+				{racks.map((box, index) => (
+					<DraggableBox
+						key={box.id}
+						displayMode={displayMode}
+						rackData={box}
+						isSelected={selectedRackIndex === index}
+						isLoading={loadingRackIndexes.some((i) => i === index)}
+						mouseDownHandler={() => {
+							rackMouseDownHandler(index);
+						}}
+					/>
+				))}
+			</div>
+		</div>
+	);
 });
 
+CanvasComponent.displayName = "CanvasComponent";
 export default CanvasComponent;
