@@ -1,6 +1,5 @@
 import { Grid2X2, House, Leaf, SquarePen, Shrub } from "lucide-react";
 
-
 export const endpoint = process.env.NEXT_PUBLIC_API_URL;
 
 interface SidebarItem {
