@@ -161,8 +161,6 @@ const PreGerminationPage: React.FC = () => {
 							<RackBox
 								id={rack.id}
 								numberOfShelves={rack.shelves.length}
-								locationX={rack.position.x}
-								locationY={rack.position.y}
 								key={index}
 							/>
 						))}
