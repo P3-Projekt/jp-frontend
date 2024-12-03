@@ -7,7 +7,7 @@ import Link from "next/link";
 
 const Sidebar: React.FC = () => {
 	return (
-		<div className="flex justify-start w-[350px]">
+		<div className="flex justify-start w-[350px] z-10 fixed h-full">
 			<div className="sidebar bg-sidebarcolor p-8 w-full">
 				<Link href="/">
 					<Image src="/logo.png" width={500} height={500} alt="Logo" />
