@@ -79,12 +79,9 @@ const CanvasComponent = forwardRef<
 	const [hasBeenMoved, setHasBeenMoved] = useState(false);
 	const [loadingRackIndexes, setLoadingRackIndexes] = useState<number[]>([]);
 
-
 	// Fetch racks from the backend
 	useEffect(() => {
-		fetchWithAuth("http://localhost:8080/Racks", {
-			
-		})
+		fetchWithAuth("http://localhost:8080/Racks", {})
 			.then((response) => {
 				// Check if the response is ok
 				if (!response.ok) {
