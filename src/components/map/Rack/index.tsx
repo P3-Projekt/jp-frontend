@@ -7,7 +7,7 @@ import { DisplayMode } from "@/components/map/CanvasComponent";
 
 import { ShelfData, Shelf } from "@/components/map/Shelf";
 
-import { useToast } from "@/hooks/use-toast";
+import { ToastMessage } from "@/functions/ToastMessage/ToastMessage";
 
 import { Plus, Minus, Trash2 } from "lucide-react";
 
@@ -53,8 +53,6 @@ const DraggableBox: React.FC<DraggableBoxProps> = ({
 		}
 	};
 
-	const { toast } = useToast();
-
 	return (
 		// Rack container
 		<>
@@ -86,22 +84,22 @@ const DraggableBox: React.FC<DraggableBoxProps> = ({
 						<div className="flex flex-row items-center w-full h-fit justify-center gap-x-1.5 mt-1">
 							<Minus
 								className="stroke-white hover:cursor-pointer hover:scale-110 hover:stroke-gray-100"
+								aria-label={"Fjern hylde"}
 								onClick={() => {
-									console.log(rackShelves[0].batches.length);
-
 									if (rackShelves[0].batches.length != 0) {
-										toast({
-											variant: "destructive",
-											title: "Noget gik galt",
-											description: "Kan ikke fjerne hylde med batch.",
+										ToastMessage({
+											title: "Noget gik galt!",
+											message: "Hylder med batches kan ikke fjernes.",
+											type: "error",
 										});
 										return;
 									} else if (rackShelves.length == 1) {
-										toast({
-											variant: "destructive",
-											title: "Noget gik galt",
-											description: "Minimum én hylde pr. reol",
+										ToastMessage({
+											title: "Noget gik galt!",
+											message: "Der skal minimum være én hylde pr. reol",
+											type: "error",
 										});
+										return;
 									} else {
 										// remove shelf from top
 										fetch(`http://localhost:8080/Rack/${rackData.id}/Shelf`, {
@@ -110,11 +108,11 @@ const DraggableBox: React.FC<DraggableBoxProps> = ({
 											.then((response) => {
 												// Check if the response is ok
 												if (!response.ok) {
-													toast({
-														variant: "destructive",
-														title: "Noget gik galt",
-														description:
-															"Hylden kunne ikke slettes - prøv igen.",
+													ToastMessage({
+														title: "Uventet fejl!",
+														message:
+															"Vi stødte på et problem, vent lidt og prøv igen",
+														type: "error",
 													});
 													throw new Error("Network response was not ok");
 												}
@@ -122,14 +120,20 @@ const DraggableBox: React.FC<DraggableBoxProps> = ({
 											})
 											.then((data) => {
 												setRackShelves(data.shelves);
+												ToastMessage({
+													title: "Hylde fjernet",
+													message: "Hylden er blevet fjernet.",
+													type: "success",
+												});
 											})
 
 											// Error handling
 											.catch((err) => {
-												toast({
-													variant: "destructive",
-													title: "Noget gik galt",
-													description: "Hylden kunne ikke slettes - prøv igen.",
+												ToastMessage({
+													title: "Uventet fejl!",
+													message:
+														"Hylden kunne ikke fjernes, vent og prøv igen.",
+													type: "error",
 												});
 												console.error("Error deleting shelf: " + err);
 											});
@@ -138,14 +142,15 @@ const DraggableBox: React.FC<DraggableBoxProps> = ({
 							/>
 							<Plus
 								className="stroke-white hover:cursor-pointer hover:scale-110 hover:stroke-gray-100"
+								aria-label={"Tilføj hylde"}
 								onClick={() => {
 									// Check if there are more or equal to 7 shelves
 									if (rackShelves.length >= 7) {
 										// send Toast of error message!
-										toast({
-											variant: "destructive",
-											title: "Noget gik galt",
-											description: "Kan ikke tilføje mere end 7 hylder.",
+										ToastMessage({
+											title: "Noget gik galt!",
+											message: "Der kan ikke være mere end 7 hylder på én roel",
+											type: "error",
 										});
 										return;
 									} else {
@@ -156,23 +161,28 @@ const DraggableBox: React.FC<DraggableBoxProps> = ({
 											.then((response) => {
 												// Check if the response is ok
 												if (!response.ok) {
-													toast({
-														variant: "destructive",
-														title: "Noget gik galt",
-														description:
-															"Kunne ikke tilføje hylden - prøv igen.",
+													ToastMessage({
+														title: "Uventet fejl!",
+														message:
+															"Vi stødte på et problem, vent lidt og prøv igen",
+														type: "error",
 													});
 													throw new Error("Network response was not ok");
 												}
+												ToastMessage({
+													title: "Hylde tilføjet",
+													message: "Der er blev tilføjet en hylde.",
+													type: "success",
+												});
 												return response.json();
 											})
 											.then((data) => setRackShelves(data.shelves))
 											// Error handling
 											.catch((err) => {
-												toast({
-													variant: "destructive",
-													title: "Noget gik galt",
-													description: "Kunne ikke tilføje hylden - prøv igen.",
+												ToastMessage({
+													title: "Uventet fejl!",
+													message: `Hylden kunne ikke oprettes, vent og prøv igen.`,
+													type: "error",
 												});
 												console.error("Error deleting shelf: " + err);
 											});
@@ -181,20 +191,24 @@ const DraggableBox: React.FC<DraggableBoxProps> = ({
 							/>
 							<Trash2
 								className="stroke-white hover:cursor-pointer hover:scale-110 hover:stroke-gray-100"
+								aria-label={"Fjern reol"}
 								onClick={() => {
 									// Check if rack is empty
 									if (rackShelves.length != 0) {
 										// send Toast as error message!
-										toast({
-											variant: "destructive",
-											title: "Noget gik galt",
-											description:
-												"Reolen skal være tom for at kunne fjerne den.",
+										ToastMessage({
+											title: "Noget gik galt!",
+											message: "Reolen skal være tom for at fjerne den.",
+											type: "error",
 										});
 										return;
 									} else {
 										// Brug en dialog som confirmation til at fjerne reolen?
-										console.log("RACK DELETED!");
+										ToastMessage({
+											title: "Reol fjernet",
+											message: "Reolen er blevet fjernet.",
+											type: "success",
+										});
 									}
 								}}
 							/>

@@ -1,6 +1,7 @@
 import { Droplets, Scissors } from "lucide-react";
 import { CircularProgressbar } from "react-circular-progressbar";
 import "./progressCicleStyle.css";
+import React from "react";
 
 export interface BatchData {
 	id: number;

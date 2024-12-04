@@ -19,6 +19,7 @@ import DraggableBox, {
 	rackWidth,
 } from "@/components/map/Rack";
 import { fetchWithAuth } from "@/components/authentication/authentication";
+import { ToastMessage } from "@/functions/ToastMessage/ToastMessage";
 
 export enum DisplayMode {
 	view,
@@ -50,9 +51,19 @@ async function updateRackPosition(rackData: RackData) {
 		);
 
 		if (!response.ok) {
+			ToastMessage({
+				title: "Uventet fejl!",
+				message: "Vi stødte på et problem, vent og prøv igen.",
+				type: "error",
+			});
 			throw new Error("Bad response code");
 		}
 	} catch (e) {
+		ToastMessage({
+			title: "Noget gik galt!",
+			message: "Kunne opdatere reol placeringen, prøv igen",
+			type: "error",
+		});
 		console.error("Error updating rack position: " + e);
 	}
 }
@@ -85,6 +96,11 @@ const CanvasComponent = forwardRef<
 			.then((response) => {
 				// Check if the response is ok
 				if (!response.ok) {
+					ToastMessage({
+						title: "Uventet fejl!",
+						message: "Vi stødte på et problem, vent og prøv igen.",
+						type: "error",
+					});
 					throw new Error("Network response was not ok");
 				}
 				return response.json();
@@ -96,6 +112,11 @@ const CanvasComponent = forwardRef<
 			})
 			// Error handling
 			.catch((err) => {
+				ToastMessage({
+					title: "Noget gik galt!",
+					message: "Vi kunne ikke finde reolerne, prøv igen",
+					type: "error",
+				});
 				console.error("Error getting racks: " + err);
 			});
 	}, []);
@@ -116,6 +137,11 @@ const CanvasComponent = forwardRef<
 				});
 
 				if (!response.ok) {
+					ToastMessage({
+						title: "Uventet fejl!",
+						message: "Vi stødte på et problem, vent og prøv igen.",
+						type: "error",
+					});
 					throw new Error("Bad response code");
 				}
 
@@ -248,7 +274,7 @@ const CanvasComponent = forwardRef<
 	/*
   // Add event listeners for panning
   useEffect(() => {
-    
+
     // Unselect
     if (isPanning) {
       document.addEventListener('mousemove', handlePanMove);
