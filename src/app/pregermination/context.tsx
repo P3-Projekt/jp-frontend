@@ -72,9 +72,39 @@ export function usePlacedAmountContext() {
 
 	if (placedAmount === undefined) {
 		throw new Error(
-			"usePlacedAmountContext must be used with a PlacedAmountContextProvider",
+			"usePlacedAmountContext must be used with a PlacedAmountContextProvider"
 		);
 	}
 
 	return placedAmount;
+}
+
+
+interface AutolocateContextProps {
+	autolocateMap: Map<Number, Map<Number, Number>>;
+	setAutolocateMap: React.Dispatch<React.SetStateAction<Map<Number, Map<Number, Number>>>>
+}
+
+const AutolocateContext = createContext<AutolocateContextProps | undefined>(undefined);
+
+export const AutolocateProvider: React.FC<{ children: ReactNode }> = ({
+	children,
+}) => {
+	const [autolocateMap, setAutolocateMap] = useState(new Map<Number, Map<Number, Number>>);
+
+	return (
+		<AutolocateContext.Provider value={{ autolocateMap, setAutolocateMap }}>
+			{children}
+		</AutolocateContext.Provider>
+	)
+};
+
+export function useAutolocateContext() {
+	const autolocateContext = useContext(AutolocateContext);
+
+	if (autolocateContext === undefined) {
+		throw new Error("useAutolocateContext must be used with a AutolocateProvider");
+	}
+
+	return autolocateContext;
 }
