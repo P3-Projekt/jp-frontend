@@ -18,7 +18,6 @@ export const metadata: Metadata = {
 	title: "JP-Grønt - Microgrønt",
 	description: "Site for JP-Grønt, a microgreen producer in Denmark",
 };
-
 const Layout: React.FC<LayoutProps> = ({ children }) => {
 	return (
 		<html lang="en">
