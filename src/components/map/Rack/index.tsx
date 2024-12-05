@@ -28,6 +28,7 @@ interface DraggableBoxProps {
 	mouseDownHandler: ((e: React.MouseEvent<HTMLDivElement>) => void) | undefined;
 	displayMode: DisplayMode;
 	isLoading: boolean;
+	className?: string;
 }
 
 const DraggableBox: React.FC<DraggableBoxProps> = ({
@@ -36,6 +37,7 @@ const DraggableBox: React.FC<DraggableBoxProps> = ({
 	mouseDownHandler,
 	displayMode,
 	isLoading,
+	className,
 }) => {
 	// State for position and dragging
 	const [showDialog, setShowDialog] = useState<boolean>(false);
@@ -59,19 +61,15 @@ const DraggableBox: React.FC<DraggableBoxProps> = ({
 		// Rack container
 		<>
 			<div
-				className={
-					"absolute flex flex-col bg-colorprimary rounded-lg p-1 outline outline-green-800 outline-1 outline-offset-0" +
-					(isSelected
-						? "cursor-grabbing scale-105 border-black"
-						: "cursor-grab")
-				}
+				className={`absolute flex flex-col bg-colorprimary rounded-lg p-1 outline outline-green-800 outline-1 outline-offset-0
+					${isSelected ? "cursor-grabbing scale-105 border-black" : "cursor-grab"} ${className}`}
 				onMouseDown={mouseDownHandlerWrapper}
 				style={{
 					left: rackData.position.x, // Adjust for pan offset visually only
 					top: rackData.position.y, // Adjust for pan offset visually only
 					width: rackWidth,
 					height: rackHeight,
-					border: isSelected ? "2px solid black" : "none",
+					border: isSelected ? "2px solid black" : "",
 				}}
 			>
 				<div className="bg-colorprimary rounded-lg mb-1">
