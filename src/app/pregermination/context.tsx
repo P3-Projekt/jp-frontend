@@ -81,8 +81,8 @@ export function usePlacedAmountContext() {
 
 
 interface AutolocateContextProps {
-	autolocateMap: Map<Number, Map<Number, Number>>;
-	setAutolocateMap: React.Dispatch<React.SetStateAction<Map<Number, Map<Number, Number>>>>
+	autolocateMap: Map<number, Map<number, number>>;
+	setAutolocateMap: React.Dispatch<React.SetStateAction<Map<number, Map<number, number>>>>
 }
 
 const AutolocateContext = createContext<AutolocateContextProps | undefined>(undefined);
@@ -90,7 +90,7 @@ const AutolocateContext = createContext<AutolocateContextProps | undefined>(unde
 export const AutolocateProvider: React.FC<{ children: ReactNode }> = ({
 	children,
 }) => {
-	const [autolocateMap, setAutolocateMap] = useState(new Map<Number, Map<Number, Number>>);
+	const [autolocateMap, setAutolocateMap] = useState(new Map<number, Map<number, number>>);
 
 	return (
 		<AutolocateContext.Provider value={{ autolocateMap, setAutolocateMap }}>
