@@ -13,9 +13,9 @@ const BrugereSide = () => {
   const [users, setUsers] = useState([]);
   const [inactiveUsers, setInactiveUsers] = useState([]);
   const [formData, setFormData] = useState({
-     name: '', 
-     role: 'Gardener' 
-    });
+    name: '',
+    role: 'Gardener'
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -120,7 +120,7 @@ const BrugereSide = () => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error( errorText || 'Kunne ikke reaktivere brugeren');
+        throw new Error(errorText || 'Kunne ikke reaktivere brugeren');
       }
 
       //Genopfrist brugertabel
@@ -133,32 +133,32 @@ const BrugereSide = () => {
     }
   };
 
-    //funktion til inaktivering af brugere
-    const handleDelete = async (name: string) => {
-      setIsLoading(true);
-      setError(null);
-  
-      try {
-        const response = await fetch(`http://localhost:8080/Users/${name}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-  
-        if (!response.ok) {
-          throw new Error('Kunne ikke inaktivere brugeren');
-        }
-  
-        //Genopfrist brugertabel
-        await fetchUsers();
-      } catch (err) {
-        setError('Kunne ikke inaktivere brugeren');
-        console.error('Kunne ikke inaktivere brugeren:', err);
-      } finally {
-        setIsLoading(false);
+  //funktion til inaktivering af brugere
+  const handleDelete = async (name: string) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`http://localhost:8080/Users/${name}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Kunne ikke inaktivere brugeren');
       }
-    };
+
+      //Genopfrist brugertabel
+      await fetchUsers();
+    } catch (err) {
+      setError('Kunne ikke inaktivere brugeren');
+      console.error('Kunne ikke inaktivere brugeren:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="p-8">
@@ -177,7 +177,7 @@ const BrugereSide = () => {
         onSubmit={handleSubmit}
       >
         <h2 className="text-lg font-semibold mb-6">OPRET EN BRUGER</h2>
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-3 gap-6">
 
           {/*Navne felt*/}
           <div>
@@ -189,6 +189,21 @@ const BrugereSide = () => {
               onChange={handleChange}
               required
               placeholder="Indsæt navn"
+              className="w-full border border-gray-300 rounded p-2"
+              disabled={isLoading}
+            />
+          </div>
+
+          {/*password felt*/}
+          <div>
+            <label className="font-semibold">Password:</label>
+            <input
+              type="text"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              placeholder="Indsæt password"
               className="w-full border border-gray-300 rounded p-2"
               disabled={isLoading}
             />
@@ -216,7 +231,7 @@ const BrugereSide = () => {
         <button
           type="submit"
           className="transition w-full bg-green-700 font-semibold hover:bg-green-800 text-white py-2 mt-4 rounded-2xl"
-          
+
           disabled={isLoading}
         >
           {isLoading ? 'HENTER DATA FRA BACKEND' : 'OPRET'}
@@ -226,7 +241,7 @@ const BrugereSide = () => {
       {/*Tabel til at vise aktive brugere*/}
       <div className="bg-sidebarcolor p-6 rounded-lg shadow-xl border mb-8">
         <h2 className="text-xl font-semibold mb-6">OVERSIGT OVER AKTIVE BRUGERE</h2>
-          <table className="w-full table-auto border-collapse">
+        <table className="w-full table-auto border-collapse">
           <thead>
             <tr className="bg-green-700 text-white">
               <th className="p-2 border text-center" style={{ width: '60px' }}>Inaktiver</th>
@@ -272,7 +287,7 @@ const BrugereSide = () => {
       {/*Tabel til at vise inaktive brugere*/}
       <div className="bg-sidebarcolor p-6 rounded-lg shadow-xl border">
         <h2 className="text-xl font-semibold mb-6">OVERSIGT OVER INAKTIVE BRUGERE</h2>
-          <table className="w-full table-auto border-collapse">
+        <table className="w-full table-auto border-collapse">
           <thead>
             <tr className="bg-red-700 text-white">
               <th className="p-2 border text-center" style={{ width: '60px' }}>Aktiver</th>

@@ -33,7 +33,7 @@ const sidebarConfig: SidebarItem[] = [
 	},
 	{
 		title: 'Marker',
-		path: '/settings',
+		path: '/marker',
 		icon: Grid2X2,
 	},
 	{
