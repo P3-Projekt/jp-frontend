@@ -9,16 +9,6 @@ import {
 	getToken,
 } from "@/components/authentication/authentication";
 
-/*
-TODOS:
-- Lav alt spacing til at bruge calc i stedet for faste værdier.
-
-Med Backend
-- Loading tiderne ved at trykke på udfør og slet opgave skal være dynamiske, så de passer med det call der bliver lavet til backend.
-- Skal laves sådan at opaverne faktisk kan udføres og slettes. (Altså at der sker noget når der trykkes på udfør og slet opgave) (Skal bruge backend)
-- Skal kunne hente opgaver, med en given batchId, og en given uge. (Skal bruge backend)
-*/
-
 const KalenderPage: React.FC = () => {
 	// Get current week number
 	const currentWeekNumber: number = getCurrentWeekNumber(new Date());
@@ -74,6 +64,7 @@ const KalenderPage: React.FC = () => {
 		fetchTasks();
 	}, [weekNumber]);
 
+	// Function to get tasks for selected day
 	const selectedDayTask = (selectedDay: Date): React.ReactNode => {
 		const normalizedSelectedDay = new Date(selectedDay.setHours(0, 0, 0, 0));
 

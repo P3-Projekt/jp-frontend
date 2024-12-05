@@ -15,78 +15,31 @@ const WeekDay = ({ currentDay, days }: WeekDayProps) => {
 	const currentDayStyle: string =
 		"w-full py-2 text-center bg-colorprimary text-white rounded content-center";
 
+	const dayNames = [
+		"mandag",
+		"tirsdag",
+		"onsdag",
+		"torsdag",
+		"fredag",
+		"lørdag",
+		"søndag",
+	];
+
 	return (
 		<>
-			<div
-				className={
-					currentDay === formatDate(days[0]) ? currentDayStyle : defaultStyle
-				}
-			>
-				<h1 className="text-xl font-bold uppercase">mandag</h1>
-				<p className="text-sm text-center font-extralight">
-					{formatDate(days[0])}
-				</p>
-			</div>
-			<div
-				className={
-					currentDay === formatDate(days[1]) ? currentDayStyle : defaultStyle
-				}
-			>
-				<h1 className="text-xl font-bold uppercase">tirsdag</h1>
-				<p className="text-sm text-center font-extralight">
-					{formatDate(days[1])}
-				</p>
-			</div>
-			<div
-				className={
-					currentDay === formatDate(days[2]) ? currentDayStyle : defaultStyle
-				}
-			>
-				<h1 className="text-xl font-bold uppercase">onsdag</h1>
-				<p className="text-sm text-center font-extralight">
-					{formatDate(days[2])}
-				</p>
-			</div>
-			<div
-				className={
-					currentDay === formatDate(days[3]) ? currentDayStyle : defaultStyle
-				}
-			>
-				<h1 className="text-xl font-bold uppercase">torsdag</h1>
-				<p className="text-sm text-center font-extralight">
-					{formatDate(days[3])}
-				</p>
-			</div>
-			<div
-				className={
-					currentDay === formatDate(days[4]) ? currentDayStyle : defaultStyle
-				}
-			>
-				<h1 className="text-xl font-bold uppercase">fredag</h1>
-				<p className="text-sm text-center font-extralight">
-					{formatDate(days[4])}
-				</p>
-			</div>
-			<div
-				className={
-					currentDay === formatDate(days[5]) ? currentDayStyle : defaultStyle
-				}
-			>
-				<h1 className="text-xl font-bold uppercase">lørdag</h1>
-				<p className="text-sm text-center font-extralight">
-					{formatDate(days[5])}
-				</p>
-			</div>
-			<div
-				className={
-					currentDay === formatDate(days[6]) ? currentDayStyle : defaultStyle
-				}
-			>
-				<h1 className="text-xl font-bold uppercase">søndag</h1>
-				<p className="text-sm text-center font-extralight">
-					{formatDate(days[6])}
-				</p>
-			</div>
+			{days.map((day, index) => (
+				<div
+					key={index}
+					className={
+						currentDay === formatDate(day) ? currentDayStyle : defaultStyle
+					}
+				>
+					<h1 className="text-xl font-bold uppercase">{dayNames[index]}</h1>
+					<p className="text-sm text-center font-extralight">
+						{formatDate(day)}
+					</p>
+				</div>
+			))}
 		</>
 	);
 };
