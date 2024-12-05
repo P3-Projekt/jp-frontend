@@ -1,8 +1,11 @@
 "use client";
 import React from "react";
+import { fetchWithAuth } from "@/components/authentication/authentication";
+
 import {
 	useShelfContext,
 	usePlacedAmountContext,
+	useAutolocateContext
 } from "@/app/pregermination/context";
 
 interface BatchReadyProps {
@@ -17,8 +20,8 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
 	amount,
 }) => {
 	const { setShelfMap, activeBatchId, setActiveBatchId } = useShelfContext();
-	const { placedAmount, setBatchAmount, setPlacedAmount } =
-		usePlacedAmountContext();
+	const { placedAmount, setBatchAmount, setPlacedAmount } = usePlacedAmountContext();
+	const { setAutolocateMap } = useAutolocateContext();
 
 	const handleClick = async () => {
 		if (activeBatchId === batchId) {
@@ -34,13 +37,9 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
 		}
 	};
 
-	const handlePlaceClick = () => {
-		console.log("Place button clicked");
-	};
-
 	const fetchMaxBatchesOnShelves = async (batchId: number) => {
 		try {
-			const response = await fetch(
+			const response = await fetchWithAuth(
 				`http://localhost:8080/Batch/${batchId}/MaxAmountOnShelves`,
 			);
 
@@ -62,9 +61,41 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
 		);
 		setShelfMap({ shelves: newShelfMap });
 	};
+	
+	const handlePlaceClick = () => {
+		console.log("Place button clicked");
+	};
+
+	const dummyData = new Map([
+		[1, new Map([[1, 13], [2, 13], [3, 18], [4, 12]])],
+		[2, new Map([[1, 8], [2, 20], [3, 13], [4, 15], [5, 6], [6, 17], [7, 6]])],
+		[3, new Map([[1, 3], [2, 20], [3, 0], [4, 2], [5, 10], [6, 15], [7, 7]])],
+	  ]);	  
+
+	const handleAutolocateClick = async () => {
+		console.log("Autolocate button clicked");
+		
+		try {
+			const response = await fetchWithAuth(`http://localhost:8080/Batch/${batchId}/Autolocate`);
+
+			if (!response.ok) {
+				throw new Error("Fetching autolocate on batches failed")
+			}
+
+			const result = await response.json();
+
+			setAutolocateMap(result);
+		} catch (error) {
+			alert(error);
+		}
+	};
+
+	const handleAutolocateClickTest = () => {
+		setAutolocateMap(dummyData);
+	}
 
 	return (
-		<div>
+		<>
 			<div
 				className={`p-2 mb-2 shadow-md rounded-lg ${activeBatchId === batchId ? "bg-colorprimary" : "bg-sidebarcolor"} cursor-pointer transition-all duration-300`}
 				onClick={handleClick}
@@ -82,7 +113,7 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
 					// Outer background
 					<div className="p-2 bg-darkgrey">
 						{/* "Autolokaliser" background */}
-						<div className="p-2 mb-2 bg-sidebarcolor shadow-md rounded-lg">
+						<div className="p-2 mb-2 bg-sidebarcolor shadow-md rounded-lg cursor-pointer transition-all duration-300" onClick={handleAutolocateClickTest}>
 							<div className="text-black text-lg font-bold text-center">
 								Autolokaliser
 							</div>
@@ -110,7 +141,7 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
 					</div>
 				)}
 			</div>
-		</div>
+		</>
 	);
 };
 
