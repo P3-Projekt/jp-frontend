@@ -276,7 +276,9 @@ const CanvasComponent = forwardRef<
 	);
 
 	const rackMouseDownHandler = function (index: number) {
-		setSelectedRackIndex(index);
+		if(displayMode === DisplayMode.edit) {
+			setSelectedRackIndex(index);
+		}
 	};
 
 	useEffect(() => {

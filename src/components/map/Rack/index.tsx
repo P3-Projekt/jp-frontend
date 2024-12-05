@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 
 import { Plus, Minus, Trash2 } from "lucide-react";
 import { LoadingSpinner } from "@/components/LoadingScreen/LoadingSpinner";
+import { fetchWithAuth } from "@/components/authentication/authentication";
 
 //Constants
 export const rackWidth = 100;
@@ -232,9 +233,34 @@ const Rack: React.FC<RackProps> = ({
 										});
 										return;
 									} else {
-										// Brug en dialog som confirmation til at fjerne reolen?
-										console.log("RACK DELETED!");
-									}
+										// Add shelf to top
+										fetchWithAuth(`http://localhost:8080/Rack/${rackData.id}`, {
+											method: "DELETE",
+										})
+											.then((response) => {
+												// Check if the response is ok
+												if (!response.ok) {
+													toast({
+														variant: "destructive",
+														title: "Noget gik galt",
+														description:
+															"Kunne ikke slette reolen - Prøv igen.",
+													});
+													throw new Error("Network response was not ok");
+												} else {
+													console.log("Rack deleted")
+												}
+											})
+											.catch((err) => {
+												toast({
+													variant: "destructive",
+													title: "Noget gik galt",
+													description: "Kunne ikke slette reolen - prøv igen.",
+												});
+												console.error("Error deleting rack: " + err);
+											});
+									
+										}
 								}}
 							/>
 						</div>
@@ -262,7 +288,7 @@ const Rack: React.FC<RackProps> = ({
 							<ShelfBox
 								key={`${shelf.id}#${index}`}
 								index={index}
-								rack={shelf.id}
+								rack={rackData.id}
 							/>
 						),
 					)}

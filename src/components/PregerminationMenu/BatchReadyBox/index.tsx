@@ -4,6 +4,7 @@ import {
 	useShelfContext,
 	usePlacedAmountContext,
 } from "@/app/pregermination/context";
+import { fetchWithAuth } from "@/components/authentication/authentication";
 
 interface BatchReadyProps {
 	batchId: number;
@@ -40,7 +41,7 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
 
 	const fetchMaxBatchesOnShelves = async (batchId: number) => {
 		try {
-			const response = await fetch(
+			const response = await fetchWithAuth(
 				`http://localhost:8080/Batch/${batchId}/MaxAmountOnShelves`,
 			);
 
