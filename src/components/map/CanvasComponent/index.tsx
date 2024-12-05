@@ -19,6 +19,8 @@ import DraggableBox, {
 	rackWidth,
 } from "@/components/map/Rack";
 import { fetchWithAuth } from "@/components/authentication/authentication";
+import { useSearchParams } from "next/navigation";
+import "./style.css";
 
 export enum DisplayMode {
 	view,
@@ -78,6 +80,26 @@ const CanvasComponent = forwardRef<
 	const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
 	const [hasBeenMoved, setHasBeenMoved] = useState(false);
 	const [loadingRackIndexes, setLoadingRackIndexes] = useState<number[]>([]);
+	const [highlightedRackId, setHighlightedRackId] = useState<string | null>(
+		null,
+	);
+
+	// Get search params
+	const searchParams = useSearchParams();
+	const highlightedId = searchParams.get("id");
+
+	useEffect(() => {
+		if (highlightedId) {
+			setHighlightedRackId(highlightedId);
+
+			const timer = setTimeout(() => {
+				console.log("clearing");
+				setHighlightedRackId(null);
+			}, 3000);
+
+			return () => clearTimeout(timer);
+		}
+	}, [highlightedId]);
 
 	// Fetch racks from the backend
 	useEffect(() => {
@@ -295,6 +317,9 @@ const CanvasComponent = forwardRef<
 						mouseDownHandler={() => {
 							rackMouseDownHandler(index);
 						}}
+						className={
+							Number(highlightedRackId) === box.id ? "highlighted blink" : ""
+						}
 					/>
 				))}
 			</div>

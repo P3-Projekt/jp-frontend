@@ -127,12 +127,12 @@ const Task = ({ fields, plantType, category, batchId }: TaskProps) => {
 						<DialogFooter>
 							<div className="w-full flex flex-row justify-between gap-y-4 mt-2">
 								<Link
-									href="/"
+									href={`/?id=${batchId}`}
 									className={buttonVariants({
 										variant: "black",
 									})}
 									onClick={() => {
-										// Send til kortF<p
+										// Send til kort
 										setOpenDialog(false);
 									}}
 								>
