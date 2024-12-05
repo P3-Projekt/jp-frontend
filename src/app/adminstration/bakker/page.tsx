@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import { fetchWithAuth } from "@/components/authentication/authentication";
 
 //bakke type interface
 type BakkeType = {
@@ -30,7 +31,7 @@ const BakkerPage = () => {
 		setIsLoading(true);
 		setError(null);
 		try {
-			const response = await fetch("http://localhost:8080/TrayTypes", {
+			const response = await fetchWithAuth("http://localhost:8080/TrayTypes", {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
@@ -70,7 +71,7 @@ const BakkerPage = () => {
 		setError(null);
 
 		try {
-			const response = await fetch("http://localhost:8080/TrayType", {
+			const response = await fetchWithAuth("http://localhost:8080/TrayType", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -112,7 +113,7 @@ const BakkerPage = () => {
 		setError(null);
 
 		try {
-			const response = await fetch(`http://localhost:8080/TrayType/${name}`, {
+			const response = await fetchWithAuth(`http://localhost:8080/TrayType/${name}`, {
 				method: "DELETE",
 				headers: {
 					"Content-Type": "application/json",

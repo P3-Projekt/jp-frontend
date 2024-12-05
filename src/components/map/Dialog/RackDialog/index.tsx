@@ -1,4 +1,5 @@
 "use client";
+import { fetchWithAuth } from "@/components/authentication/authentication";
 
 import React, { useEffect, useState } from "react";
 
@@ -247,7 +248,7 @@ const RackDialog: React.FC<RackDialogProps> = ({
 								setTaskCompleting(true);
 								// Udfør opgaven
 								try {
-									fetch(
+									fetchWithAuth(
 										`http://localhost:8080/Task/${selectedBatch?.nextTask.id}/Complete`,
 										{
 											method: "PUT",

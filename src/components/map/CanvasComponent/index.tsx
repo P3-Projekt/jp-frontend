@@ -35,7 +35,7 @@ export const snapToGrid = (value: number) =>
 
 async function updateRackPosition(rackData: RackData) {
 	try {
-		const response = await fetch(
+		const response = await fetchWithAuth(
 			"http://localhost:8080/Rack/" + rackData.id + "/Position",
 			{
 				method: "PUT",
@@ -104,7 +104,7 @@ const CanvasComponent = forwardRef<
 		async (xCoordinate: number, yCoordinate: number, index: number) => {
 			try {
 				setLoadingRackIndexes([...loadingRackIndexes, index]);
-				const response = await fetch("http://localhost:8080/Rack", {
+				const response = await fetchWithAuth("http://localhost:8080/Rack", {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",

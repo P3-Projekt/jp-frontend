@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { fetchWithAuth } from "@/components/authentication/authentication";
 
 //plantetype interface
 interface PlantType {
@@ -41,7 +42,7 @@ const PlanterPage = () => {
 		setIsLoading(true);
 		setError(null);
 		try {
-			const response = await fetch("http://localhost:8080/PlantTypes", {
+			const response = await fetchWithAuth("http://localhost:8080/PlantTypes", {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
@@ -107,7 +108,7 @@ const PlanterPage = () => {
 		};
 
 		try {
-			const response = await fetch("http://localhost:8080/PlantType", {
+			const response = await fetchWithAuth("http://localhost:8080/PlantType", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -151,7 +152,7 @@ const PlanterPage = () => {
 		setError(null);
 
 		try {
-			const response = await fetch(
+			const response = await fetchWithAuth(
 				`http://localhost:8080/PlantType/${plantTypeName}`,
 				{
 					method: "DELETE",

@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, Undo2 } from "lucide-react";
 import Task from "@/app/kalender/Task";
 import WeekDay from "@/app/kalender/WeekDay";
 import { TaskProps } from "@/app/kalender/Task";
+import { fetchWithAuth } from "@/components/authentication/authentication";
 
 /*
 TODOS:
@@ -49,7 +50,7 @@ const KalenderPage: React.FC = () => {
 	useEffect(() => {
 		// Fetch tasks from backend
 		const fetchTasks = async () => {
-			const data = await fetch(
+			const data = await fetchWithAuth(
 				process.env.NEXT_PUBLIC_URL + `Tasks?weekNumber=${weekNumber}`,
 			);
 			setTasks(await data.json());

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import { fetchWithAuth } from "@/components/authentication/authentication";
 
 interface User {
 	name: string;
@@ -29,7 +30,7 @@ const BrugereSide = () => {
 		setIsLoading(true);
 		setError(null);
 		try {
-			const response = await fetch("http://localhost:8080/Users", {
+			const response = await fetchWithAuth("http://localhost:8080/Users", {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
@@ -73,7 +74,7 @@ const BrugereSide = () => {
 		setError(null);
 
 		try {
-			const response = await fetch("http://localhost:8080/User", {
+			const response = await fetchWithAuth("http://localhost:8080/User", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -114,7 +115,7 @@ const BrugereSide = () => {
 		setError(null);
 
 		try {
-			const response = await fetch(
+			const response = await fetchWithAuth(
 				`http://localhost:8080/Users/${name}/activate`,
 				{
 					method: "PUT",
@@ -145,7 +146,7 @@ const BrugereSide = () => {
 		setError(null);
 
 		try {
-			const response = await fetch(`http://localhost:8080/Users/${name}`, {
+			const response = await fetchWithAuth(`http://localhost:8080/Users/${name}`, {
 				method: "DELETE",
 				headers: {
 					"Content-Type": "application/json",

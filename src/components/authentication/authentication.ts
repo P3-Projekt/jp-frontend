@@ -18,7 +18,7 @@ export function fetchWithAuth(
 		...options.headers, // Merge any additional headers passed in options
 	};
 
-	// Perform the fetch call with the provided URL and options
+	// Perform the fetchWithAuth call with the provided URL and options
 	return fetch(url, {
 		...options, // Spread the passed options (method, body, etc.)
 		headers, // Override headers with our Bearer token

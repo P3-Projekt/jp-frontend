@@ -2,9 +2,9 @@
 import React, { useEffect, useState } from "react";
 import GerminationBox from "@/components/PregerminationMenu/GerminationBox/index";
 import BatchReadyBox from "@/components/PregerminationMenu/BatchReadyBox/index";
-import { ShelfProvider } from "./context";
-import { PlacedAmountProvider } from "./context";
+import { ShelfProvider, PlacedAmountProvider, AutolocateProvider } from "./context";
 import RackBox from "@/components/Rack";
+import { fetchWithAuth } from "@/components/authentication/authentication";
 
 interface Batch {
 	batchId: number;
@@ -41,7 +41,7 @@ const PreGerminationPage: React.FC = () => {
 	useEffect(() => {
 		const fetchBatchData = async () => {
 			try {
-				const response = await fetch(
+				const response = await fetchWithAuth(
 					"http://localhost:8080/PreGerminatingBatches",
 				); // Fetch pregerminating batches
 
@@ -86,7 +86,7 @@ const PreGerminationPage: React.FC = () => {
 
 		const fetchRackData = async () => {
 			try {
-				const response = await fetch("http://localhost:8080/Racks");
+				const response = await fetchWithAuth("http://localhost:8080/Racks");
 
 				if (!response.ok) {
 					throw new Error("Fetching rack data failed");
@@ -107,65 +107,67 @@ const PreGerminationPage: React.FC = () => {
 	return (
 		<ShelfProvider>
 			<PlacedAmountProvider>
-				<div className="flex">
-					{/* Grey "Forspiring" background */}
-					<div className="w-[250px] fixed h-full bg-lightgrey flex flex-col">
-						<div className="bg-colorprimary mb-2">
-							<h1 className="text-white font-bold text-2xl text-center mt-2 mb-2">
-								Forspiring
-							</h1>
-						</div>
+				<AutolocateProvider>
+					<div className="flex">
+						{/* Grey "Forspiring" background */}
+						<div className="w-[250px] fixed h-full bg-lightgrey flex flex-col">
+							<div className="bg-colorprimary mb-2">
+								<h1 className="text-white font-bold text-2xl text-center mt-2 mb-2">
+									Forspiring
+								</h1>
+							</div>
 
-						{/* Centered "Klar" box with border */}
-						<div className="flex justify-center items-center">
-							<div className="bg-sidebarcolor w-full p-2 text-center text-colorprimary font-bold text-xl border-b-4 border-t-4 border-colorprimary">
-								Klar
+							{/* Centered "Klar" box with border */}
+							<div className="flex justify-center items-center">
+								<div className="bg-sidebarcolor w-full p-2 text-center text-colorprimary font-bold text-xl border-b-4 border-t-4 border-colorprimary">
+									Klar
+								</div>
+							</div>
+
+							{/* "Klar" box content */}
+							<div className="bg-lightgrey p-2 space-y-2 flex-1 overflow-y-auto">
+								{canBePlacedBatches.map((batch: Batch, index: number) => (
+									<BatchReadyBox
+										batchId={batch.batchId}
+										plantType={batch.plantName}
+										amount={batch.amount}
+										key={index}
+									/>
+								))}
+							</div>
+
+							{/* Centered "Spirer" box with border */}
+							<div className="flex justify-center items-center">
+								<div className="bg-sidebarcolor w-full p-2 text-center text-colorprimary font-bold text-xl border-b-4 border-t-4 border-colorprimary">
+									Spirer
+								</div>
+							</div>
+
+							{/* "Spire" box content */}
+							<div className="bg-lightgrey p-2 mb-2 flex-1 overflow-y-auto">
+								{pregerminatingBatches.map((batch: Batch, index: number) => (
+									<GerminationBox
+										plantType={batch.plantName}
+										amount={batch.amount}
+										daysUntilReady={batch.daysUntilReady}
+										key={index}
+									/>
+								))}
 							</div>
 						</div>
 
-						{/* "Klar" box content */}
-						<div className="bg-lightgrey p-2 space-y-2 flex-1 overflow-y-auto">
-							{canBePlacedBatches.map((batch: Batch, index: number) => (
-								<BatchReadyBox
-									batchId={batch.batchId}
-									plantType={batch.plantName}
-									amount={batch.amount}
-									key={index}
-								/>
-							))}
-						</div>
-
-						{/* Centered "Spirer" box with border */}
-						<div className="flex justify-center items-center">
-							<div className="bg-sidebarcolor w-full p-2 text-center text-colorprimary font-bold text-xl border-b-4 border-t-4 border-colorprimary">
-								Spirer
-							</div>
-						</div>
-
-						{/* "Spire" box content */}
-						<div className="bg-lightgrey p-2 mb-2 flex-1 overflow-y-auto">
-							{pregerminatingBatches.map((batch: Batch, index: number) => (
-								<GerminationBox
-									plantType={batch.plantName}
-									amount={batch.amount}
-									daysUntilReady={batch.daysUntilReady}
+						{/* Container for rack components */}
+						<div className="left-[650px] top-[50px] fixed space-y-1">
+							{rackData.map((rack: RackData, index: number) => (
+								<RackBox
+									id={rack.id}
+									numberOfShelves={rack.shelves.length}
 									key={index}
 								/>
 							))}
 						</div>
 					</div>
-
-					{/* Container for rack components */}
-					<div className="left-[650px] top-[50px] fixed space-y-1">
-						{rackData.map((rack: RackData, index: number) => (
-							<RackBox
-								id={rack.id}
-								numberOfShelves={rack.shelves.length}
-								key={index}
-							/>
-						))}
-					</div>
-				</div>
+				</AutolocateProvider>
 			</PlacedAmountProvider>
 		</ShelfProvider>
 	);
