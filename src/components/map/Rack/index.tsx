@@ -38,7 +38,7 @@ const Rack: React.FC<RackProps> = ({
 	mouseDownHandler,
 	displayMode,
 	isLoading,
-	overrideColor
+	overrideColor,
 }) => {
 	// State for position and dragging
 	const [showDialog, setShowDialog] = useState<boolean>(false);
@@ -61,17 +61,21 @@ const Rack: React.FC<RackProps> = ({
 
 	return (
 		// Rack container
-		<div className={
-			(displayMode === DisplayMode.edit || displayMode === DisplayMode.editPrototype ? "cursor-grab active:cursor-grabbing" : 
-			displayMode === DisplayMode.view ? "cursor-pointer" : 
-			"cursor-default")
-			}>
+		<div
+			className={
+				displayMode === DisplayMode.edit ||
+				displayMode === DisplayMode.editPrototype
+					? "cursor-grab active:cursor-grabbing"
+					: displayMode === DisplayMode.view
+						? "cursor-pointer"
+						: "cursor-default"
+			}
+		>
 			<div
 				className={
-					"absolute flex flex-col rounded-lg p-1 outline bg-colorprimary outline-1 outline-offset-0 " + overrideColor + 
-					(isSelected
-						? " scale-105 border-black"
-						: "")
+					"absolute flex flex-col rounded-lg p-1 outline bg-colorprimary outline-1 outline-offset-0 " +
+					overrideColor +
+					(isSelected ? " scale-105 border-black" : "")
 				}
 				onMouseDown={mouseDownHandlerWrapper}
 				style={{
@@ -90,12 +94,18 @@ const Rack: React.FC<RackProps> = ({
 							{" "}
 							{`Reol #${rackData.id}`}{" "}
 						</p>
-					) : displayMode === DisplayMode.edit || displayMode === DisplayMode.editPrototype ? (
+					) : displayMode === DisplayMode.edit ||
+					  displayMode === DisplayMode.editPrototype ? (
 						<div className="flex flex-row items-center w-full h-fit justify-center gap-x-1.5 mt-1">
 							<Minus
-								className={"stroke-white " + (displayMode === DisplayMode.edit && !isLoading ? "hover:cursor-pointer hover:scale-110 hover:stroke-gray-100" : undefined)}
+								className={
+									"stroke-white " +
+									(displayMode === DisplayMode.edit && !isLoading
+										? "hover:cursor-pointer hover:scale-110 hover:stroke-gray-100"
+										: undefined)
+								}
 								onClick={() => {
-									if(displayMode === DisplayMode.editPrototype || isLoading) {
+									if (displayMode === DisplayMode.editPrototype || isLoading) {
 										return;
 									}
 									console.log(rackShelves[0].batches.length);
@@ -148,9 +158,14 @@ const Rack: React.FC<RackProps> = ({
 								}}
 							/>
 							<Plus
-								className={"stroke-white " + (displayMode === DisplayMode.edit && !isLoading  ? "hover:cursor-pointer hover:scale-110 hover:stroke-gray-100" : undefined)}
+								className={
+									"stroke-white " +
+									(displayMode === DisplayMode.edit && !isLoading
+										? "hover:cursor-pointer hover:scale-110 hover:stroke-gray-100"
+										: undefined)
+								}
 								onClick={() => {
-									if(displayMode === DisplayMode.editPrototype || isLoading) {
+									if (displayMode === DisplayMode.editPrototype || isLoading) {
 										return;
 									}
 									// Check if there are more or equal to 7 shelves
@@ -194,9 +209,14 @@ const Rack: React.FC<RackProps> = ({
 								}}
 							/>
 							<Trash2
-								className={"stroke-white " + (displayMode === DisplayMode.edit && !isLoading  ? "hover:cursor-pointer hover:scale-110 hover:stroke-gray-100" : undefined)}
+								className={
+									"stroke-white " +
+									(displayMode === DisplayMode.edit && !isLoading
+										? "hover:cursor-pointer hover:scale-110 hover:stroke-gray-100"
+										: undefined)
+								}
 								onClick={() => {
-									if(displayMode === DisplayMode.editPrototype || isLoading) {
+									if (displayMode === DisplayMode.editPrototype || isLoading) {
 										return;
 									}
 									// Check if rack is empty
@@ -221,7 +241,12 @@ const Rack: React.FC<RackProps> = ({
 
 				{/* Shelf container */}
 				<div className="flex flex-1 flex-col space-y-1">
-					{isLoading ? <LoadingSpinner size={50} className="stroke-white container mt-10"/> : null}
+					{isLoading ? (
+						<LoadingSpinner
+							size={50}
+							className="stroke-white container mt-10"
+						/>
+					) : null}
 
 					{rackShelves.map((shelf, index) =>
 						displayMode != DisplayMode.input ? (

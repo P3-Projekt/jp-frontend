@@ -30,7 +30,8 @@ export const EditMenu: React.FC<{
 
 	const getPositionRelativeToCanvas = useCallback(
 		function (e: MouseEvent) {
-			if (!canvasRef.current || !canvasComponentRef.current) throw new Error("Canvas ref is not set");
+			if (!canvasRef.current || !canvasComponentRef.current)
+				throw new Error("Canvas ref is not set");
 
 			const offset = canvasComponentRef.current.getOffset();
 
@@ -40,8 +41,12 @@ export const EditMenu: React.FC<{
 			let canvasRelativeY = e.clientY - canvasOffset.top;
 
 			if (isMouseInsideCanvas(e)) {
-				canvasRelativeX = snapToGrid(canvasRelativeX - offset.x - rackWidth / 2);
-				canvasRelativeY = snapToGrid(canvasRelativeY - offset.y - rackHeight / 2);
+				canvasRelativeX = snapToGrid(
+					canvasRelativeX - offset.x - rackWidth / 2,
+				);
+				canvasRelativeY = snapToGrid(
+					canvasRelativeY - offset.y - rackHeight / 2,
+				);
 			} else {
 				//Offset by height and width of rack
 				canvasRelativeX -= offset.x + rackWidth / 2;
@@ -70,7 +75,12 @@ export const EditMenu: React.FC<{
 			setIsMouseDown(false);
 			setIsRackRed(false);
 		},
-		[isMouseDown, canvasComponentRef, getPositionRelativeToCanvas, isMouseInsideCanvas],
+		[
+			isMouseDown,
+			canvasComponentRef,
+			getPositionRelativeToCanvas,
+			isMouseInsideCanvas,
+		],
 	);
 
 	const setMouseDown = function () {
@@ -79,26 +89,41 @@ export const EditMenu: React.FC<{
 
 	const handleMouseMove = useCallback(
 		(e: MouseEvent) => {
-			if (isMouseDown && elementRef.current && canvasRef.current && canvasComponentRef.current) {
+			if (
+				isMouseDown &&
+				elementRef.current &&
+				canvasRef.current &&
+				canvasComponentRef.current
+			) {
 				const containerOffset = elementRef.current.getBoundingClientRect();
 				const canvasOffset = canvasRef.current.getBoundingClientRect();
 
 				const { canvasRelativeX, canvasRelativeY } =
 					getPositionRelativeToCanvas(e);
 
-				if(isMouseInsideCanvas(e) && canvasComponentRef.current.isPositionOverlapping({x: canvasRelativeX, y: canvasRelativeY})){
+				if (
+					isMouseInsideCanvas(e) &&
+					canvasComponentRef.current.isPositionOverlapping({
+						x: canvasRelativeX,
+						y: canvasRelativeY,
+					})
+				) {
 					setIsRackRed(true);
 				} else {
 					setIsRackRed(false);
 				}
 
 				const canvasRelativeToContainerX =
-					canvasOffset.left - containerOffset.left + canvasComponentRef.current.getOffset().x;
+					canvasOffset.left -
+					containerOffset.left +
+					canvasComponentRef.current.getOffset().x;
 				const canvasRelativeToContainerY =
-					canvasOffset.top - containerOffset.top + canvasComponentRef.current.getOffset().y;
+					canvasOffset.top -
+					containerOffset.top +
+					canvasComponentRef.current.getOffset().y;
 
 				const newPositionX = canvasRelativeToContainerX + canvasRelativeX;
-				const newPositionY = canvasRelativeToContainerY + canvasRelativeY
+				const newPositionY = canvasRelativeToContainerY + canvasRelativeY;
 
 				setPosition({
 					x: newPositionX,
@@ -106,7 +131,13 @@ export const EditMenu: React.FC<{
 				});
 			}
 		},
-		[isMouseDown, canvasRef, getPositionRelativeToCanvas, canvasComponentRef, isMouseInsideCanvas],
+		[
+			isMouseDown,
+			canvasRef,
+			getPositionRelativeToCanvas,
+			canvasComponentRef,
+			isMouseInsideCanvas,
+		],
 	);
 
 	useEffect(() => {
@@ -156,7 +187,9 @@ export const EditMenu: React.FC<{
 								isSelected={undefined}
 								displayMode={DisplayMode.editPrototype}
 								isLoading={false}
-								overrideColor={isRackRed ? "bg-[hsl(var(--destructive))]" : undefined}
+								overrideColor={
+									isRackRed ? "bg-[hsl(var(--destructive))]" : undefined
+								}
 							/>
 						</div>
 					</div>

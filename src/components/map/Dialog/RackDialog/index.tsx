@@ -72,9 +72,9 @@ const RackDialog: React.FC<RackDialogProps> = ({
 	}
 
 	//Avoid mouse event bubbling down to elements below
-	const propagateMouseEvent = function(e: React.MouseEvent<HTMLDivElement>){
+	const propagateMouseEvent = function (e: React.MouseEvent<HTMLDivElement>) {
 		e.stopPropagation();
-	}
+	};
 
 	return (
 		<div onMouseDown={propagateMouseEvent}>
