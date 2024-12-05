@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useRouter } from "next/navigation";
 
 interface User {
   name: string;
@@ -10,10 +11,12 @@ interface User {
 }
 
 const BrugereSide = () => {
-  const [users, setUsers] = useState([]);
-  const [inactiveUsers, setInactiveUsers] = useState([]);
+  const router = useRouter();
+  const [users, setUsers] = useState<User[]>([]);
+  const [inactiveUsers, setInactiveUsers] = useState<User[]>([]);
   const [formData, setFormData] = useState({
     name: '',
+    password: '', 
     role: 'Gardener'
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -24,15 +27,42 @@ const BrugereSide = () => {
     fetchUsers();
   }, []);
 
+  // When checking authentication
+  const authToken = localStorage.getItem('authToken');
+  if (authToken && isTokenExpired(authToken)) {
+    // Clear the expired token and redirect to login
+    localStorage.removeItem('authToken');
+    router.push('/login');
+  }
+
+  function isTokenExpired(token: string) {
+    try {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace('-', '+').replace('_', '/');
+      const payload = JSON.parse(window.atob(base64));
+      return payload.exp < Date.now() / 1000;
+    } catch (error) {
+      return true; // If token is invalid, consider it expired
+    }
+  }
+
   // funktion til at hente brugere fra backend
   const fetchUsers = async () => {
     setIsLoading(true);
     setError(null);
     try {
+      // Retrieve the auth token from local storage
+      const authToken = localStorage.getItem('authToken');
+
+      // Check if token exists
+      if (!authToken) {
+        throw new Error('No authentication token found');
+      }
       const response = await fetch('http://localhost:8080/Users', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          "Authorization": `Bearer ${authToken}`
         },
       });
 
@@ -76,9 +106,11 @@ const BrugereSide = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          "Authorization": `Bearer ${authToken}`
         },
         body: JSON.stringify({
           name: formData.name,
+          password: formData.password,
           role: formData.role,
         })
       });
@@ -92,7 +124,7 @@ const BrugereSide = () => {
       await fetchUsers();
 
       // nulstil formen
-      setFormData({ name: '', role: 'Gardener' });
+      setFormData({ name: '', password: '', role: 'Gardener' });
     } catch (err: any) {
       if (err.message.includes('already exists')) {
         setError('Brugeren eksistere allerede');
@@ -115,6 +147,7 @@ const BrugereSide = () => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          "Authorization": `Bearer ${authToken}`
         },
       });
 
@@ -143,6 +176,7 @@ const BrugereSide = () => {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
+          "Authorization": `Bearer ${authToken}`
         },
       });
 
@@ -198,7 +232,7 @@ const BrugereSide = () => {
           <div>
             <label className="font-semibold">Password:</label>
             <input
-              type="text"
+              type="password" 
               name="password"
               value={formData.password}
               onChange={handleChange}
