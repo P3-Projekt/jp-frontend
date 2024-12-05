@@ -1,6 +1,4 @@
-import { Grid2X2, House, Leaf, SquarePen, Shrub } from "lucide-react";
-
-export const endpoint = process.env.NEXT_PUBLIC_API_URL;
+import { Grid2X2, House, Leaf, SquarePen } from "lucide-react";
 
 interface SidebarItem {
 	title: string;
@@ -11,42 +9,37 @@ interface SidebarItem {
 
 const sidebarConfig: SidebarItem[] = [
 	{
-		title: "Hjem",
-		path: "/",
+		title: 'Hjem',
+		path: '/',
 		icon: House,
 	},
 	{
-		title: "Adminstration",
+		title: 'Adminstration',
 		icon: Leaf,
 		children: [
 			{
-				title: "Planter",
-				path: "/adminstration/planter",
+				title: 'Planter',
+				path: '/adminstration/planter',
 			},
 			{
-				title: "Bakker",
-				path: "/adminstration/bakker",
+				title: 'Bakker',
+				path: '/adminstration/bakker',
 			},
 			{
-				title: "Brugere",
-				path: "/adminstration/Brugere",
+				title: 'Brugere',
+				path: '/adminstration/Brugere',
 			},
 		],
 	},
 	{
-		title: "Marker",
-		path: "/settings",
+		title: 'Marker',
+		path: '/marker',
 		icon: Grid2X2,
 	},
 	{
-		title: "Redigeringstilstand",
-		path: "/redigeringstilstand",
+		title: 'Redigeringstilstand',
+		path: '/settings',
 		icon: SquarePen,
-	},
-	{
-		title: "Forspiring",
-		path: "/pregermination",
-		icon: Shrub,
 	},
 ];
 
