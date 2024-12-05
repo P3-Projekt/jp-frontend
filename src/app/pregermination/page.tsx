@@ -2,7 +2,11 @@
 import React, { useEffect, useState } from "react";
 import GerminationBox from "@/components/PregerminationMenu/GerminationBox/index";
 import BatchReadyBox from "@/components/PregerminationMenu/BatchReadyBox/index";
-import { ShelfProvider, PlacedAmountProvider, AutolocateProvider } from "./context";
+import {
+	ShelfProvider,
+	PlacedAmountProvider,
+	AutolocateProvider,
+} from "./context";
 import RackBox from "@/components/Rack";
 import { fetchWithAuth } from "@/components/authentication/authentication";
 

@@ -1,11 +1,20 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { fetchWithAuth } from "@/components/authentication/authentication";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	DialogFooter,
+} from "@/components/ui/dialog";
+import { X } from "lucide-react";
 
 import {
 	useShelfContext,
 	usePlacedAmountContext,
-	useAutolocateContext
+	useAutolocateContext,
 } from "@/app/pregermination/context";
 
 interface BatchReadyProps {
@@ -20,8 +29,10 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
 	amount,
 }) => {
 	const { setShelfMap, activeBatchId, setActiveBatchId } = useShelfContext();
-	const { placedAmount, setBatchAmount, setPlacedAmount } = usePlacedAmountContext();
+	const { placedAmount, setBatchAmount, setPlacedAmount } =
+		usePlacedAmountContext();
 	const { setAutolocateMap } = useAutolocateContext();
+	const [openDialog, setOpenDialog] = useState(false);
 
 	const handleClick = async () => {
 		if (activeBatchId === batchId) {
@@ -61,38 +72,70 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
 		);
 		setShelfMap({ shelves: newShelfMap });
 	};
-	
+
 	const handlePlaceClick = () => {
 		console.log("Place button clicked");
-	};
 
-	const dummyData = new Map([
-		[1, new Map([[1, 13], [2, 13], [3, 18], [4, 12]])],
-		[2, new Map([[1, 8], [2, 20], [3, 13], [4, 15], [5, 6], [6, 17], [7, 6]])],
-		[3, new Map([[1, 3], [2, 20], [3, 0], [4, 2], [5, 10], [6, 15], [7, 7]])],
-	  ]);	  
+		setOpenDialog(true);
+	};
 
 	const handleAutolocateClick = async () => {
 		console.log("Autolocate button clicked");
-		
+
 		try {
-			const response = await fetchWithAuth(`http://localhost:8080/Batch/${batchId}/Autolocate`);
+			const response = await fetchWithAuth(
+				`http://localhost:8080/Batch/${batchId}/Autolocate`,
+			);
 
 			if (!response.ok) {
-				throw new Error("Fetching autolocate on batches failed")
+				throw new Error("Fetching autolocate on batches failed");
 			}
 
 			const result = await response.json();
 
-			setAutolocateMap(result);
+			const autolocateMap = new Map();
+			for (const [key] of Object.entries(result)) {
+				const innerObject = result[key];
+				const outerKey = Number(key);
+
+				autolocateMap.set(outerKey, new Map());
+				for (const [innerKey, innerValue] of Object.entries(innerObject)) {
+					autolocateMap.get(outerKey).set(Number(innerKey), Number(innerValue));
+				}
+			}
+
+			setPlacedAmount(sumNestedNumberMap(autolocateMap));
+
+			setAutolocateMap(autolocateMap);
 		} catch (error) {
-			alert(error);
+			if (error instanceof TypeError) {
+				alert(
+					"Failed to use autolocate as autolocateMap includes a non Map/Number value",
+				);
+			} else {
+				alert(error);
+			}
 		}
 	};
 
-	const handleAutolocateClickTest = () => {
-		setAutolocateMap(dummyData);
-	}
+	const sumNestedNumberMap = (nestedMap: Map<unknown, unknown>) => {
+		let accumulator = 0;
+		for (const value of nestedMap.values()) {
+			if (value instanceof Map) {
+				accumulator += sumNestedNumberMap(value);
+			} else if (typeof value === "number") {
+				accumulator += value;
+			} else {
+				throw new TypeError(
+					"The nested map contains a type that is '" +
+						typeof value +
+						"' which is neither a number or a map",
+				);
+			}
+		}
+
+		return accumulator;
+	};
 
 	return (
 		<>
@@ -113,7 +156,10 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
 					// Outer background
 					<div className="p-2 bg-darkgrey">
 						{/* "Autolokaliser" background */}
-						<div className="p-2 mb-2 bg-sidebarcolor shadow-md rounded-lg cursor-pointer transition-all duration-300" onClick={handleAutolocateClickTest}>
+						<div
+							className="p-2 mb-2 bg-sidebarcolor shadow-md rounded-lg cursor-pointer"
+							onClick={handleAutolocateClick}
+						>
 							<div className="text-black text-lg font-bold text-center">
 								Autolokaliser
 							</div>
@@ -122,14 +168,37 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
 						{/* "Lokaliseret" background */}
 						{placedAmount === amount ? (
 							// If all plants are placed
-							<div
-								className="bg-colorprimary p-2 shadow-md rounded-lg cursor-pointer transition-all duration-300"
-								onClick={handlePlaceClick}
-							>
-								<div className="text-white text-center text-lg font-bold">
-									Bekræft placering
+							<>
+								<div
+									className="bg-colorprimary p-2 shadow-md rounded-lg cursor-pointer transition-all duration-300"
+									onClick={handlePlaceClick}
+								>
+									<div className="text-white text-center text-lg font-bold">
+										Bekræft placering
+									</div>
 								</div>
-							</div>
+
+								<Dialog open={openDialog}>
+									<DialogContent className="bg-white opacity-100 min-w-[500px] min-h-[300px] [&>button]:hidden">
+										<DialogHeader>
+											<DialogTitle>
+												<div>
+													<div className="ml-auto -mr-3">
+														<X
+															className="size-14 text-black cursor-pointer"
+															onClick={() => {
+																setOpenDialog(false);
+															}}
+														/>
+													</div>
+												</div>
+											</DialogTitle>
+											<DialogDescription></DialogDescription>
+											<DialogFooter></DialogFooter>
+										</DialogHeader>
+									</DialogContent>
+								</Dialog>
+							</>
 						) : (
 							// If not all plants are placed
 							<div className="bg-sidebarcolor text-black p-2 shadow-md rounded-lg transition-all duration-300">

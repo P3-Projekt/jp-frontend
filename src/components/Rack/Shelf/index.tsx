@@ -1,7 +1,7 @@
 import {
 	usePlacedAmountContext,
 	useShelfContext,
-	useAutolocateContext
+	useAutolocateContext,
 } from "@/app/pregermination/context";
 import React, { useEffect, useState } from "react";
 
@@ -14,25 +14,24 @@ const ShelfBox: React.FC<ShelfProps> = ({ index, rack }) => {
 	const { shelfMap } = useShelfContext(); //Get the shelfMap which tells this shelf how much available space it has
 	const [currentValue, setCurrentValue] = useState(0); //The current input value which becomes the previous when the next input is entered
 	const [availableSpace, setAvailableSpace] = useState(0); //The maximal space available on the shelf
-	const { placedAmount, setPlacedAmount, batchAmount } = usePlacedAmountContext();
+	const { placedAmount, setPlacedAmount, batchAmount } =
+		usePlacedAmountContext();
 	const { autolocateMap } = useAutolocateContext();
-	
-	
+
 	//console.log(`Rendering shelf ${index} on rack ${rack}`);
 
-	const getAutolocateAmount = () => {
+	useEffect(() => {
+		let autoLocateAmount = 0;
 		const rackMap = autolocateMap.get(rack);
 		if (rackMap !== undefined) {
-			const amount = rackMap.get(index);
-			return typeof amount === 'number' ? amount : 0;
+			const amount = rackMap.get(index + 1);
+			autoLocateAmount = typeof amount === "number" ? amount : 0;
 		}
-		return 0;
-	}
 
-	useEffect(() => {
-		setAvailableSpace(100);
-		validateAndSetInput(getAutolocateAmount());
-	}, [autolocateMap])
+		if (autoLocateAmount !== 0) {
+		}
+		setCurrentValue(autoLocateAmount);
+	}, [autolocateMap, index, rack]);
 
 	useEffect(() => {
 		setCurrentValue(0);
@@ -67,8 +66,7 @@ const ShelfBox: React.FC<ShelfProps> = ({ index, rack }) => {
 	};
 
 	const validateAndSetInput = (input: number) => {
-		//const max = getMax(input);
-		const max = 100000;
+		const max = getMax(input);
 		if (input < 0) {
 			//Input may not be negative
 			input = 0;

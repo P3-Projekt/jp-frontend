@@ -105,9 +105,12 @@ const DraggableBox: React.FC<DraggableBoxProps> = ({
 										});
 									} else {
 										// remove shelf from top
-										fetchWithAuth(`http://localhost:8080/Rack/${rackData.id}/Shelf`, {
-											method: "DELETE",
-										})
+										fetchWithAuth(
+											`http://localhost:8080/Rack/${rackData.id}/Shelf`,
+											{
+												method: "DELETE",
+											},
+										)
 											.then((response) => {
 												// Check if the response is ok
 												if (!response.ok) {
@@ -151,9 +154,12 @@ const DraggableBox: React.FC<DraggableBoxProps> = ({
 										return;
 									} else {
 										// Add shelf to top
-										fetchWithAuth(`http://localhost:8080/Rack/${rackData.id}/Shelf`, {
-											method: "POST",
-										})
+										fetchWithAuth(
+											`http://localhost:8080/Rack/${rackData.id}/Shelf`,
+											{
+												method: "POST",
+											},
+										)
 											.then((response) => {
 												// Check if the response is ok
 												if (!response.ok) {

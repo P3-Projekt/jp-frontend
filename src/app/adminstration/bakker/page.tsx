@@ -113,12 +113,15 @@ const BakkerPage = () => {
 		setError(null);
 
 		try {
-			const response = await fetchWithAuth(`http://localhost:8080/TrayType/${name}`, {
-				method: "DELETE",
-				headers: {
-					"Content-Type": "application/json",
+			const response = await fetchWithAuth(
+				`http://localhost:8080/TrayType/${name}`,
+				{
+					method: "DELETE",
+					headers: {
+						"Content-Type": "application/json",
+					},
 				},
-			});
+			);
 
 			if (!response.ok) {
 				const errorText = await response.text();

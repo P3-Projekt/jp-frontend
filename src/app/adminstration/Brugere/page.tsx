@@ -146,12 +146,15 @@ const BrugereSide = () => {
 		setError(null);
 
 		try {
-			const response = await fetchWithAuth(`http://localhost:8080/Users/${name}`, {
-				method: "DELETE",
-				headers: {
-					"Content-Type": "application/json",
+			const response = await fetchWithAuth(
+				`http://localhost:8080/Users/${name}`,
+				{
+					method: "DELETE",
+					headers: {
+						"Content-Type": "application/json",
+					},
 				},
-			});
+			);
 
 			if (!response.ok) {
 				throw new Error("Kunne ikke inaktivere brugeren");
