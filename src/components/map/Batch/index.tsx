@@ -28,9 +28,9 @@ type BatchArguments = BatchData & additionalArgs;
 export const Batch: React.FC<BatchArguments> = (
 	batchArguments: BatchArguments,
 ) => {
-	const currentDate = new Date().toISOString().split("T")[0]; // Get current date in YYYY-MM-DD format
+	const currentDate: string = new Date().toISOString().split("T")[0]; // Get current date in YYYY-MM-DD format
 
-	const taskIsDue =
+	const taskIsDue: boolean =
 		new Date(currentDate) >= new Date(batchArguments.nextTask.dueDate);
 
 	return (

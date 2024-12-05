@@ -15,8 +15,8 @@ interface LayoutProps {
 
 // Metadata
 export const metadata: Metadata = {
-	title: "Test",
-	description: "Test app",
+	title: "JP-Grønt - Microgrønt",
+	description: "Site for JP-Grønt, a microgreen producer in Denmark",
 };
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {

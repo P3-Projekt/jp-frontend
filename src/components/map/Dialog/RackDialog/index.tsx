@@ -28,7 +28,7 @@ import { ToastMessage } from "@/functions/ToastMessage/ToastMessage";
 
 let rackToDisplayUnSynced: RackData | null = null;
 
-export function setRackToBeDisplayed(rack: RackData) {
+export function setRackToBeDisplayed(rack: RackData): void {
 	rackToDisplayUnSynced = rack;
 }
 
@@ -45,7 +45,8 @@ const RackDialog: React.FC<RackDialogProps> = ({
 	const [taskCompleting, setTaskCompleting] = useState<boolean>(false);
 	const [completeConfirm, setCompleteConfirm] = useState<boolean>(false);
 
-	const user = "Victor";
+	// SKAL FJERNES INDEN PRODUKTION
+	const user: string = "Victor";
 
 	const taskTranslate: { [key: string]: string } = {
 		Water: "Vanding",
@@ -67,7 +68,7 @@ const RackDialog: React.FC<RackDialogProps> = ({
 
 	const currentDate = new Date().toISOString().split("T")[0]; // Get current date in YYYY-MM-DD format
 
-	function taskIsDue(batch: BatchData) {
+	function taskIsDue(batch: BatchData): boolean {
 		return new Date(currentDate) >= new Date(batch.nextTask.dueDate);
 	}
 
@@ -175,11 +176,11 @@ const RackDialog: React.FC<RackDialogProps> = ({
 												<div className="h-full w-full overflow-x-scroll ml-2 bg-gray-200 justify-between content-center pl-2 pr-2 self-center border-black border-2">
 													<div className="h-4/5 w-full flex flex-row items-center gap-x-4">
 														{/* Dynamiclly adding batches */}
-														{shelf.batches.map((batch) => (
+														{shelf.batches.map((batch: BatchData) => (
 															<div
 																key={batch.id}
 																className={`flex flex-row h-full content-center items-center self-center pl-1 pr-1 text-black border-black border rounded  font-semibold hover:cursor-pointer ${selectedBatch === batch ? "bg-blue-200" : ""}`}
-																onClick={() => {
+																onClick={(): void => {
 																	// Her vælges den specifikke batch:
 																	if (selectedBatch === batch) {
 																		setSelectedBatch(null);
@@ -235,8 +236,8 @@ const RackDialog: React.FC<RackDialogProps> = ({
 					<AlertDialogFooter>
 						<Button
 							aria-label={"Annuller udførelse"}
-							className={`` + buttonVariants({ variant: "cancel" })}
-							onClick={() => {
+							className={buttonVariants({ variant: "cancel" })}
+							onClick={(): void => {
 								// Cancel completion
 								setCompleteConfirm(false);
 							}}
@@ -246,8 +247,8 @@ const RackDialog: React.FC<RackDialogProps> = ({
 						<Button
 							aria-label={"Bekræft udførelse"}
 							disabled={taskCompleting}
-							className={`` + buttonVariants({ variant: "green" })}
-							onClick={() => {
+							className={buttonVariants({ variant: "green" })}
+							onClick={(): void => {
 								setTaskCompleting(true);
 								// Udfør opgaven
 								try {
@@ -258,10 +259,10 @@ const RackDialog: React.FC<RackDialogProps> = ({
 											headers: {
 												"Content-Type": "application/json",
 											},
-											body: JSON.stringify({ username: user }),
+											body: JSON.stringify({ username: user }), // SKAL LAVES OM INDEN PRODUKTION
 										},
 									)
-										.then((response) => {
+										.then((response: Response): void => {
 											// Check if the response is ok
 											if (!response.ok) {
 												ToastMessage({
@@ -281,7 +282,7 @@ const RackDialog: React.FC<RackDialogProps> = ({
 											}
 										})
 										// Error handling
-										.catch((err) => {
+										.catch((err): void => {
 											ToastMessage({
 												title: "Noget gik galt!",
 												message: "Opgaven kunne ikke udføres, prøv igen.",

@@ -12,8 +12,8 @@ import { ToastMessage } from "@/functions/ToastMessage/ToastMessage";
 import { Plus, Minus, Trash2 } from "lucide-react";
 
 //Constants
-export const rackWidth = 100;
-export const rackHeight = 200;
+export const rackWidth: number = 100;
+export const rackHeight: number = 200;
 
 export interface RackData {
 	id: number;
@@ -43,7 +43,7 @@ const DraggableBox: React.FC<DraggableBoxProps> = ({
 
 	const mouseDownHandlerWrapper = function (
 		e: React.MouseEvent<HTMLDivElement>,
-	) {
+	): void {
 		if (displayMode === DisplayMode.view) {
 			setRackToBeDisplayed(rackData);
 			setShowDialog(true);
@@ -85,18 +85,18 @@ const DraggableBox: React.FC<DraggableBoxProps> = ({
 							<Minus
 								className="stroke-white hover:cursor-pointer hover:scale-110 hover:stroke-gray-100"
 								aria-label={"Fjern hylde"}
-								onClick={() => {
+								onClick={(): void => {
 									if (rackShelves[0].batches.length != 0) {
 										ToastMessage({
 											title: "Noget gik galt!",
-											message: "Hylder med batches kan ikke fjernes.",
+											message: "Kan ikke fjerne hylde med batch.",
 											type: "error",
 										});
 										return;
 									} else if (rackShelves.length == 1) {
 										ToastMessage({
 											title: "Noget gik galt!",
-											message: "Der skal minimum være én hylde pr. reol",
+											message: "Minimum være én hylde pr. reol",
 											type: "error",
 										});
 										return;
@@ -105,7 +105,7 @@ const DraggableBox: React.FC<DraggableBoxProps> = ({
 										fetch(`http://localhost:8080/Rack/${rackData.id}/Shelf`, {
 											method: "DELETE",
 										})
-											.then((response) => {
+											.then((response: Response) => {
 												// Check if the response is ok
 												if (!response.ok) {
 													ToastMessage({
@@ -118,7 +118,7 @@ const DraggableBox: React.FC<DraggableBoxProps> = ({
 												}
 												return response.json();
 											})
-											.then((data) => {
+											.then((data): void => {
 												setRackShelves(data.shelves);
 												ToastMessage({
 													title: "Hylde fjernet",
@@ -128,7 +128,7 @@ const DraggableBox: React.FC<DraggableBoxProps> = ({
 											})
 
 											// Error handling
-											.catch((err) => {
+											.catch((err): void => {
 												ToastMessage({
 													title: "Uventet fejl!",
 													message:
@@ -143,7 +143,7 @@ const DraggableBox: React.FC<DraggableBoxProps> = ({
 							<Plus
 								className="stroke-white hover:cursor-pointer hover:scale-110 hover:stroke-gray-100"
 								aria-label={"Tilføj hylde"}
-								onClick={() => {
+								onClick={(): void => {
 									// Check if there are more or equal to 7 shelves
 									if (rackShelves.length >= 7) {
 										// send Toast of error message!
@@ -158,7 +158,7 @@ const DraggableBox: React.FC<DraggableBoxProps> = ({
 										fetch(`http://localhost:8080/Rack/${rackData.id}/Shelf`, {
 											method: "POST",
 										})
-											.then((response) => {
+											.then((response: Response) => {
 												// Check if the response is ok
 												if (!response.ok) {
 													ToastMessage({
@@ -178,7 +178,7 @@ const DraggableBox: React.FC<DraggableBoxProps> = ({
 											})
 											.then((data) => setRackShelves(data.shelves))
 											// Error handling
-											.catch((err) => {
+											.catch((err): void => {
 												ToastMessage({
 													title: "Uventet fejl!",
 													message: `Hylden kunne ikke oprettes, vent og prøv igen.`,
@@ -192,13 +192,13 @@ const DraggableBox: React.FC<DraggableBoxProps> = ({
 							<Trash2
 								className="stroke-white hover:cursor-pointer hover:scale-110 hover:stroke-gray-100"
 								aria-label={"Fjern reol"}
-								onClick={() => {
+								onClick={(): void => {
 									// Check if rack is empty
 									if (rackShelves.length != 0) {
 										// send Toast as error message!
 										ToastMessage({
 											title: "Noget gik galt!",
-											message: "Reolen skal være tom for at fjerne den.",
+											message: "Tøm reolen for at fjerne den,",
 											type: "error",
 										});
 										return;
@@ -219,21 +219,22 @@ const DraggableBox: React.FC<DraggableBoxProps> = ({
 				{/* Shelf container */}
 				<div className="flex flex-1 flex-col space-y-1 hover:cursor-pointer">
 					{isLoading ? <p className="text-white">Is loading</p> : null}
-					{rackShelves.map((shelf, index) =>
-						displayMode != DisplayMode.input ? (
-							<Shelf
-								displayMode={displayMode}
-								key={index}
-								{...shelf}
-								isFewShelves={rackShelves.length <= 3}
-							/>
-						) : (
-							<ShelfBox
-								key={`${shelf.id}#${index}`}
-								index={index}
-								rack={shelf.id}
-							/>
-						),
+					{rackShelves.map(
+						(shelf: ShelfData, index: number): React.JSX.Element =>
+							displayMode != DisplayMode.input ? (
+								<Shelf
+									displayMode={displayMode}
+									key={index}
+									{...shelf}
+									isFewShelves={rackShelves.length <= 3}
+								/>
+							) : (
+								<ShelfBox
+									key={`${shelf.id}#${index}`}
+									index={index}
+									rack={shelf.id}
+								/>
+							),
 					)}
 				</div>
 			</div>

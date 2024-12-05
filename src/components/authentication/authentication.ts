@@ -1,5 +1,5 @@
 export function getToken() {
-	const token = localStorage.getItem("authToken");
+	const token: string = localStorage.getItem("authToken");
 	if (!token) {
 		window.location.href = "/login";
 	} else {

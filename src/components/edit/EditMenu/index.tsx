@@ -1,7 +1,13 @@
 "use client";
 
 import DraggableBox, { rackWidth, rackHeight } from "@/components/map/Rack";
-import { RefObject, useCallback, useEffect, useRef, useState } from "react";
+import React, {
+	RefObject,
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import {
 	DisplayMode,
 	snapToGrid,
@@ -14,12 +20,12 @@ export const EditMenu: React.FC<{
 }> = ({ canvasRef, canvasComponentRef }) => {
 	const [position, setPosition] = useState({ x: 0, y: 0 });
 	const [isMouseDown, setIsMouseDown] = useState(false);
-	const elementRef = useRef<HTMLDivElement>(null);
+	const elementRef = useRef<HTMLDivElement>(null!);
 
 	const isMouseInsideCanvas = useCallback(
-		function (e: MouseEvent) {
+		function (e: MouseEvent): boolean {
 			if (canvasRef.current) {
-				const canvasOffset = canvasRef.current.getBoundingClientRect();
+				const canvasOffset: DOMRect = canvasRef.current.getBoundingClientRect();
 				return e.clientX >= canvasOffset.left;
 			}
 			return false;
@@ -31,10 +37,10 @@ export const EditMenu: React.FC<{
 		function (e: MouseEvent) {
 			if (!canvasRef.current) throw new Error("Canvas ref is not set");
 
-			const canvasOffset = canvasRef.current.getBoundingClientRect();
+			const canvasOffset: DOMRect = canvasRef.current.getBoundingClientRect();
 
-			let canvasRelativeX = e.clientX - canvasOffset.left;
-			let canvasRelativeY = e.clientY - canvasOffset.top;
+			let canvasRelativeX: number = e.clientX - canvasOffset.left;
+			let canvasRelativeY: number = e.clientY - canvasOffset.top;
 
 			if (isMouseInsideCanvas(e)) {
 				canvasRelativeX = snapToGrid(canvasRelativeX - rackWidth / 2);
@@ -53,7 +59,7 @@ export const EditMenu: React.FC<{
 	);
 
 	const setMouseUp = useCallback(
-		function (e: MouseEvent) {
+		function (e: MouseEvent): void {
 			//Create new rack
 			if (canvasComponentRef.current && isMouseDown) {
 				const { canvasRelativeX, canvasRelativeY } =
@@ -70,22 +76,23 @@ export const EditMenu: React.FC<{
 		[isMouseDown, canvasComponentRef, getPositionRelativeToCanvas],
 	);
 
-	const setMouseDown = function () {
+	const setMouseDown = function (): void {
 		setIsMouseDown(true);
 	};
 
 	const handleMouseMove = useCallback(
-		(e: MouseEvent) => {
+		(e: MouseEvent): void => {
 			if (isMouseDown && elementRef.current && canvasRef.current) {
-				const containerOffset = elementRef.current.getBoundingClientRect();
-				const canvasOffset = canvasRef.current.getBoundingClientRect();
+				const containerOffset: DOMRect =
+					elementRef.current.getBoundingClientRect();
+				const canvasOffset: DOMRect = canvasRef.current.getBoundingClientRect();
 
 				const { canvasRelativeX, canvasRelativeY } =
 					getPositionRelativeToCanvas(e);
 
-				const canvasRelativeToContainerX =
+				const canvasRelativeToContainerX: number =
 					canvasOffset.left - containerOffset.left;
-				const canvasRelativeToContainerY =
+				const canvasRelativeToContainerY: number =
 					canvasOffset.top - containerOffset.top;
 
 				setPosition({
@@ -100,7 +107,7 @@ export const EditMenu: React.FC<{
 	useEffect(() => {
 		window.addEventListener("mouseup", setMouseUp);
 		window.addEventListener("mousemove", handleMouseMove);
-		return () => {
+		return (): void => {
 			window.removeEventListener("mouseup", setMouseUp);
 			window.removeEventListener("mousemove", handleMouseMove);
 		};

@@ -4,6 +4,7 @@ import {
 	useShelfContext,
 	usePlacedAmountContext,
 } from "@/app/pregermination/context";
+import { ToastMessage } from "@/functions/ToastMessage/ToastMessage";
 
 interface BatchReadyProps {
 	batchId: number;
@@ -34,29 +35,39 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
 		}
 	};
 
-	const handlePlaceClick = () => {
+	const handlePlaceClick = (): void => {
 		console.log("Place button clicked");
 	};
 
 	const fetchMaxBatchesOnShelves = async (batchId: number) => {
 		try {
-			const response = await fetch(
+			const response: Response = await fetch(
 				`http://localhost:8080/Batch/${batchId}/MaxAmountOnShelves`,
 			);
 
 			if (!response.ok) {
+				ToastMessage({
+					title: "Uventet fejl",
+					message: "Kunne ikke hente maksimal mængde på hylder",
+					type: "error",
+				});
 				throw new Error("Fetching max batches on shelves failed");
 			}
 
 			const result = await response.json();
 
 			updateShelfMap(result);
-		} catch (error) {
-			alert(error);
+		} catch (err) {
+			ToastMessage({
+				title: "Uventet fejl",
+				message: "Kunne ikke hente maksimal mængde på hylder",
+				type: "error",
+			});
+			console.error("Kunne ikke hente maksimal mængde på hylder: " + err);
 		}
 	};
 
-	const updateShelfMap = (data: object) => {
+	const updateShelfMap = (data: object): void => {
 		const newShelfMap = new Map<number, number[]>(
 			Object.entries(data).map(([key, value]) => [Number(key), value]),
 		);
