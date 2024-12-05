@@ -28,6 +28,7 @@ interface RackProps {
 	mouseDownHandler: ((e: React.MouseEvent<HTMLDivElement>) => void) | undefined;
 	displayMode: DisplayMode;
 	isLoading: boolean;
+	overrideColor?: string;
 }
 
 const Rack: React.FC<RackProps> = ({
@@ -36,6 +37,7 @@ const Rack: React.FC<RackProps> = ({
 	mouseDownHandler,
 	displayMode,
 	isLoading,
+	overrideColor
 }) => {
 	// State for position and dragging
 	const [showDialog, setShowDialog] = useState<boolean>(false);
@@ -44,6 +46,7 @@ const Rack: React.FC<RackProps> = ({
 	const mouseDownHandlerWrapper = function (
 		e: React.MouseEvent<HTMLDivElement>,
 	) {
+		e.stopPropagation();
 		if (displayMode === DisplayMode.view) {
 			setRackToBeDisplayed(rackData);
 			setShowDialog(true);
@@ -57,13 +60,17 @@ const Rack: React.FC<RackProps> = ({
 
 	return (
 		// Rack container
-		<>
+		<div className={
+			(displayMode === DisplayMode.edit ? "cursor-grab active:cursor-grabbing" : 
+			displayMode === DisplayMode.view ? "cursor-pointer" : 
+			"cursor-default")
+			}>
 			<div
 				className={
-					"absolute flex flex-col bg-colorprimary rounded-lg p-1 outline outline-green-800 outline-1 outline-offset-0" +
+					"absolute flex flex-col rounded-lg p-1 outline bg-colorprimary outline-green-800 outline-1 outline-offset-0 " + overrideColor + 
 					(isSelected
-						? "cursor-grabbing scale-105 border-black"
-						: "cursor-grab")
+						? " scale-105 border-black"
+						: "")
 				}
 				onMouseDown={mouseDownHandlerWrapper}
 				style={{
@@ -74,7 +81,7 @@ const Rack: React.FC<RackProps> = ({
 					border: isSelected ? "2px solid black" : "none",
 				}}
 			>
-				<div className="bg-colorprimary rounded-lg mb-1">
+				<div className="rounded-lg mb-1">
 					{/* Show rack ID */}
 					{displayMode === DisplayMode.input ||
 					displayMode == DisplayMode.view ? (
@@ -203,7 +210,7 @@ const Rack: React.FC<RackProps> = ({
 				</div>
 
 				{/* Shelf container */}
-				<div className="flex flex-1 flex-col space-y-1 hover:cursor-pointer">
+				<div className="flex flex-1 flex-col space-y-1">
 					{isLoading ? <p className="text-white">Is loading</p> : null}
 					{rackShelves.map((shelf, index) =>
 						displayMode != DisplayMode.input ? (
@@ -224,7 +231,7 @@ const Rack: React.FC<RackProps> = ({
 				</div>
 			</div>
 			<RackDialog showDialog={showDialog} setShowDialog={setShowDialog} />
-		</>
+		</div>
 	);
 };
 

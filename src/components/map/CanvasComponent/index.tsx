@@ -31,7 +31,7 @@ const GRID_SIZE = 50;
 
 // Helper function to snap moving rack coordinates to grid
 export const snapToGrid = (value: number) =>
-	Math.abs(Math.round(value / GRID_SIZE) * GRID_SIZE);
+	Math.round(value / GRID_SIZE) * GRID_SIZE;
 
 async function updateRackPosition(rackData: RackData) {
 	try {
@@ -63,6 +63,8 @@ interface CanvasComponentProps {
 
 export interface CanvasComponentMethods {
 	newRack: (x: number, y: number) => void;
+	getOffset: () => { x: number; y: number };
+	isPositionOverlapping: (position: { x: number; y: number }) => boolean;
 }
 
 // CanvasComponent component
@@ -71,11 +73,11 @@ const CanvasComponent = forwardRef<
 	CanvasComponentProps
 >(({ displayMode }, ref) => {
 	const [racks, setRacks] = useState<RackData[]>([]);
-	const [selectedRackIndex, setSelectedRackIndex] = useState<number | null>(
-		null,
-	);
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	const [selectedRackIndex, setSelectedRackIndex] = useState<number | null>(null);
+
 	const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
+	const [panStart, setPanStart] = useState({ x: 0, y: 0 });
+	const [isPanning, setIsPanning] = useState(false);
 	const [hasBeenMoved, setHasBeenMoved] = useState(false);
 	const [loadingRackIndexes, setLoadingRackIndexes] = useState<number[]>([]);
 
@@ -134,8 +136,19 @@ const CanvasComponent = forwardRef<
 		[racks, loadingRackIndexes],
 	);
 
+	const isPositionOverlapping = useCallback(function(position: {x: number, y: number}) {
+		return racks.some((box) => {
+			const xDelta = Math.abs(box.position.x - position.x);
+			const yDelta = Math.abs(box.position.y - position.y);
+			return xDelta < rackWidth && yDelta < rackHeight;
+		});
+	}, [racks]);
+
 	const newRack = useCallback(
 		(xPosition: number, yPosition: number) => {
+			if(isPositionOverlapping({x: xPosition, y: yPosition})) {
+				return;
+			}
 			const newRackIndex = racks.length;
 			const newRacks = [
 				...racks,
@@ -148,7 +161,7 @@ const CanvasComponent = forwardRef<
 			setRacks(newRacks);
 			addNewRackFetch(xPosition, yPosition, newRackIndex);
 		},
-		[addNewRackFetch, racks],
+		[addNewRackFetch, racks, isPositionOverlapping]
 	);
 
 	useEffect(() => {
@@ -158,8 +171,10 @@ const CanvasComponent = forwardRef<
 	useImperativeHandle(ref, () => {
 		return {
 			newRack: newRack,
+			getOffset: () => panOffset,
+			isPositionOverlapping: isPositionOverlapping,
 		};
-	});
+	}, [panOffset, newRack, isPositionOverlapping]);
 
 	const updateRack = useCallback(
 		(rack: RackData, index: number) => {
@@ -171,10 +186,31 @@ const CanvasComponent = forwardRef<
 		[racks],
 	);
 
+	const handlePanMove = useCallback((e : React.MouseEvent<HTMLDivElement>) => {
+		if (!isPanning){
+			return;
+		}
+
+		const panDeltaX = e.clientX - panStart.x;
+		const panDeltaY = e.clientY - panStart.y;
+
+		const newOffsetX = panOffset.x + panDeltaX;
+		const newOffsetY = panOffset.y + panDeltaY;
+	
+		setPanOffset({ x: newOffsetX, y: newOffsetY });
+		setPanStart({ x: e.clientX, y: e.clientY });
+	}, [isPanning, panStart, panOffset]);
+
 	const handleMouseMove = useCallback(
 		function (event: React.MouseEvent<HTMLDivElement>) {
-			if (selectedRackIndex === null || displayMode !== DisplayMode.edit)
+
+			if (isPanning){
+				handlePanMove(event);
+			}
+
+			if (selectedRackIndex === null || displayMode !== DisplayMode.edit){
 				return;
+			}
 
 			const rect = (
 				event.currentTarget as HTMLDivElement
@@ -218,15 +254,16 @@ const CanvasComponent = forwardRef<
 			panOffset.y,
 			racks,
 			updateRack,
+			isPanning,
+			handlePanMove
 		],
 	);
 
 	const handleMouseUp = useCallback(
 		function () {
+			setIsPanning(false);
 			if (selectedRackIndex !== null && hasBeenMoved) {
 				updateRackPosition(racks[selectedRackIndex]);
-
-				console.log("Update position", racks[selectedRackIndex].position);
 			}
 			setSelectedRackIndex(null);
 		},
@@ -245,31 +282,18 @@ const CanvasComponent = forwardRef<
 		};
 	}, [hasBeenMoved, selectedRackIndex, racks, handleMouseUp]);
 
-	/*
-  // Add event listeners for panning
-  useEffect(() => {
-    
-    // Unselect
-    if (isPanning) {
-      document.addEventListener('mousemove', handlePanMove);
-      document.addEventListener('mouseup', handlePanEnd);
-    } else {
-      document.removeEventListener('mousemove', handlePanMove);
-      document.removeEventListener('mouseup', handlePanEnd);
-    }
 
-    return () => {
-      document.removeEventListener('mousemove', handlePanMove);
-      document.removeEventListener('mouseup', handlePanEnd);
-    };
-  }, [isPanning, panStart, panOffset, handlePanMove, handlePanEnd]);
-  */
+	const startPanning = function (event: React.MouseEvent<HTMLDivElement>) {
+		setIsPanning(true);
+		setPanStart({ x: event.clientX, y: event.clientY });
+	}
 
 	// Grid lines
 	return (
 		<div
-			className="relative w-full h-full overflow-hidden z-1"
+			className="relative w-full h-full overflow-hidden z-1 cursor-grab active:cursor-grabbing"
 			onMouseMove={handleMouseMove}
+			onMouseDown={startPanning}
 		>
 			<div
 				className="absolute w-full h-full inset-0 pointer-events-none opacity-40"

@@ -71,8 +71,13 @@ const RackDialog: React.FC<RackDialogProps> = ({
 		return new Date(currentDate) >= new Date(batch.nextTask.dueDate);
 	}
 
+	//Avoid mouse event bubbling down to elements below
+	const propagateMouseEvent = function(e: React.MouseEvent<HTMLDivElement>){
+		e.stopPropagation();
+	}
+
 	return (
-		<>
+		<div onMouseDown={propagateMouseEvent}>
 			<Dialog open={showDialog} onOpenChange={setShowDialog}>
 				<DialogContent className="bg-white opacity-100 min-w-[700px] min-h-[500px] [&>button]:hidden">
 					<DialogHeader>
@@ -307,7 +312,7 @@ const RackDialog: React.FC<RackDialogProps> = ({
 					</AlertDialogFooter>
 				</AlertDialogContent>
 			</AlertDialog>
-		</>
+		</div>
 	);
 };
 
