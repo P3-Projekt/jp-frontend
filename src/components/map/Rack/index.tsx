@@ -104,11 +104,11 @@ const Rack: React.FC<RackProps> = ({
 										? "hover:cursor-pointer hover:scale-110 hover:stroke-gray-100"
 										: undefined)
 								}
+								onMouseDown={(e) => {e.stopPropagation();}}
 								onClick={() => {
 									if (displayMode === DisplayMode.editPrototype || isLoading) {
 										return;
 									}
-									console.log(rackShelves[0].batches.length);
 
 									if (rackShelves[0].batches.length != 0) {
 										toast({
@@ -164,6 +164,7 @@ const Rack: React.FC<RackProps> = ({
 										? "hover:cursor-pointer hover:scale-110 hover:stroke-gray-100"
 										: undefined)
 								}
+								onMouseDown={(e) => {e.stopPropagation();}}
 								onClick={() => {
 									if (displayMode === DisplayMode.editPrototype || isLoading) {
 										return;
@@ -215,6 +216,7 @@ const Rack: React.FC<RackProps> = ({
 										? "hover:cursor-pointer hover:scale-110 hover:stroke-gray-100"
 										: undefined)
 								}
+								onMouseDown={(e) => {e.stopPropagation();}}
 								onClick={() => {
 									if (displayMode === DisplayMode.editPrototype || isLoading) {
 										return;
