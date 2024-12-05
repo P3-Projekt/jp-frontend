@@ -134,7 +134,7 @@ const KalenderPage: React.FC = () => {
 	return (
 		<>
 			{/* UGER */}
-			<div className="w-full h-full flex flex-col justify-center select-none overflow-hidden">
+			<div className="w-full h-full flex flex-col justify-center select-none overflow-hidden m-8">
 				<div className="flex flex-row justify-center">
 					<ChevronLeft
 						aria-label="Forige uge"
