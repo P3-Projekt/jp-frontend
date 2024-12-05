@@ -10,6 +10,7 @@ import { ShelfData, Shelf } from "@/components/map/Shelf";
 import { useToast } from "@/hooks/use-toast";
 
 import { Plus, Minus, Trash2 } from "lucide-react";
+import { LoadingSpinner } from "@/components/LoadingScreen/LoadingSpinner";
 
 //Constants
 export const rackWidth = 100;
@@ -61,13 +62,13 @@ const Rack: React.FC<RackProps> = ({
 	return (
 		// Rack container
 		<div className={
-			(displayMode === DisplayMode.edit ? "cursor-grab active:cursor-grabbing" : 
+			(displayMode === DisplayMode.edit || displayMode === DisplayMode.editPrototype ? "cursor-grab active:cursor-grabbing" : 
 			displayMode === DisplayMode.view ? "cursor-pointer" : 
 			"cursor-default")
 			}>
 			<div
 				className={
-					"absolute flex flex-col rounded-lg p-1 outline bg-colorprimary outline-green-800 outline-1 outline-offset-0 " + overrideColor + 
+					"absolute flex flex-col rounded-lg p-1 outline bg-colorprimary outline-1 outline-offset-0 " + overrideColor + 
 					(isSelected
 						? " scale-105 border-black"
 						: "")
@@ -89,11 +90,14 @@ const Rack: React.FC<RackProps> = ({
 							{" "}
 							{`Reol #${rackData.id}`}{" "}
 						</p>
-					) : displayMode === DisplayMode.edit ? (
+					) : displayMode === DisplayMode.edit || displayMode === DisplayMode.editPrototype ? (
 						<div className="flex flex-row items-center w-full h-fit justify-center gap-x-1.5 mt-1">
 							<Minus
-								className="stroke-white hover:cursor-pointer hover:scale-110 hover:stroke-gray-100"
+								className={"stroke-white " + (displayMode === DisplayMode.edit && !isLoading ? "hover:cursor-pointer hover:scale-110 hover:stroke-gray-100" : undefined)}
 								onClick={() => {
+									if(displayMode === DisplayMode.editPrototype || isLoading) {
+										return;
+									}
 									console.log(rackShelves[0].batches.length);
 
 									if (rackShelves[0].batches.length != 0) {
@@ -144,8 +148,11 @@ const Rack: React.FC<RackProps> = ({
 								}}
 							/>
 							<Plus
-								className="stroke-white hover:cursor-pointer hover:scale-110 hover:stroke-gray-100"
+								className={"stroke-white " + (displayMode === DisplayMode.edit && !isLoading  ? "hover:cursor-pointer hover:scale-110 hover:stroke-gray-100" : undefined)}
 								onClick={() => {
+									if(displayMode === DisplayMode.editPrototype || isLoading) {
+										return;
+									}
 									// Check if there are more or equal to 7 shelves
 									if (rackShelves.length >= 7) {
 										// send Toast of error message!
@@ -187,8 +194,11 @@ const Rack: React.FC<RackProps> = ({
 								}}
 							/>
 							<Trash2
-								className="stroke-white hover:cursor-pointer hover:scale-110 hover:stroke-gray-100"
+								className={"stroke-white " + (displayMode === DisplayMode.edit && !isLoading  ? "hover:cursor-pointer hover:scale-110 hover:stroke-gray-100" : undefined)}
 								onClick={() => {
+									if(displayMode === DisplayMode.editPrototype || isLoading) {
+										return;
+									}
 									// Check if rack is empty
 									if (rackShelves.length != 0) {
 										// send Toast as error message!
@@ -211,7 +221,8 @@ const Rack: React.FC<RackProps> = ({
 
 				{/* Shelf container */}
 				<div className="flex flex-1 flex-col space-y-1">
-					{isLoading ? <p className="text-white">Is loading</p> : null}
+					{isLoading ? <LoadingSpinner size={50} className="stroke-white container mt-10"/> : null}
+
 					{rackShelves.map((shelf, index) =>
 						displayMode != DisplayMode.input ? (
 							<Shelf

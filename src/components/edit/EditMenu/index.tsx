@@ -154,7 +154,7 @@ export const EditMenu: React.FC<{
 								}}
 								mouseDownHandler={setMouseDown}
 								isSelected={undefined}
-								displayMode={DisplayMode.edit}
+								displayMode={DisplayMode.editPrototype}
 								isLoading={false}
 								overrideColor={isRackRed ? "bg-[hsl(var(--destructive))]" : undefined}
 							/>

@@ -24,7 +24,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 		<html lang="en">
 			<body
 				className={cn(
-					"min-h-screen font-sans antialiased grainy",
+					"min-h-screen font-sans antialiased grainy overflow-hidden",
 					inter.className,
 				)}
 			>

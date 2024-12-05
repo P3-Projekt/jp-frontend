@@ -23,7 +23,8 @@ import { fetchWithAuth } from "@/components/authentication/authentication";
 export enum DisplayMode {
 	view,
 	edit,
-	input,
+	editPrototype,
+	input
 }
 
 // Grid size for snapping
