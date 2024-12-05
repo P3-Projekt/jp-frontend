@@ -1,6 +1,26 @@
-export function getToken() {
+import { JwtPayload, jwtDecode } from 'jwt-decode';
+
+export const isTokenExpired = (token: string): boolean => {
+  try {
+    const decoded = jwtDecode<JwtPayload>(token);
+    if (!decoded.exp) {
+      console.warn('Token does not have an expiration time.');
+      return true; // Consider invalid tokens as expired
+    }
+    const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
+    return decoded.exp < currentTime;
+  } catch (error) {
+    console.error('Error decoding token:', error);
+    return true; // Treat invalid tokens as expired
+  }
+};
+
+function getToken() {
 	const token = localStorage.getItem("authToken");
 	if (!token) {
+		window.location.href = "/login";
+	} else if (isTokenExpired(token)) {
+		localStorage.removeItem("authToken");
 		window.location.href = "/login";
 	} else {
 		return token;
