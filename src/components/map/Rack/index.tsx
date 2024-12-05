@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import RackDialog, { setRackToBeDisplayed } from "../Dialog/RackDialog";
-import ShelfBox from "@/components/Rack/Shelf";
+import ShelfBox from "@/components/map/ShelfInput";
 
 import { DisplayMode } from "@/components/map/CanvasComponent";
 
