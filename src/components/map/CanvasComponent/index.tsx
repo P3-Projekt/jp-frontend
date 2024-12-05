@@ -13,7 +13,7 @@ import React, {
 	forwardRef,
 	useImperativeHandle,
 } from "react";
-import DraggableBox, {
+import Rack, {
 	RackData,
 	rackHeight,
 	rackWidth,
@@ -286,7 +286,7 @@ const CanvasComponent = forwardRef<
 				className="absolute inset-0"
 			>
 				{racks.map((box, index) => (
-					<DraggableBox
+					<Rack
 						key={box.id}
 						displayMode={displayMode}
 						rackData={box}

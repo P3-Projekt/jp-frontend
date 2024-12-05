@@ -22,7 +22,7 @@ export interface RackData {
 }
 
 // DraggableBox component props
-interface DraggableBoxProps {
+interface RackProps {
 	rackData: RackData;
 	isSelected: boolean | undefined;
 	mouseDownHandler: ((e: React.MouseEvent<HTMLDivElement>) => void) | undefined;
@@ -30,7 +30,7 @@ interface DraggableBoxProps {
 	isLoading: boolean;
 }
 
-const DraggableBox: React.FC<DraggableBoxProps> = ({
+const Rack: React.FC<RackProps> = ({
 	rackData,
 	isSelected,
 	mouseDownHandler,
@@ -228,4 +228,4 @@ const DraggableBox: React.FC<DraggableBoxProps> = ({
 	);
 };
 
-export default DraggableBox;
+export default Rack;
