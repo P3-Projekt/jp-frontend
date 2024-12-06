@@ -79,14 +79,14 @@ export function usePlacedAmountContext() {
 	return placedAmount;
 }
 
-interface AutolocateContextProps {
-	autolocateMap: Map<number, Map<number, number>>;
-	setAutolocateMap: React.Dispatch<
+interface NestedMapProps {
+	nestedMap: Map<number, Map<number, number>>;
+	setNestedMap: React.Dispatch<
 		React.SetStateAction<Map<number, Map<number, number>>>
 	>;
 }
 
-const AutolocateContext = createContext<AutolocateContextProps | undefined>(
+const AutolocateContext = createContext<NestedMapProps | undefined>(
 	undefined,
 );
 
@@ -98,7 +98,7 @@ export const AutolocateProvider: React.FC<{ children: ReactNode }> = ({
 	);
 
 	return (
-		<AutolocateContext.Provider value={{ autolocateMap, setAutolocateMap }}>
+		<AutolocateContext.Provider value={{ nestedMap: autolocateMap, setNestedMap: setAutolocateMap }}>
 			{children}
 		</AutolocateContext.Provider>
 	);
@@ -114,4 +114,59 @@ export function useAutolocateContext() {
 	}
 
 	return autolocateContext;
+}
+
+interface batchPositionProps {
+	batchPositionMap: Map<number, number>;
+	batchPositionMapSet: (key: number, value: number) => void;
+	batchPositionMapDelete: (key: number) => void;
+	batchPositionMapHas: (key: number) => boolean;
+}
+
+const BatchPositionContext = createContext<batchPositionProps | undefined>(
+	undefined,
+);
+
+export const BatchPositionProvider: React.FC<{ children: ReactNode }> = ({
+	children,
+}) => {
+	const [batchPositionMap, setBatchPositionMap] = useState(new Map<number, number>);
+
+	const batchPositionMapSet = (key: number, value: number) => {
+		setBatchPositionMap((prev) => {
+			const newMap = new Map(prev);
+			newMap.set(key, value);
+			return newMap;
+		});
+	}
+
+	const batchPositionMapHas = (key: number) => {
+		return batchPositionMap.has(key);
+	}
+
+	const batchPositionMapDelete = (key: number) => {
+		setBatchPositionMap((prev) => {
+			const newMap = new Map(prev);
+			newMap.delete(key);
+			return newMap;
+		})
+	}
+
+	return (
+		<BatchPositionContext.Provider value={{batchPositionMap, batchPositionMapSet, batchPositionMapDelete, batchPositionMapHas }}>
+			{children}
+		</BatchPositionContext.Provider>
+	);
+};
+
+export function useBatchPositionContext() {
+	const batchPositionContext = useContext(BatchPositionContext);
+
+	if (batchPositionContext === undefined) {
+		throw new Error(
+			"useBatchPositionContext must be used with a BatchPositionContext.Provider",
+		);
+	}
+
+	return batchPositionContext;
 }

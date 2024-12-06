@@ -2,53 +2,47 @@ import {
 	usePlacedAmountContext,
 	useShelfContext,
 	useAutolocateContext,
+	useBatchPositionContext
 } from "@/app/pregermination/context";
 import React, { useEffect, useState } from "react";
+import { ShelfData } from "@/app/pregermination/page";
 
-export interface ShelfProps {
-	index: number;
-	rack: number;
-}
-
-const ShelfBox: React.FC<ShelfProps> = ({ index, rack }) => {
+const ShelfBox: React.FC<ShelfData> = ({ position, rackId, id: shelfId }) => {
 	const { shelfMap } = useShelfContext(); //Get the shelfMap which tells this shelf how much available space it has
 	const [currentValue, setCurrentValue] = useState(0); //The current input value which becomes the previous when the next input is entered
 	const [availableSpace, setAvailableSpace] = useState(0); //The maximal space available on the shelf
-	const { placedAmount, setPlacedAmount, batchAmount } =
-		usePlacedAmountContext();
-	const { autolocateMap } = useAutolocateContext();
-
-	//console.log(`Rendering shelf ${index} on rack ${rack}`);
+	const { placedAmount, setPlacedAmount, batchAmount } = usePlacedAmountContext();
+	const { nestedMap: autolocateMap } = useAutolocateContext();
+	const { batchPositionMapSet, batchPositionMapDelete, batchPositionMapHas} = useBatchPositionContext();
 
 	useEffect(() => {
 		let autoLocateAmount = 0;
-		const rackMap = autolocateMap.get(rack);
-		if (rackMap !== undefined) {
-			const amount = rackMap.get(index + 1);
+		const rackIdMap = autolocateMap.get(rackId);
+		if (rackIdMap !== undefined) {
+			const amount = rackIdMap.get(position + 1);
 			autoLocateAmount = typeof amount === "number" ? amount : 0;
 		}
 
 		if (autoLocateAmount !== 0) {
 		}
-		setCurrentValue(autoLocateAmount);
-	}, [autolocateMap, index, rack]);
+		updateCurrentValue(autoLocateAmount);
+	}, [autolocateMap, position, rackId]);
 
 	useEffect(() => {
 		setCurrentValue(0);
 		if (shelfMap === undefined) {
 			throw new TypeError("shelfMap from useShelfContext is undefined");
 		}
-		const shelfArray = shelfMap.shelves.get(rack);
+		const shelfArray = shelfMap.shelves.get(rackId);
 		if (shelfArray !== undefined) {
-			const space = shelfArray.at(index);
+			const space = shelfArray.at(position);
 			if (space) {
 				setAvailableSpace(space);
 			}
 		} else {
-			//console.log("Setting space to 0");
 			setAvailableSpace(0);
 		}
-	}, [shelfMap, rack, index]);
+	}, [shelfMap, rackId, position]);
 
 	const getMax = (currentlyPlaced: number) => {
 		if (batchAmount === null) {
@@ -63,6 +57,19 @@ const ShelfBox: React.FC<ShelfProps> = ({ index, rack }) => {
 			batchAmount - placedAmount + currentlyPlaced - valueDifference; // Calculate the amount left to be placed
 		//console.log(`leftToBePlaced: ${leftToBePlaced}`);
 		return leftToBePlaced < availableSpace ? leftToBePlaced : availableSpace; // Return the smaller of leftToBePlaced and availableSpace
+	};
+
+	// Update the current value and store the value in the batchPositionContext
+	const updateCurrentValue = (value: number) => {
+		setCurrentValue(value);
+
+		if (value !== 0) {
+			console.log(`Shelf with id ${shelfId} settings its value to ${value}`);
+			batchPositionMapSet(shelfId, value);
+		} else if (batchPositionMapHas(shelfId)) {
+			console.log(`Shelf with id ${shelfId} deleting its value`);
+			batchPositionMapDelete(shelfId);
+		}
 	};
 
 	const validateAndSetInput = (input: number) => {
@@ -81,7 +88,7 @@ const ShelfBox: React.FC<ShelfProps> = ({ index, rack }) => {
 		const newPlacedAmount = placedAmount + valueDifference;
 		setPlacedAmount(newPlacedAmount);
 		//console.log("Placed amount was before: " + placedAmount + " and is now: " + newPlacedAmount);
-		setCurrentValue(input);
+		updateCurrentValue(input);
 	};
 
 	return (

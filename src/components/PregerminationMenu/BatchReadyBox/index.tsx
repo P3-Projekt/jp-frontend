@@ -10,12 +10,16 @@ import {
 	DialogFooter,
 } from "@/components/ui/dialog";
 import { X } from "lucide-react";
+import { Button, buttonVariants } from "@/components/ui/button";
 
 import {
 	useShelfContext,
 	usePlacedAmountContext,
 	useAutolocateContext,
+	useBatchPositionContext
 } from "@/app/pregermination/context";
+import { METHODS } from "http";
+import { create } from "domain";
 
 interface BatchReadyProps {
 	batchId: number;
@@ -28,10 +32,11 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
 	plantType,
 	amount,
 }) => {
-	const { setShelfMap, activeBatchId, setActiveBatchId } = useShelfContext();
+	const { setShelfMap, activeBatchId, setActiveBatchId, shelfMap } = useShelfContext();
 	const { placedAmount, setBatchAmount, setPlacedAmount } =
 		usePlacedAmountContext();
-	const { setAutolocateMap } = useAutolocateContext();
+	const { setNestedMap: setAutolocateMap } = useAutolocateContext();
+	const {batchPositionMap} = useBatchPositionContext();
 	const [openDialog, setOpenDialog] = useState(false);
 
 	const handleClick = async () => {
@@ -66,6 +71,94 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
 		}
 	};
 
+	const fetchBatchPosition = async (data: unknown) => {
+		try {
+			const response = await fetchWithAuth(
+				`http://localhost:8080/Batch/${batchId}/Position`,
+				{
+					method: 'PUT',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({
+						locations: data,
+						username: "demo"						
+					}),
+				}
+			);
+
+			if (!response.ok) {
+				throw new Error("Updating batch position failed");
+			}
+
+		} catch (error) {
+			alert(error)
+		}
+	}
+
+	const handleConfirmPlaceClick = async () => {
+		setOpenDialog(false);
+		console.log(batchPositionMap);
+		const obj = mapToObject(batchPositionMap);
+		console.log(obj);
+		await fetchBatchPosition(obj);
+	};
+
+	// const printPositionMapJSON2 = () => {
+	// 	// Log the original Map to the console for debugging
+	// 	console.log(batchPositionMap);
+	
+		// Function to convert a Map to a plain JavaScript object
+		const mapToObject = (map: Map<any, any>): Record<string, any> => {
+			// Initialize an empty object to hold the converted Map data
+			const obj: Record<string, any> = {};
+			// Iterate over each key-value pair in the Map
+			for (const [key, value] of map.entries()) {
+				// Convert the key to a string (object keys in JSON must be strings)
+				// If the value is another Map, call mapToObject recursively to handle it
+				// Otherwise, directly assign the value to the object
+				obj[String(key)] = value instanceof Map ? mapToObject(value) : value;
+			}
+			// Return the resulting plain object
+			return obj;
+		};
+	
+	// 	// // Create a result object that includes the serialized Map and a username field
+	// 	// const result = {
+	// 	// 	// Convert the batchPositionMap to a plain object and then serialize it as a JSON string
+	// 	// 	locations: JSON.stringify(mapToObject(batchPositionMap)),
+	// 	// 	// Include a hardcoded username field in the result
+	// 	// 	username: "unnecessary",
+	// 	// };
+	
+	// 	// Log the result object to the console for debugging
+	// 	console.log(result);
+	// 	return result;
+	// };
+	
+		
+
+	const createNestedObjectFromNestedMap = (nestedMap: Map<string | number, unknown>, outputObject: Record<string | number, string | number | {}>) => {
+		for (const [key, value] of nestedMap.entries()) {
+			if (typeof key !== "number" && typeof key !== "string") {
+				throw new TypeError("Found key with type '" + typeof key + "', it must be a string or a number");
+			}
+			if (value instanceof Map) {
+				const nestedObject = {};
+				outputObject[key] = nestedObject;
+				createNestedObjectFromNestedMap(value, nestedObject);
+			} else if (typeof value === "number" || typeof value === "string") {
+				outputObject[key] = value;
+			} else {
+				throw new TypeError(
+					"The nested map contains a type that is '" +
+						typeof value +
+						"' which is neither a number or a an object",
+				);
+			}
+		}
+	}
+
 	const updateShelfMap = (data: object) => {
 		const newShelfMap = new Map<number, number[]>(
 			Object.entries(data).map(([key, value]) => [Number(key), value]),
@@ -94,15 +187,17 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
 			const result = await response.json();
 
 			const autolocateMap = new Map();
-			for (const [key] of Object.entries(result)) {
-				const innerObject = result[key];
-				const outerKey = Number(key);
+			// for (const [key] of Object.entries(result)) {
+			// 	const innerObject = result[key];
+			// 	const outerKey = Number(key);
 
-				autolocateMap.set(outerKey, new Map());
-				for (const [innerKey, innerValue] of Object.entries(innerObject)) {
-					autolocateMap.get(outerKey).set(Number(innerKey), Number(innerValue));
-				}
-			}
+			// 	autolocateMap.set(outerKey, new Map());
+			// 	for (const [innerKey, innerValue] of Object.entries(innerObject)) {
+			// 		autolocateMap.get(outerKey).set(Number(innerKey), Number(innerValue));
+			// 	}
+			// }
+
+			createNestedNumberMap(result, autolocateMap);
 
 			setPlacedAmount(sumNestedNumberMap(autolocateMap));
 
@@ -110,7 +205,7 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
 		} catch (error) {
 			if (error instanceof TypeError) {
 				alert(
-					"Failed to use autolocate as autolocateMap includes a non Map/Number value",
+					"Failed to use autolocate as autolocateMap includes a non Map/Number value:" + error.message, 
 				);
 			} else {
 				alert(error);
@@ -118,6 +213,27 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
 		}
 	};
 
+	// Create a nested number map from an object consisting of objects and numbers, and save result to outputMap
+	const createNestedNumberMap = (sourceObject: object, outputMap: Map<number, unknown>) => {
+		for (const [key, value] of Object.entries(sourceObject)) {
+			const numericKey = Number(key);
+			const numericValue = Number(value);
+			if (Number.isNaN(numericKey) || !Number.isInteger(numericKey)) {
+				throw new TypeError("Found key '"+ key +"'which couldn't be parsed as an integer");
+			}
+			if (value instanceof Object) {
+				const nestedMap = new Map<number, unknown>();
+				outputMap.set(numericKey, nestedMap);
+				createNestedNumberMap(value, nestedMap);
+			} else if (!Number.isNaN(numericValue) || !Number.isInteger(numericValue)) {
+				outputMap.set(numericKey, numericValue);
+			} else {
+				throw new TypeError("Found value with type '" + typeof value + "', the object must consist only of objects and strings which can be parsed as an integer.");
+			}
+		}
+	}
+
+	// Calculate the sum of a nested number map
 	const sumNestedNumberMap = (nestedMap: Map<unknown, unknown>) => {
 		let accumulator = 0;
 		for (const value of nestedMap.values()) {
@@ -174,27 +290,59 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
 									onClick={handlePlaceClick}
 								>
 									<div className="text-white text-center text-lg font-bold">
-										Bekræft placering
+										Placer batch
 									</div>
 								</div>
 
 								<Dialog open={openDialog}>
-									<DialogContent className="bg-white opacity-100 min-w-[500px] min-h-[300px] [&>button]:hidden">
+									<DialogContent className="bg-white opacity-100 min-w-[600px] min-h-[300px] [&>button]:hidden">
 										<DialogHeader>
+											<div>
+												{/* Header */}
+											</div>
 											<DialogTitle>
-												<div>
-													<div className="ml-auto -mr-3">
-														<X
-															className="size-14 text-black cursor-pointer"
-															onClick={() => {
-																setOpenDialog(false);
-															}}
-														/>
+												<div className="flex flex-row justify-start items-center">
+													<div className="text-black text-5xl uppercase font-bold cursor-default">
+														Placer batch
 													</div>
 												</div>
 											</DialogTitle>
-											<DialogDescription></DialogDescription>
-											<DialogFooter></DialogFooter>
+											<DialogDescription>
+												Er du sikker på at du vil bekræfte placeringen af denne batch?
+												Dette valg er endeligt og kan ikke fortrydes.
+											</DialogDescription>
+											<DialogFooter>
+												<div className="flex justify-between w-full">
+													<Button
+														className={
+															`hover:cursor-pointer font-bold` +
+															buttonVariants({
+																variant: "cancel",
+															})
+														}
+														onClick={() => {
+															console.log("Cancel clicked");
+															setOpenDialog(false);
+														}}
+														>
+															Annuller placering
+													</Button>
+													<Button
+														className={
+															`hover:cursor-pointer font-bold` +
+															buttonVariants({
+																variant: "green",
+															})
+														}
+														onClick={() => {
+															console.log("Confirm clicked");
+															handleConfirmPlaceClick();
+														}}
+														>
+															Bekræft placering
+													</Button>
+												</div>
+											</DialogFooter>
 										</DialogHeader>
 									</DialogContent>
 								</Dialog>

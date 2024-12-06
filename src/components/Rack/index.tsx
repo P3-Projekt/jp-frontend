@@ -1,12 +1,11 @@
 import React from "react";
 import ShelfBox from "./Shelf";
+import { ShelfData } from "@/app/pregermination/page";
+import { RackData } from "@/app/pregermination/page";
 
-interface RackProps {
-	id: number;
-	numberOfShelves: number;
-}
+const RackBox: React.FC<RackData> = ({ id, shelves }) => {
+	console.log(shelves);
 
-const RackBox: React.FC<RackProps> = ({ id, numberOfShelves }) => {
 	return (
 		// Rack container
 		<div className="flex flex-col h-[300px] w-[150px] bg-colorprimary rounded-lg p-1">
@@ -17,8 +16,8 @@ const RackBox: React.FC<RackProps> = ({ id, numberOfShelves }) => {
 
 			{/* Shelf container */}
 			<div className="flex flex-1 flex-col space-y-1">
-				{Array.from({ length: numberOfShelves }).map((_, index) => (
-					<ShelfBox key={`${id}#${index}`} index={index} rack={id} />
+				{Array.from({ length: shelves.length }).map((_, index) => (
+					<ShelfBox key={`${id}#${index}`} position={index} rackId={id} id={shelves[index].id} />
 				))}
 			</div>
 		</div>
