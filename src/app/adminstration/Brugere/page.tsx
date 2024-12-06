@@ -257,7 +257,7 @@ const BrugereSide = () => {
 
       {/* Tabel over aktive brugere */}
       <div className="bg-sidebarcolor p-6 rounded-lg shadow-xl border mb-8">
-        <h2 className="text-xl font-semibold mb-6">OVERSIGT OVER AKTIVE BRUGERE</h2>
+        <h2 className="text-xl font-semibold mb-6">AKTIV BRUGER OVERSIGT</h2>
         <table className="w-full table-auto border-collapse">
           <thead>
             <tr className="bg-colorprimary text-white">
@@ -304,7 +304,7 @@ const BrugereSide = () => {
 
       {/* Tabel over inaktive brugere */}
       <div className="bg-sidebarcolor p-6 rounded-lg shadow-xl border">
-        <h2 className="text-xl font-semibold mb-6">OVERSIGT OVER INAKTIVE BRUGERE</h2>
+        <h2 className="text-xl font-semibold mb-6">INAKTIV BRUGER OVERSIGT</h2>
         <table className="w-full table-auto border-collapse">
           <thead>
             <tr className="bg-red-900 text-white">

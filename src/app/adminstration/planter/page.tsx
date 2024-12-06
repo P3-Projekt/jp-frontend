@@ -219,7 +219,7 @@ const PlanterPage = () => {
 
           {/* Spiringstids felt */}
           <div className="flex-col w-1/4">
-            <label className="font-semibold mb-2">Spiring:</label>
+            <label className="font-semibold mb-2">Spirings tid:</label>
             <input
               id="spiring"
               type="number"

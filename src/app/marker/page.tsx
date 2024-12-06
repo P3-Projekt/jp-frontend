@@ -202,7 +202,7 @@ const BatchesPage = () => {
 
     return (
         <div className="p-8">
-            <h1 className="text-3xl font-bold mb-6 text-center">BATCHES</h1>
+            <h1 className="text-3xl font-bold mb-6 text-center">MARKER</h1>
 
             {/* Fejlmeddelsesboks */}
             {error && (
@@ -216,7 +216,7 @@ const BatchesPage = () => {
                 className="bg-sidebarcolor p-6 rounded-lg shadow-xl mb-8 border"
                 onSubmit={handleSubmit}
             >
-                <h2 className="text-lg font-semibold mb-6">OPRET EN NY BATCH</h2>
+                <h2 className="text-lg font-semibold mb-6">OPRET EN NY BATCH AF MARKER</h2>
                 <div className="grid grid-cols-3 gap-6">
 
                     {/* Valg af plantetype */}
@@ -278,7 +278,7 @@ const BatchesPage = () => {
                     className="transition w-full bg-colorprimary font-semibold hover:bg-green-700 text-white py-2 mt-4 rounded-2xl"
                     disabled={isLoading}
                 >
-                    {isLoading ? 'HENTER DATA FRA BACKEND' : 'OPRET BATCH'}
+                    {isLoading ? 'HENTER DATA FRA BACKEND' : 'OPRET BATCH AF MARKER'}
                 </button>
             </form>
 
