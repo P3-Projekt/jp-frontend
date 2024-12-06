@@ -222,7 +222,7 @@ const BakkerPage = () => {
         {/* Knap til at indsende ny bakke type */}
         <button
           type="submit"
-          className="transition w-full bg-green-700 font-semibold hover:bg-green-800 text-white py-2 mt-4 rounded-2xl"
+          className="transition w-full bg-colorprimary font-semibold hover:bg-green-700 text-white py-2 mt-4 rounded-2xl"
           disabled={isLoading}
         >
           {isLoading ? 'HENTER DATA FRA BACKEND' : 'OPRET BAKKE TYPE'}
@@ -234,7 +234,7 @@ const BakkerPage = () => {
         <h2 className="text-lg font-semibold mb-6">BAKKE TYPE OVERSIGT</h2>
         <table className="w-full table-auto border-collapse">
           <thead>
-            <tr className="bg-green-700 text-white">
+            <tr className="bg-colorprimary text-white">
               <th className="p-2 border text-center" style={{ width: '60px' }}>Slet</th>
               <th className="p-2 border w-1/3">Bakke navn</th>
               <th className="p-2 border w-1/3">Længde [cm]</th>

@@ -248,7 +248,7 @@ const BrugereSide = () => {
         {/* Opret bruger knap */}
         <button
           type="submit"
-          className="transition w-full bg-green-700 font-semibold hover:bg-green-800 text-white py-2 mt-4 rounded-2xl"
+          className="transition w-full bg-colorprimary font-semibold hover:bg-green-700 text-white py-2 mt-4 rounded-2xl"
           disabled={isLoading}
         >
           {isLoading ? 'HENTER DATA FRA BACKEND' : 'OPRET BRUGER'}
@@ -260,7 +260,7 @@ const BrugereSide = () => {
         <h2 className="text-xl font-semibold mb-6">OVERSIGT OVER AKTIVE BRUGERE</h2>
         <table className="w-full table-auto border-collapse">
           <thead>
-            <tr className="bg-green-700 text-white">
+            <tr className="bg-colorprimary text-white">
               <th className="p-2 border text-center" style={{ width: '60px' }}>Inaktiver</th>
               <th className="p-2 border w-1/2">Bruger</th>
               <th className="p-2 border w-1/2">Role</th>

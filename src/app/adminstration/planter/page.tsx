@@ -273,7 +273,7 @@ const PlanterPage = () => {
         {/* Checkboxe til vandingsskema */}
         <div className="mt-6">
           <h3 className="font-semibold text-center">Vandings skema:</h3>
-          <div className="grid grid-cols-7 gap-4 mt-2 border-2 border-black bg-white mb-2 p-4 w-2/5 mx-auto">
+          <div className="grid grid-cols-7 gap-4 mt-2 border-2 border-colorprimary bg-white mb-2 p-4 w-2/5 mx-auto">
             {/* Dynamisk generering af checkboxe baseret på gro tid */}
             {[...Array(parseInt(formData.groTid) || 0)].map((_, day) => (
               <label key={day} className="flex flex-col items-center">
@@ -295,7 +295,7 @@ const PlanterPage = () => {
         {/* Opret-knap */}
         <button
           type="submit"
-          className="transition w-full bg-green-700 font-semibold hover:bg-green-800 text-white py-2 mt-4 rounded-2xl"
+          className="transition w-full bg-colorprimary font-semibold hover:bg-green-700 text-white py-2 mt-4 rounded-2xl"
           disabled={isLoading}
         >
           {isLoading ? 'HENTER DATA FRA BACKEND' : 'OPRET PLANTE TYPE'}
@@ -307,7 +307,7 @@ const PlanterPage = () => {
         <h2 className="text-lg font-semibold mb-6">PLANTE TYPE OVERSIGT</h2>
         <table className="w-full table-auto border-collapse">
           <thead>
-            <tr className="bg-green-700 text-white">
+            <tr className="bg-colorprimary text-white">
               <th className="p-2 border text-center" style={{ width: '60px' }}>Slet</th>
               <th className="p-2 border w-1/5">Sort navn</th>
               <th className="p-2 border w-1/5">Spiring [dage]</th>
