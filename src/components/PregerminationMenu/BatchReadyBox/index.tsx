@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import { fetchWithAuth } from "@/components/authentication/authentication";
 import {
 	useShelfContext,
 	usePlacedAmountContext,
