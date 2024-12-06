@@ -92,8 +92,7 @@ const Rack: React.FC<RackProps> = ({
 					{displayMode === DisplayMode.input ||
 					displayMode == DisplayMode.view ? (
 						<p className="text-center text-white rounded-lg select-none">
-							{" "}
-							{`Reol #${rackData.id}`}{" "}
+							{`Reol #${rackData.id}`}
 						</p>
 					) : displayMode === DisplayMode.edit ||
 					  displayMode === DisplayMode.editPrototype ? (
@@ -111,19 +110,19 @@ const Rack: React.FC<RackProps> = ({
 										return;
 									}
 
-									if (rackShelves[0].batches.length != 0) {
+									if(rackShelves.length === 0){
+										toast({
+											variant: "destructive",
+											title: "Noget gik galt",
+											description: "Der er ingen hylder at fjerne",
+										});
+									} else if (rackShelves[0].batches.length != 0) {
 										toast({
 											variant: "destructive",
 											title: "Noget gik galt",
 											description: "Kan ikke fjerne hylde med batch.",
 										});
 										return;
-									} else if (rackShelves.length == 1) {
-										toast({
-											variant: "destructive",
-											title: "Noget gik galt",
-											description: "Minimum én hylde pr. reol",
-										});
 									} else {
 										// remove shelf from top
 										fetchWithAuth(`http://localhost:8080/Rack/${rackData.id}/Shelf`, {
