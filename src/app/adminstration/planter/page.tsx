@@ -180,7 +180,7 @@ const PlanterPage = () => {
 			// Genindlæs plantetyper efter succesfuld sletning
 			await fetchPlantTypes();
 		} catch (err) {
-			setError("Kunne ikke slette plante typen");
+			setError("Kunne ikke slette plante typen. Den er måske i brug");
 			console.error("Kunne ikke slette plante typen:", err);
 		} finally {
 			setIsLoading(false);

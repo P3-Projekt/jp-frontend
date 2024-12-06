@@ -1,7 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { fetchWithAuth, getUser } from "@/components/authentication/authentication";
+import {
+	fetchWithAuth,
+	getUser,
+} from "@/components/authentication/authentication";
 
 // Interface til at definere batch-typen med dens egenskaber
 type BatchType = {

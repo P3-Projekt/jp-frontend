@@ -141,7 +141,7 @@ const BakkerPage = () => {
 			// Genindlæser listen over bakke typer
 			await fetchTrayTypes();
 		} catch (err) {
-			setError("Kunne ikke slette bakke typen");
+			setError("Kunne ikke slette bakke typen. Den er måske i brug");
 			console.error("Fejl ved sletning af bakke type:", err);
 		} finally {
 			setIsLoading(false);
@@ -187,7 +187,7 @@ const BakkerPage = () => {
 
 					{/* Input felt for bakke type længde */}
 					<div className="flex-col">
-						<label className="font-semibold">Længde:</label>
+						<label className="font-semibold">Længde [cm]:</label>
 						<input
 							id="lengthCm"
 							type="number"
@@ -204,7 +204,7 @@ const BakkerPage = () => {
 
 					{/* Input felt for bakke type bredde */}
 					<div className="flex-col">
-						<label className="font-semibold">Bredde:</label>
+						<label className="font-semibold">Bredde [cm]:</label>
 						<input
 							id="widthCm"
 							type="number"
