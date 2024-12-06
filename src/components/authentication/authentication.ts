@@ -27,6 +27,13 @@ function getToken() {
 	}
 }
 
+export function getUser(){
+	const token = getToken();
+	if(token){
+		return jwtDecode<JwtPayload>(token).sub;
+	}
+}
+
 // Define a helper function to make API calls with Bearer token
 export function fetchWithAuth(
 	url: string,

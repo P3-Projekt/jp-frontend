@@ -25,6 +25,7 @@ import { Droplets, Loader2, Scissors, X } from "lucide-react";
 import { CircularProgressbar } from "react-circular-progressbar";
 import { BatchData } from "../../Batch";
 import { toast } from "@/hooks/use-toast";
+import { getUser } from "@/components/authentication/authentication";
 
 let rackToDisplayUnSynced: RackData | null = null;
 
@@ -35,17 +36,17 @@ export function setRackToBeDisplayed(rack: RackData) {
 interface RackDialogProps {
 	showDialog: boolean;
 	setShowDialog: (show: boolean) => void;
+	getLocations: (batchId: number) => string[];
 }
 
 const RackDialog: React.FC<RackDialogProps> = ({
 	showDialog,
 	setShowDialog,
+	getLocations
 }) => {
 	const [selectedBatch, setSelectedBatch] = useState<BatchData | null>(null);
 	const [taskCompleting, setTaskCompleting] = useState<boolean>(false);
 	const [completeConfirm, setCompleteConfirm] = useState<boolean>(false);
-
-	const user = "Victor";
 
 	const taskTranslate: { [key: string]: string } = {
 		Water: "Vanding",
@@ -79,7 +80,7 @@ const RackDialog: React.FC<RackDialogProps> = ({
 	return (
 		<div onMouseDown={propagateMouseEvent}>
 			<Dialog open={showDialog} onOpenChange={setShowDialog}>
-				<DialogContent className="bg-white opacity-100 min-w-[700px] min-h-[500px] [&>button]:hidden">
+				<DialogContent className="bg-white opacity-100 min-w-[900px] min-h-[500px] [&>button]:hidden">
 					<DialogHeader>
 						<DialogTitle>
 							<div className="flex flex-row justify-start items-center">
@@ -97,10 +98,10 @@ const RackDialog: React.FC<RackDialogProps> = ({
 							</div>
 						</DialogTitle>
 						<DialogDescription>
-							<div className="min-h-full gap-x-4 flex flex-row justify-between content-center">
+							<div className="min-h-full gap-x-5 flex flex-row justify-between content-center">
 								{/* rack information */}
 								{/* skal kunne laves om alt efter hvilken batch der klikkes på */}
-								<div className="h-[290px] self-center items-start basis-1/2 flex flex-col bg-blue-200 text-xl text-black rounded border-2 border-black pl-2 pr-2">
+								<div className="h-[290px] self-center items-start basis-2/5 flex flex-col bg-blue-200 text-xl text-black rounded border-2 border-black pl-2 pr-2">
 									<div>
 										Næste opgave:{" "}
 										<span className="font-semibold font-">
@@ -114,7 +115,7 @@ const RackDialog: React.FC<RackDialogProps> = ({
 										</span>
 									</div>
 									<div>
-										Antal:
+										Antal:{" "}
 										<span className="font-semibold">
 											{selectedBatch?.amount}
 										</span>
@@ -126,6 +127,10 @@ const RackDialog: React.FC<RackDialogProps> = ({
 									<div>
 										Batch id:{" "}
 										<span className="font-semibold">{selectedBatch?.id}</span>
+									</div>
+									<div>
+										Lokationer:{" "}
+										<span className="font-semibold">{selectedBatch != null && getLocations(selectedBatch.id).join(", ")}</span>
 									</div>
 									<div className="mt-3">
 										Oprettet af:{" "}
@@ -164,7 +169,7 @@ const RackDialog: React.FC<RackDialogProps> = ({
 								</div>
 								{/* Batch information */}
 								<div
-									className={`h-[400px] pl-2 basis-1/2 grid grid-cols-1 grid-rows-7 gap-y-5 justify-evenly content-center`}
+									className={`h-[400px] pl-2 basis-3/5 grid grid-cols-1 grid-rows-7 gap-y-5 justify-evenly content-center`}
 								>
 									{/* Skal oprettes dynamisk alt efter hvor mange hylder der er */}
 									{rackToDisplay?.shelves.map((shelf, index) => (
@@ -177,7 +182,7 @@ const RackDialog: React.FC<RackDialogProps> = ({
 													{index + 1}
 												</div>
 												<div className="h-full w-full overflow-x-scroll ml-2 bg-gray-200 justify-between content-center pl-2 pr-2 self-center border-black border-2">
-													<div className="h-4/5 w-full flex flex-row items-center gap-x-4">
+													<div className="h-4/5 w-full flex flex-row items-center gap-x-1">
 														{/* Dynamiclly adding batches */}
 														{shelf.batches.map((batch) => (
 															<div
@@ -192,21 +197,21 @@ const RackDialog: React.FC<RackDialogProps> = ({
 																	}
 																}}
 															>
-																{batch.plant}
+																<p className="text-xl">{batch.plant}</p>
 																{batch?.nextTask.category === "Water" &&
 																taskIsDue(batch) ? (
 																	<Droplets
-																		className={`text-blue-600 border-black size-6 self-center`}
+																		className={`text-blue-600 border-black size-5 self-center`}
 																	/>
 																) : batch?.nextTask.category === "Harvest" &&
 																  taskIsDue(batch) ? (
 																	<Scissors
-																		className={`text-green-600 size-6`}
+																		className={`text-green-600 size-5`}
 																	/>
 																) : (
 																	<CircularProgressbar
 																		value={batch?.nextTask.progress}
-																		className={`size-5 w-fit ml-1`}
+																		className={`size-4 w-fit ml-1`}
 																		strokeWidth={25}
 																		minValue={0}
 																		maxValue={100}
@@ -259,7 +264,7 @@ const RackDialog: React.FC<RackDialogProps> = ({
 											headers: {
 												"Content-Type": "application/json",
 											},
-											body: JSON.stringify({ username: user }),
+											body: JSON.stringify({ username: getUser() }),
 										},
 									)
 										.then((response) => {

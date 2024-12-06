@@ -31,6 +31,7 @@ interface RackProps {
 	displayMode: DisplayMode;
 	overrideColor?: string;
 	removeRack?: () => void;
+	getLocations?: (batchId: number) => string[];
 }
 
 const Rack: React.FC<RackProps> = ({
@@ -39,7 +40,8 @@ const Rack: React.FC<RackProps> = ({
 	mouseDownHandler,
 	displayMode,
 	overrideColor,
-	removeRack
+	removeRack,
+	getLocations
 }) => {
 	// State for position and dragging
 	const [showDialog, setShowDialog] = useState<boolean>(false);
@@ -295,7 +297,9 @@ const Rack: React.FC<RackProps> = ({
 					)}
 				</div>
 			</div>
-			<RackDialog showDialog={showDialog} setShowDialog={setShowDialog} />
+			{getLocations && (
+				<RackDialog showDialog={showDialog} setShowDialog={setShowDialog} getLocations={getLocations} />
+			)}
 		</div>
 	);
 };

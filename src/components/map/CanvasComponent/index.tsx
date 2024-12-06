@@ -288,6 +288,20 @@ const CanvasComponent = forwardRef<
 		setRacks(newRacks);
 	}, [racks]);
 
+	const getLocationsByBatch = useCallback(function (batchId: number) {
+		const locations : string[] = []
+
+		for(const rack of racks) {
+			for(const [index, shelf] of rack.shelves.entries()) {
+				if(shelf.batches.some(batch => batch.id === batchId)) {
+					locations.push(`${rack.id}.${index + 1}`);
+				}
+			}
+		}
+		return locations;
+
+	} , [racks]);
+
 	useEffect(() => {
 		document.addEventListener("mouseup", handleMouseUp);
 
@@ -332,6 +346,7 @@ const CanvasComponent = forwardRef<
 							rackMouseDownHandler(index);
 						}}
 						removeRack={() => {removeRack(index)}}
+						getLocations={getLocationsByBatch}
 					/>
 				))}
 				{Array.from(loadingRacks.values()).map((box) => (
