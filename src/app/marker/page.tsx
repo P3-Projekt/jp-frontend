@@ -154,49 +154,51 @@ const BatchesPage = () => {
 	};
 
 	// Håndter indsendelse af ny batch
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		setIsLoading(true);
-		setError(null);
-		const authToken = localStorage.getItem("authToken");
-
-		try {
-			// Send anmodning til backend for at oprette ny batch
-			const response = await fetchWithAuth("http://localhost:8080/Batch", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					plantTypeId: formData.plantTypeId,
-					trayTypeId: formData.trayTypeId,
-					createdByUsername: currentUser,
-					amount: formData.amount,
-				}),
-			});
-
-			if (!response.ok) {
-				const errorText = await response.text();
-				throw new Error(errorText || "Kunne ikke oprette batch");
-			}
-
-			// Genopfrisk batch-liste efter oprettelse
-			await fetchBatches();
-
-			// Nulstil formular
-			setFormData({
-				plantTypeId: "",
-				trayTypeId: "",
-				createdByUsername: "",
-				amount: 0,
-			});
-		} catch (err: any) {
-			setError(err.message || "Kunne ikke oprette batch");
-			console.error("Kunne ikke oprette batch:", err);
-		} finally {
-			setIsLoading(false);
-		}
-	};
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsLoading(true);
+        setError(null);
+      
+        try {
+          // Send anmodning til backend for at oprette ny batch
+          const response = await fetchWithAuth("http://localhost:8080/Batch", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              plantTypeId: formData.plantTypeId,
+              trayTypeId: formData.trayTypeId,
+              createdByUsername: currentUser,
+              amount: formData.amount,
+            }),
+          });
+      
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || "Kunne ikke oprette batch");
+          }
+      
+          // Genopfrisk batch-liste efter oprettelse
+          await fetchBatches();
+      
+          // Nulstil formular
+          setFormData({
+            plantTypeId: "",
+            trayTypeId: "",
+            createdByUsername: "",
+            amount: 0,
+          });
+        } catch (err: unknown) {
+          // Use 'unknown' type instead of 'any'
+          // Type guard to check if err is an Error
+          const errorMessage = err instanceof Error ? err.message : String(err);
+          setError(errorMessage || "Kunne ikke oprette batch");
+          console.error("Kunne ikke oprette batch:", err);
+        } finally {
+          setIsLoading(false);
+        }
+      };
 
 	return (
 		<div className="p-8">

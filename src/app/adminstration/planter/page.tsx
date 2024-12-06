@@ -103,7 +103,7 @@ const PlanterPage = () => {
 	};
 
 	// Håndter indsendelse af formular til oprettelse af ny plantetype
-	const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setIsLoading(true);
 		setError(null);
@@ -143,8 +143,8 @@ const PlanterPage = () => {
 				position: "NoPreferred",
 				vanding: [],
 			});
-		} catch (err: any) {
-			if (err.message.includes("already exists")) {
+		} catch (err) {
+			if (err instanceof Error && err.message.includes("already exists")) {
 				setError("Plante typen eksistere allerede");
 			} else {
 				setError("Kunne ikke skabe plante typen");
@@ -154,7 +154,7 @@ const PlanterPage = () => {
 			setIsLoading(false);
 		}
 	};
-
+  
 	// Håndter sletning af en plantetype
 	const handleDelete = async (plantTypeName: string) => {
 		setIsLoading(true);

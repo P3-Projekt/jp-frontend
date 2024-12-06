@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { fetchWithAuth } from "@/components/authentication/authentication";
+
 
 // Definition af en bakke type med dens egenskaber
 type BakkeType = {
@@ -88,41 +88,42 @@ const BakkerPage = () => {
 	};
 
 	// Håndterer indsendelse af ny bakke type
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		setIsLoading(true);
-		setError(null);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
 
-		try {
-			// Sender en anmodning til backend for at oprette ny bakke type
-			const response = await fetchWithAuth("http://localhost:8080/TrayType", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(formData),
-			});
+    try {
+        // Sender en anmodning til backend for at oprette ny bakke type
+        const response = await fetchWithAuth("http://localhost:8080/TrayType", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formData),
+        });
 
-			if (!response.ok) {
-				const errorText = await response.text();
-				throw new Error(errorText || "Kunne ikke skabe bakke typen");
-			}
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || "Kunne ikke skabe bakke typen");
+        }
 
-			// Genindlæser listen over bakke typer
-			await fetchTrayTypes();
-			// Nulstiller formular-felterne
-			setFormData({ name: "", lengthCm: 0, widthCm: 0 });
-		} catch (err: any) {
-			if (err.message.includes("already exists")) {
-				setError("Bakke typen eksisterer allerede");
-			} else {
-				setError("Kunne ikke skabe bakke typen");
-			}
-			console.error("Fejl ved oprettelse af bakke type:", err);
-		} finally {
-			setIsLoading(false);
-		}
-	};
+        // Genindlæser listen over bakke typer
+        await fetchTrayTypes();
+        // Nulstiller formular-felterne
+        setFormData({ name: "", lengthCm: 0, widthCm: 0 });
+    } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : String(err);
+        if (errorMessage.includes("already exists")) {
+            setError("Bakke typen eksisterer allerede");
+        } else {
+            setError("Kunne ikke skabe bakke typen");
+        }
+        console.error("Fejl ved oprettelse af bakke type:", errorMessage);
+    } finally {
+        setIsLoading(false);
+    }
+};
 
 	// Funktion til at slette en bakke type
 	const handleDelete = async (name: string) => {

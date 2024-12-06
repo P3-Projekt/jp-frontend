@@ -107,17 +107,18 @@ const BrugereSide = () => {
 
 			// Nulstil formularen
 			setFormData({ name: "", password: "", role: "Gardener" });
-		} catch (err: unknown) {
-			if (err.message.includes("already exists")) {
-				setError("Brugeren eksistere allerede");
-			} else {
-				setError("Kunne ikke skabe brugeren");
-			}
-			console.error("Kunne ikke skabe brugeren:", err);
-		} finally {
-			setIsLoading(false);
-		}
-	};
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : String(err);     
+      if (errorMessage.includes("already exists")) {
+          setError("Brugeren eksistere allerede");
+      } else {
+          setError("Kunne ikke skabe brugeren");
+      }
+      console.error("Kunne ikke skabe brugeren:", err);
+  } finally {
+      setIsLoading(false);
+  }
+};
 
 	// Funktion til reaktivering af en inaktiv bruger
 	const handleReactivate = async (name: string) => {
