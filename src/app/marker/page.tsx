@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { fetchWithAuth } from "@/components/authentication/authentication";
+import { fetchWithAuth, getUser } from "@/components/authentication/authentication";
 
 // Interface til at definere batch-typen med dens egenskaber
 type BatchType = {
@@ -40,9 +40,8 @@ const BatchesPage = () => {
 	// Hent indledende data når siden indlæses
 	useEffect(() => {
 		// Hent brugerens token og brugernavn
-		const authToken = localStorage.getItem("authToken");
-		if (authToken) {
-			const username = extractUsernameFromToken(authToken);
+		const username = getUser();
+		if (username) {
 			setCurrentUser(username);
 		}
 		// Hent batches, plantetyper og bakketyper
@@ -50,20 +49,6 @@ const BatchesPage = () => {
 		fetchPlantTypes();
 		fetchTrayTypes();
 	}, []);
-
-	// Funktion til at uddrage brugernavn fra JWT token
-	function extractUsernameFromToken(token: string): string {
-		try {
-			// Dekoder token for at hente brugeroplysninger
-			const base64Url = token.split(".")[1];
-			const base64 = base64Url.replace("-", "+").replace("_", "/");
-			const payload = JSON.parse(window.atob(base64));
-			return payload.sub || payload.username || ""; // Tilpas efter tokenens struktur
-		} catch (error) {
-			console.error("Fejl ved udtrædning af brugernavn fra token:", error);
-			return "";
-		}
-	}
 
 	// Hent batches fra backend
 	const fetchBatches = async () => {
