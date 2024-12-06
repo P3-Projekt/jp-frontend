@@ -298,7 +298,7 @@ const PlanterPage = () => {
           className="transition w-full bg-colorprimary font-semibold hover:bg-green-700 text-white py-2 mt-4 rounded-2xl"
           disabled={isLoading}
         >
-          {isLoading ? 'HENTER DATA FRA BACKEND' : 'OPRET PLANTE TYPE'}
+          {isLoading ? 'HENTER DATA FRA DATABASEN' : 'OPRET PLANTE TYPE'}
         </button>
       </form>
 

@@ -278,7 +278,7 @@ const BatchesPage = () => {
                     className="transition w-full bg-colorprimary font-semibold hover:bg-green-700 text-white py-2 mt-4 rounded-2xl"
                     disabled={isLoading}
                 >
-                    {isLoading ? 'HENTER DATA FRA BACKEND' : 'OPRET BATCH AF MARKER'}
+                    {isLoading ? 'HENTER DATA FRA DATABASEN' : 'OPRET BATCH AF MARKER'}
                 </button>
             </form>
 

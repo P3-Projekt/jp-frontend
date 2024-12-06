@@ -225,7 +225,7 @@ const BakkerPage = () => {
           className="transition w-full bg-colorprimary font-semibold hover:bg-green-700 text-white py-2 mt-4 rounded-2xl"
           disabled={isLoading}
         >
-          {isLoading ? 'HENTER DATA FRA BACKEND' : 'OPRET BAKKE TYPE'}
+          {isLoading ? 'HENTER DATA FRA DATABASEN' : 'OPRET BAKKE TYPE'}
         </button>
       </form>
 
