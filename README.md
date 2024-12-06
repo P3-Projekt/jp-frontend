@@ -8,4 +8,4 @@ First, run the development server:
 npm run dev
 ```
 
-The application is not accessible on [http://localhost:3000](http://localhost:3000)
+The application is now accessible on [http://localhost:3000](http://localhost:3000)
