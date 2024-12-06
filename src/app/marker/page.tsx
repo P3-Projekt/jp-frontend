@@ -275,7 +275,7 @@ const BatchesPage = () => {
                 {/* Knap til oprettelse af batch */}
                 <button
                     type="submit"
-                    className="transition w-full bg-green-700 font-semibold hover:bg-green-800 text-white py-2 mt-4 rounded-2xl"
+                    className="transition w-full bg-colorprimary font-semibold hover:bg-green-700 text-white py-2 mt-4 rounded-2xl"
                     disabled={isLoading}
                 >
                     {isLoading ? 'HENTER DATA FRA BACKEND' : 'OPRET BATCH'}
@@ -287,7 +287,7 @@ const BatchesPage = () => {
                 <h2 className="text-lg font-semibold mb-6">BATCH OVERSIGT</h2>
                 <table className="w-full table-auto border">
                     <thead>
-                        <tr className="bg-green-700 text-white">
+                        <tr className="bg-colorprimary text-white">
                             <th className="p-2 border w-1/7">Batch ID</th>
                             <th className="p-2 border w-1/7">Sået af</th>
                             <th className="p-2 border w-1/7">Plante type</th>
