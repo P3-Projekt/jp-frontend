@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useRouter } from "next/navigation";
 import { fetchWithAuth } from "@/components/authentication/authentication";
 
-// Definerer interface til bakke type data
+// Definition af en bakke type med dens egenskaber
 type BakkeType = {
   name: string;    
   lengthCm: number; 
@@ -14,16 +14,23 @@ type BakkeType = {
 
 const BakkerPage = () => {
   const router = useRouter();
-  const [bakketyper, setBakketyper] = useState<BakkeType[]>([]); // Liste over bakke typer hentet fra backend
-  const [formData, setFormData] = useState<BakkeType>({ // Formular data for at oprette ny bakke type
+  // State til at gemme listen over bakke typer
+  const [bakketyper, setBakketyper] = useState<BakkeType[]>([]);
+  
+  // State til formular data for oprettelse af ny bakke type
+  const [formData, setFormData] = useState<BakkeType>({
     name: '',
     lengthCm: 0,
     widthCm: 0,
   });
-  const [isLoading, setIsLoading] = useState(false); // Indikator for dataindlæsning
-  const [error, setError] = useState<string | null>(null); // Fejlbeskeder til brugeren
+  
+  // State til at holde styr på indlæsnings status
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // State til at gemme eventuelle fejlmeddelelser
+  const [error, setError] = useState<string | null>(null);
 
-  // Hent bakke typer fra backend når siden loades første gang
+  // Henter bakke typer når siden indlæses
   useEffect(() => {
     fetchTrayTypes();
   }, []);
@@ -33,6 +40,7 @@ const BakkerPage = () => {
     setIsLoading(true);
     setError(null);
     try {
+      // Sender en anmodning til backend for at hente bakke typer
       const response = await fetchWithAuth("http://localhost:8080/TrayTypes", {
         method: "GET",
         headers: {
@@ -40,41 +48,48 @@ const BakkerPage = () => {
         },
       });
 
+      // Håndterer fejl ved hentning af data
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(errorText || "Kunne ikke hente bakke typer fra databasen");
       }
 
+      // Gemmer de hentede bakke typer i state
       const data = await response.json();
-      setBakketyper(data); // Opdater liste over bakke typer
+      setBakketyper(data);
     } catch (err) {
+      // Håndterer fejl og viser fejlmeddelelse
       setError("Kunne ikke hente bakke typer fra databasen");
       console.error("Fejl ved hentning af bakke typer:", err);
 
+      // Omdirigerer til login-side hvis der mangler autentifikationstoken
       if (err instanceof Error && err.message === 'No authentication token found') {
-        router.push('/login'); // Naviger til login hvis token mangler
+        router.push('/login');
       }
     } finally {
+      // Afslutter indlæsnings-staten
       setIsLoading(false);
     }
   };
 
-  // Håndter ændringer i formular felter
+  // Håndterer ændringer i formular-felter
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === 'name' ? value : +value, // Konverter numeriske felter
+      // Konverterer numeriske felter til tal, mens tekst-felter forbliver uændrede
+      [name]: name === 'name' ? value : +value,
     }));
   };
 
-  // Håndter formular indsendelse for at oprette ny bakke type
+  // Håndterer indsendelse af ny bakke type
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
 
     try {
+      // Sender en anmodning til backend for at oprette ny bakke type
       const response = await fetchWithAuth('http://localhost:8080/TrayType', {
         method: 'POST',
         headers: {
@@ -88,8 +103,10 @@ const BakkerPage = () => {
         throw new Error(errorText || 'Kunne ikke skabe bakke typen');
       }
 
-      await fetchTrayTypes(); // Opdater liste efter oprettelse
-      setFormData({ name: '', lengthCm: 0, widthCm: 0 }); // Nulstil formular
+      // Genindlæser listen over bakke typer
+      await fetchTrayTypes();
+      // Nulstiller formular-felterne
+      setFormData({ name: '', lengthCm: 0, widthCm: 0 });
     } catch (err: any) {
       if (err.message.includes('already exists')) {
         setError('Bakke typen eksisterer allerede');
@@ -108,6 +125,7 @@ const BakkerPage = () => {
     setError(null);
 
     try {
+      // Sender en anmodning til backend for at slette en bakke type
       const response = await fetchWithAuth(`http://localhost:8080/TrayType/${name}`, {
         method: 'DELETE',
         headers: {
@@ -115,12 +133,14 @@ const BakkerPage = () => {
         },
       });
 
+      // Håndterer fejl ved sletning
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(errorText || 'Kunne ikke slette bakke typen');
       }
 
-      await fetchTrayTypes(); // Opdater liste efter sletning
+      // Genindlæser listen over bakke typer
+      await fetchTrayTypes();
     } catch (err) {
       setError('Kunne ikke slette bakke typen');
       console.error('Fejl ved sletning af bakke type:', err);
@@ -131,9 +151,10 @@ const BakkerPage = () => {
 
   return (
     <div className="p-8">
+      {/* Sidens overskrift */}
       <h1 className="text-3xl font-bold mb-6 text-center">BAKKE TYPER</h1>
 
-      {/* Fejlmeddelelse øverst på siden */}
+      {/* Fejlmeddelelse vises, hvis der er en */}
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
           {error}
@@ -147,8 +168,7 @@ const BakkerPage = () => {
       >
         <h2 className="text-lg font-semibold mb-6">OPRET EN BAKKE TYPE</h2>
         <div className="flex gap-6 grid grid-cols-3">
-
-          {/* Navne felt */}
+          {/* Input felt for bakke type navn */}
           <div className="flex-col">
             <label className="font-semibold">Navn:</label>
             <input
@@ -164,7 +184,7 @@ const BakkerPage = () => {
             />
           </div>
 
-          {/* Længde felt */}
+          {/* Input felt for bakke type længde */}
           <div className="flex-col">
             <label className="font-semibold">Længde:</label>
             <input
@@ -181,7 +201,7 @@ const BakkerPage = () => {
             />
           </div>
 
-          {/* Bredde felt */}
+          {/* Input felt for bakke type bredde */}
           <div className="flex-col">
             <label className="font-semibold">Bredde:</label>
             <input
@@ -199,7 +219,7 @@ const BakkerPage = () => {
           </div>
         </div>
 
-        {/* Knap til oprettelse */}
+        {/* Knap til at indsende ny bakke type */}
         <button
           type="submit"
           className="transition w-full bg-green-700 font-semibold hover:bg-green-800 text-white py-2 mt-4 rounded-2xl"
@@ -209,7 +229,7 @@ const BakkerPage = () => {
         </button>
       </form>
 
-      {/* Tabel til visning af bakke typer */}
+      {/* Tabel til visning af eksisterende bakke typer */}
       <div className="bg-sidebarcolor p-6 rounded-lg shadow-xl border mb-8">
         <h2 className="text-lg font-semibold mb-6">BAKKE TYPE OVERSIGT</h2>
         <table className="w-full table-auto border-collapse">
@@ -222,13 +242,16 @@ const BakkerPage = () => {
             </tr>
           </thead>
           <tbody>
+            {/* Indlæsnings-tilstand */}
             {isLoading ? (
               <tr>
                 <td colSpan={4} className="text-center py-4">Indlæser bakke typer...</td>
               </tr>
             ) : (
+              // Viser eksisterende bakke typer i tabel
               bakketyper.map((bakke) => (
                 <tr key={bakke.name} className="odd:bg-white even:bg-gray-200">
+                  {/* Slet-knap for hver bakke type */}
                   <td className="p-2 border text-center">
                     <button
                       onClick={() => handleDelete(bakke.name)}
@@ -244,6 +267,7 @@ const BakkerPage = () => {
                       />
                     </button>
                   </td>
+                  {/* Detaljer for hver bakke type */}
                   <td className="p-2 border text-center">{bakke.name}</td>
                   <td className="p-2 border text-center">{bakke.lengthCm}</td>
                   <td className="p-2 border text-center">{bakke.widthCm}</td>

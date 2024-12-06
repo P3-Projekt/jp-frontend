@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { useRouter } from "next/navigation";
 import { fetchWithAuth } from "@/components/authentication/authentication";
 
-//plantetype interface
+// Interface til definition af plantetyper med deres egenskaber
 interface PlantType {
   name: string;
   preGerminationDays: number;
@@ -14,7 +13,7 @@ interface PlantType {
   wateringSchedule: number[];
 }
 
-//mapping til at konvertere til visning a positioner
+// Mapping til at oversætte positioner til mere læsbare tekster
 const positionDisplayMap = {
   'NoPreferred': 'Ligegyldigt',
   'Low': 'Nederst',
@@ -22,8 +21,10 @@ const positionDisplayMap = {
 };
 
 const PlanterPage = () => {
-  const router = useRouter();
+  // State til at gemme liste over plantetyper
   const [planterTyper, setPlanterTyper] = useState<PlantType[]>([]);
+  
+  // State til formulardataen, som bruges til at oprette nye plantetyper
   const [formData, setFormData] = useState({
     navn: '',
     spiring: '',
@@ -31,19 +32,22 @@ const PlanterPage = () => {
     position: 'NoPreferred',
     vanding: [] as number[],
   });
+  
+  // State til at håndtere indlæsning og fejl
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Hent plantetyper fra backend når der skiftes til siden
+  // Hent plantetyper fra backend når siden indlæses
   useEffect(() => {
     fetchPlantTypes();
   }, []);
 
-  // function til at hente plantetyper fra backend
+  // Funktion til at hente plantetyper fra backend
   const fetchPlantTypes = async () => {
     setIsLoading(true);
     setError(null);
     try {
+      // Send anmodning til backend for at hente plantetyper
       const response = await fetchWithAuth('http://localhost:8080/PlantTypes', {
         method: 'GET',
         headers: {
@@ -56,18 +60,21 @@ const PlanterPage = () => {
         throw new Error(errorText || 'Kunne ikke hente plantetyper fra database');
       }
 
+      // Opdater state med de hentede plantetyper
       const data = await response.json();
       setPlanterTyper(data);
 
     } catch (error) {
+      // Vis fejlbesked hvis hentning fejler
       setError('Kunne ikke hente plante typer fra database');
       console.error('Kunne ikke hente plante typer fra database:', error);
     } finally {
+      // Afslut indlæsnings-tilstand
       setIsLoading(false);
     }
   };
 
-  // Håndtering af ændringer af input
+  // Håndter ændringer i inputfelter
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -76,11 +83,12 @@ const PlanterPage = () => {
     }));
   };
 
-  // Håndtere checkbox ændringer for vandingskemaet
+  // Håndter ændringer i checkboxe for vandingsskema
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = e.target;
     setFormData((prevData) => {
       const intValue = parseInt(value);
+      // Tilføj eller fjern dage fra vandingsskemaet
       const updatedVanding = checked
         ? [...prevData.vanding, intValue].sort((a, b) => a - b)
         : prevData.vanding.filter((day) => day !== intValue);
@@ -91,13 +99,13 @@ const PlanterPage = () => {
     });
   };
 
-  // Håndtering af at sende formen til backend
+  // Håndter indsendelse af formular til oprettelse af ny plantetype
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
 
-    // får det der sendes til at matche backend
+    // Forbered data til backend
     const createPlantTypeRequest = {
       name: formData.navn,
       preGerminationDays: parseInt(formData.spiring),
@@ -107,6 +115,7 @@ const PlanterPage = () => {
     };
 
     try {
+      // Send anmodning til backend for at oprette ny plantetype
       const response = await fetchWithAuth('http://localhost:8080/PlantType', {
         method: 'POST',
         headers: {
@@ -120,10 +129,10 @@ const PlanterPage = () => {
         throw new Error(errorText || 'Kunne ikke skabe plante type');
       }
 
-      // hent plantetyper fra backend igen
+      // Genindlæs plantetyper efter succesfuld oprettelse
       await fetchPlantTypes();
 
-      // reset formen
+      // Nulstil formularen
       setFormData({
         navn: '',
         spiring: '',
@@ -143,12 +152,13 @@ const PlanterPage = () => {
     }
   };
 
-  // håndtere sletning af plantetyper
+  // Håndter sletning af en plantetype
   const handleDelete = async (plantTypeName: string) => {
     setIsLoading(true);
     setError(null);
 
     try {
+      // Send anmodning til backend for at slette plantetype
       const response = await fetchWithAuth(`http://localhost:8080/PlantType/${plantTypeName}`, {
         method: 'DELETE',
         headers: {
@@ -156,12 +166,13 @@ const PlanterPage = () => {
         },
       });
 
+      // Håndter fejl ved sletning
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(errorText || 'Kunne ikke slette plantetype');
       }
 
-      // henter plante typer fra backend igen så vi har de nyeste data
+      // Genindlæs plantetyper efter succesfuld sletning
       await fetchPlantTypes();
     } catch (err) {
       setError('Kunne ikke slette plante typen');
@@ -175,14 +186,14 @@ const PlanterPage = () => {
     <div className="p-8">
       <h1 className="text-3xl font-bold mb-6 text-center">PLANTE SORTER</h1>
 
-      {/*box til at skrive fejlmedelser i hvis der kommer nogen*/}
+      {/* Område til visning af fejlmeddelelser */}
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
           {error}
         </div>
       )}
 
-      {/*Form til input af data der skal sendes til backend*/}
+      {/* Formular til oprettelse af ny plantetype */}
       <form
         className="bg-sidebarcolor p-6 rounded-lg shadow-xl mb-8 border"
         onSubmit={handleSubmit}
@@ -190,7 +201,7 @@ const PlanterPage = () => {
         <h2 className="text-lg font-semibold mb-6">OPRET EN PLANTE TYPE</h2>
         <div className="flex gap-6">
 
-          {/*Navne felt*/}
+          {/* Navne felt */}
           <div className="flex-col w-1/4">
             <label className="font-semibold mb-2">Navn:</label>
             <input
@@ -206,7 +217,7 @@ const PlanterPage = () => {
             />
           </div>
 
-          {/*Spirings felt*/}
+          {/* Spiringstids felt */}
           <div className="flex-col w-1/4">
             <label className="font-semibold mb-2">Spiring:</label>
             <input
@@ -223,7 +234,7 @@ const PlanterPage = () => {
             />
           </div>
 
-          {/*Gro tids felt*/}
+          {/* Gro tids felt */}
           <div className="flex-col w-1/4">
             <label className="font-semibold mb-2">Gro tid:</label>
             <input
@@ -240,7 +251,7 @@ const PlanterPage = () => {
             />
           </div>
 
-          {/*Foretrukne positions felt*/}
+          {/* Positions felt */}
           <div className="flex-col w-1/4">
             <label className="font-semibold mb-2">Position:</label>
             <select
@@ -259,10 +270,11 @@ const PlanterPage = () => {
           </div>
         </div>
 
-        {/* checkboxe til vandings skema*/}
+        {/* Checkboxe til vandingsskema */}
         <div className="mt-6">
           <h3 className="font-semibold text-center">Vandings skema:</h3>
           <div className="grid grid-cols-7 gap-4 mt-2 border-2 border-black bg-white mb-2 p-4 w-2/5 mx-auto">
+            {/* Dynamisk generering af checkboxe baseret på gro tid */}
             {[...Array(parseInt(formData.groTid) || 0)].map((_, day) => (
               <label key={day} className="flex flex-col items-center">
                 <span>Dag {day + 1}</span>
@@ -280,17 +292,17 @@ const PlanterPage = () => {
           </div>
         </div>
 
+        {/* Opret-knap */}
         <button
           type="submit"
           className="transition w-full bg-green-700 font-semibold hover:bg-green-800 text-white py-2 mt-4 rounded-2xl"
-
           disabled={isLoading}
         >
-          {isLoading ? 'HENTER DATA FRA BACKEND' : 'OPRET'}
+          {isLoading ? 'HENTER DATA FRA BACKEND' : 'OPRET PLANTE TYPE'}
         </button>
       </form>
 
-      {/* Tabel til at se plante typer i database */}
+      {/* Tabel til visning af eksisterende plantetyper */}
       <div className="bg-sidebarcolor p-6 rounded-lg shadow-xl">
         <h2 className="text-lg font-semibold mb-6">PLANTE TYPE OVERSIGT</h2>
         <table className="w-full table-auto border-collapse">
@@ -305,7 +317,7 @@ const PlanterPage = () => {
             </tr>
           </thead>
           <tbody>
-            {isLoading ? (
+            {isLoading ? ( // Indlæsningsmeddelelse
               <tr>
                 <td colSpan={6} className="p-4 text-center">
                   Indlæser plante typer...
@@ -339,7 +351,6 @@ const PlanterPage = () => {
             )}
           </tbody>
         </table>
-
       </div>
     </div>
   );
