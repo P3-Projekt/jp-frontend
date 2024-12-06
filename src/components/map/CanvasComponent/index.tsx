@@ -258,11 +258,6 @@ const CanvasComponent = forwardRef<
 					if (index === selectedRackIndex) return false;
 					const xDelta: number = Math.abs(box.position.x - xCoordinate);
 					const yDelta: number = Math.abs(box.position.y - yCoordinate);
-					ToastMessage({
-						title: "Noget gik galt!",
-						message: "Reolen overlapper en anden reol",
-						type: "error",
-					});
 					return xDelta < rackWidth && yDelta < rackHeight;
 				},
 			);
