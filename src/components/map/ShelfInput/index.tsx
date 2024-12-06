@@ -83,7 +83,9 @@ const ShelfBox: React.FC<ShelfProps> = ({ index, rack }) => {
 						}}
 						className="w-12 h-4 bg-sidebarcolor rounded border border-colorprimary text-black text-center text-sm"
 					/>
-					<div className="text-black text-center ml-1 text-sm ">/ {availableSpace}</div>
+					<div className="text-black text-center ml-1 text-sm ">
+						/ {availableSpace}
+					</div>
 				</div>
 			)}
 		</div>

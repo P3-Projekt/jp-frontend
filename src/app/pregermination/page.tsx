@@ -15,8 +15,6 @@ interface Batch {
 	daysUntilReady: number;
 }
 
-
-
 const PreGerminationPage: React.FC = () => {
 	const [pregerminatingBatches, setPregerminatingBatches] = useState<Batch[]>(
 		[],
@@ -83,14 +81,14 @@ const PreGerminationPage: React.FC = () => {
 								Forspiring
 							</h1>
 						</div>
-	
+
 						{/* Centered "Klar" box with border */}
 						<div className="flex justify-center items-center">
 							<div className="bg-sidebarcolor w-full p-2 text-center text-colorprimary font-bold text-xl border-b-4 border-t-4 border-colorprimary">
 								Klar
 							</div>
 						</div>
-	
+
 						{/* "Klar" box content */}
 						<div className="bg-lightgrey p-2 space-y-2 flex-1 overflow-y-auto">
 							{canBePlacedBatches.map((batch: Batch, index: number) => (
@@ -102,14 +100,14 @@ const PreGerminationPage: React.FC = () => {
 								/>
 							))}
 						</div>
-	
+
 						{/* Centered "Spirer" box with border */}
 						<div className="flex justify-center items-center">
 							<div className="bg-sidebarcolor w-full p-2 text-center text-colorprimary font-bold text-xl border-b-4 border-t-4 border-colorprimary">
 								Spirer
 							</div>
 						</div>
-	
+
 						{/* "Spire" box content */}
 						<div className="bg-lightgrey p-2 mb-2 flex-1 overflow-y-auto">
 							{pregerminatingBatches.map((batch: Batch, index: number) => (
@@ -122,7 +120,7 @@ const PreGerminationPage: React.FC = () => {
 							))}
 						</div>
 					</div>
-	
+
 					{/* Adjust the main content area to account for the fixed sidebar */}
 					<div className="ml-[250px] flex-1">
 						<CanvasComponent displayMode={DisplayMode.input} />
@@ -132,5 +130,5 @@ const PreGerminationPage: React.FC = () => {
 		</ShelfProvider>
 	);
 };
-	
+
 export default PreGerminationPage;

@@ -42,7 +42,7 @@ interface RackDialogProps {
 const RackDialog: React.FC<RackDialogProps> = ({
 	showDialog,
 	setShowDialog,
-	getLocations
+	getLocations,
 }) => {
 	const [selectedBatch, setSelectedBatch] = useState<BatchData | null>(null);
 	const [taskCompleting, setTaskCompleting] = useState<boolean>(false);
@@ -130,7 +130,10 @@ const RackDialog: React.FC<RackDialogProps> = ({
 									</div>
 									<div>
 										Lokationer:{" "}
-										<span className="font-semibold">{selectedBatch != null && getLocations(selectedBatch.id).join(", ")}</span>
+										<span className="font-semibold">
+											{selectedBatch != null &&
+												getLocations(selectedBatch.id).join(", ")}
+										</span>
 									</div>
 									<div className="mt-3">
 										Oprettet af:{" "}

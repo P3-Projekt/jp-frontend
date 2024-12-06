@@ -41,7 +41,7 @@ const Rack: React.FC<RackProps> = ({
 	displayMode,
 	overrideColor,
 	removeRack,
-	getLocations
+	getLocations,
 }) => {
 	// State for position and dragging
 	const [showDialog, setShowDialog] = useState<boolean>(false);
@@ -106,13 +106,15 @@ const Rack: React.FC<RackProps> = ({
 										? "hover:cursor-pointer hover:scale-110 hover:stroke-gray-100"
 										: undefined)
 								}
-								onMouseDown={(e) => {e.stopPropagation();}}
+								onMouseDown={(e) => {
+									e.stopPropagation();
+								}}
 								onClick={() => {
 									if (displayMode === DisplayMode.editPrototype) {
 										return;
 									}
 
-									if(rackShelves.length === 0){
+									if (rackShelves.length === 0) {
 										toast({
 											variant: "destructive",
 											title: "Noget gik galt",
@@ -127,9 +129,12 @@ const Rack: React.FC<RackProps> = ({
 										return;
 									} else {
 										// remove shelf from top
-										fetchWithAuth(`http://localhost:8080/Rack/${rackData.id}/Shelf`, {
-											method: "DELETE",
-										})
+										fetchWithAuth(
+											`http://localhost:8080/Rack/${rackData.id}/Shelf`,
+											{
+												method: "DELETE",
+											},
+										)
 											.then((response) => {
 												// Check if the response is ok
 												if (!response.ok) {
@@ -166,7 +171,9 @@ const Rack: React.FC<RackProps> = ({
 										? "hover:cursor-pointer hover:scale-110 hover:stroke-gray-100"
 										: undefined)
 								}
-								onMouseDown={(e) => {e.stopPropagation();}}
+								onMouseDown={(e) => {
+									e.stopPropagation();
+								}}
 								onClick={() => {
 									if (displayMode === DisplayMode.editPrototype) {
 										return;
@@ -182,9 +189,12 @@ const Rack: React.FC<RackProps> = ({
 										return;
 									} else {
 										// Add shelf to top
-										fetchWithAuth(`http://localhost:8080/Rack/${rackData.id}/Shelf`, {
-											method: "POST",
-										})
+										fetchWithAuth(
+											`http://localhost:8080/Rack/${rackData.id}/Shelf`,
+											{
+												method: "POST",
+											},
+										)
 											.then((response) => {
 												// Check if the response is ok
 												if (!response.ok) {
@@ -218,13 +228,20 @@ const Rack: React.FC<RackProps> = ({
 										? "hover:cursor-pointer hover:scale-110 hover:stroke-gray-100"
 										: undefined)
 								}
-								onMouseDown={(e) => {e.stopPropagation();}}
+								onMouseDown={(e) => {
+									e.stopPropagation();
+								}}
 								onClick={() => {
 									if (displayMode === DisplayMode.editPrototype) {
 										return;
 									}
 									// Check if rack is empty
-									if (rackShelves.reduce((acc, shelf) => acc + shelf.batches.length, 0) != 0) {
+									if (
+										rackShelves.reduce(
+											(acc, shelf) => acc + shelf.batches.length,
+											0,
+										) != 0
+									) {
 										// send Toast as error message!
 										toast({
 											variant: "destructive",
@@ -249,7 +266,7 @@ const Rack: React.FC<RackProps> = ({
 													});
 													throw new Error("Network response was not ok");
 												} else {
-													if(removeRack){
+													if (removeRack) {
 														removeRack();
 													}
 												}
@@ -262,8 +279,7 @@ const Rack: React.FC<RackProps> = ({
 												});
 												console.error("Error deleting rack: " + err);
 											});
-									
-										}
+									}
 								}}
 							/>
 						</div>
@@ -298,7 +314,11 @@ const Rack: React.FC<RackProps> = ({
 				</div>
 			</div>
 			{getLocations && (
-				<RackDialog showDialog={showDialog} setShowDialog={setShowDialog} getLocations={getLocations} />
+				<RackDialog
+					showDialog={showDialog}
+					setShowDialog={setShowDialog}
+					getLocations={getLocations}
+				/>
 			)}
 		</div>
 	);

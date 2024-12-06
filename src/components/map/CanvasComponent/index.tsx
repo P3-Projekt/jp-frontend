@@ -21,7 +21,7 @@ export enum DisplayMode {
 	edit,
 	editPrototype,
 	input,
-	loading
+	loading,
 }
 
 // Grid size for snapping
@@ -79,7 +79,9 @@ const CanvasComponent = forwardRef<
 	const [panStart, setPanStart] = useState({ x: 0, y: 0 });
 	const [isPanning, setIsPanning] = useState(false);
 	const [hasBeenMoved, setHasBeenMoved] = useState(false);
-	const [loadingRacks, setLoadingRacks] = useState<Map<number, RackData>>(new Map());
+	const [loadingRacks, setLoadingRacks] = useState<Map<number, RackData>>(
+		new Map(),
+	);
 
 	// Fetch racks from the backend
 	useEffect(() => {
@@ -103,7 +105,7 @@ const CanvasComponent = forwardRef<
 	}, []);
 
 	const addNewRackFetch = useCallback(
-		async (tempId : number, data : RackData) => {
+		async (tempId: number, data: RackData) => {
 			try {
 				const response = await fetchWithAuth("http://localhost:8080/Rack", {
 					method: "POST",
@@ -152,13 +154,14 @@ const CanvasComponent = forwardRef<
 				return;
 			}
 
-			const tempId = Math.max(...racks.map((rack) => rack.id), ...loadingRacks.keys()) + 1;
+			const tempId =
+				Math.max(...racks.map((rack) => rack.id), ...loadingRacks.keys()) + 1;
 
 			const newRack = {
 				id: tempId,
 				position: { x: xPosition, y: yPosition },
 				shelves: [],
-			}
+			};
 
 			const newLoadingRacks = new Map(loadingRacks);
 			newLoadingRacks.set(tempId, newRack);
@@ -278,29 +281,34 @@ const CanvasComponent = forwardRef<
 	);
 
 	const rackMouseDownHandler = function (index: number) {
-		if(displayMode === DisplayMode.edit) {
+		if (displayMode === DisplayMode.edit) {
 			setSelectedRackIndex(index);
 		}
 	};
 
-	const removeRack = useCallback(function (indexToRemove: number){
-		const newRacks = racks.filter((box, i) => i !== indexToRemove);
-		setRacks(newRacks);
-	}, [racks]);
+	const removeRack = useCallback(
+		function (indexToRemove: number) {
+			const newRacks = racks.filter((box, i) => i !== indexToRemove);
+			setRacks(newRacks);
+		},
+		[racks],
+	);
 
-	const getLocationsByBatch = useCallback(function (batchId: number) {
-		const locations : string[] = []
+	const getLocationsByBatch = useCallback(
+		function (batchId: number) {
+			const locations: string[] = [];
 
-		for(const rack of racks) {
-			for(const [index, shelf] of rack.shelves.entries()) {
-				if(shelf.batches.some(batch => batch.id === batchId)) {
-					locations.push(`${rack.id}.${index + 1}`);
+			for (const rack of racks) {
+				for (const [index, shelf] of rack.shelves.entries()) {
+					if (shelf.batches.some((batch) => batch.id === batchId)) {
+						locations.push(`${rack.id}.${index + 1}`);
+					}
 				}
 			}
-		}
-		return locations;
-
-	} , [racks]);
+			return locations;
+		},
+		[racks],
+	);
 
 	useEffect(() => {
 		document.addEventListener("mouseup", handleMouseUp);
@@ -345,7 +353,9 @@ const CanvasComponent = forwardRef<
 						mouseDownHandler={() => {
 							rackMouseDownHandler(index);
 						}}
-						removeRack={() => {removeRack(index)}}
+						removeRack={() => {
+							removeRack(index);
+						}}
 						getLocations={getLocationsByBatch}
 					/>
 				))}
