@@ -70,7 +70,7 @@ const BatchesPage = () => {
 		setIsLoading(true);
 		setError(null);
 		try {
-			// Send anmodning til backend
+			// Send anmodning (med token) til backend
 			const response = await fetchWithAuth("http://localhost:8080/Batches", {
 				method: "GET",
 				headers: {
@@ -98,7 +98,7 @@ const BatchesPage = () => {
 	// Hent plantetyper fra backend
 	const fetchPlantTypes = async () => {
 		try {
-			// Send anmodning for at hente plantetyper
+			// Send anmodning (med token) for at hente plantetyper
 			const response = await fetchWithAuth("http://localhost:8080/PlantTypes", {
 				method: "GET",
 				headers: {
@@ -121,7 +121,7 @@ const BatchesPage = () => {
 	// Hent bakketyper fra backend
 	const fetchTrayTypes = async () => {
 		try {
-			// Send anmodning for at hente bakketyper
+			// Send anmodning (med token) for at hente bakketyper
 			const response = await fetchWithAuth("http://localhost:8080/TrayTypes", {
 				method: "GET",
 				headers: {
@@ -190,9 +190,8 @@ const BatchesPage = () => {
 				amount: 0,
 			});
 		} catch (err) {
-			setError(
-				(err instanceof Error && err.message) || "Kunne ikke oprette batch",
-			);
+			const errorMessage = err instanceof Error ? err.message : String(err);
+			setError(errorMessage || "Kunne ikke oprette batch");
 			console.error("Kunne ikke oprette batch:", err);
 		} finally {
 			setIsLoading(false);
@@ -285,7 +284,7 @@ const BatchesPage = () => {
 					className="transition w-full bg-colorprimary font-semibold hover:bg-green-700 text-white py-2 mt-4 rounded-2xl"
 					disabled={isLoading}
 				>
-					{isLoading ? "HENTER DATA FRA BACKEND" : "OPRET BATCH AF MARKER"}
+					{isLoading ? "HENTER DATA FRA DATABASEN" : "OPRET BATCH AF MARKER"}
 				</button>
 			</form>
 

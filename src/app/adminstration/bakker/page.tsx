@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { fetchWithAuth } from "@/components/authentication/authentication";
 
 // Definition af en bakke type med dens egenskaber
@@ -13,7 +12,6 @@ type BakkeType = {
 };
 
 const BakkerPage = () => {
-	const router = useRouter();
 	// State til at gemme listen over bakke typer
 	const [bakketyper, setBakketyper] = useState<BakkeType[]>([]);
 
@@ -31,11 +29,11 @@ const BakkerPage = () => {
 	const [error, setError] = useState<string | null>(null);
 
 	// Funktion til at hente bakke typer fra backend
-	async function fetchTrayTypes() {
+	const fetchTrayTypes = useCallback(async () => {
 		setIsLoading(true);
 		setError(null);
 		try {
-			// Sender en anmodning til backend for at hente bakke typer
+			// Sender en anmodning (med token) til backend for at hente bakke typer
 			const response = await fetchWithAuth("http://localhost:8080/TrayTypes", {
 				method: "GET",
 				headers: {
@@ -58,21 +56,16 @@ const BakkerPage = () => {
 			// Håndterer fejl og viser fejlmeddelelse
 			setError("Kunne ikke hente bakke typer fra databasen");
 			console.error("Fejl ved hentning af bakke typer:", err);
-
-			// Omdirigerer til login-side hvis der mangler autentifikationstoken
-			if (
-				err instanceof Error &&
-				err.message === "No authentication token found"
-			) {
-				router.push("/login");
-			}
 		} finally {
 			// Afslutter indlæsnings-staten
 			setIsLoading(false);
 		}
-	}
+	}, []);
 
-	fetchTrayTypes();
+	// Henter bakke typer når siden indlæses
+	useEffect(() => {
+		fetchTrayTypes();
+	}, [fetchTrayTypes]);
 
 	// Håndterer ændringer i formular-felter
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,7 +84,7 @@ const BakkerPage = () => {
 		setError(null);
 
 		try {
-			// Sender en anmodning til backend for at oprette ny bakke type
+			// Sender en anmodning (med token) til backend for at oprette ny bakke type
 			const response = await fetchWithAuth("http://localhost:8080/TrayType", {
 				method: "POST",
 				headers: {
@@ -109,13 +102,14 @@ const BakkerPage = () => {
 			await fetchTrayTypes();
 			// Nulstiller formular-felterne
 			setFormData({ name: "", lengthCm: 0, widthCm: 0 });
-		} catch (err) {
-			if (err instanceof Error && err.message.includes("already exists")) {
+		} catch (err: unknown) {
+			const errorMessage = err instanceof Error ? err.message : String(err);
+			if (errorMessage.includes("already exists")) {
 				setError("Bakke typen eksisterer allerede");
 			} else {
 				setError("Kunne ikke skabe bakke typen");
 			}
-			console.error("Fejl ved oprettelse af bakke type:", err);
+			console.error("Fejl ved oprettelse af bakke type:", errorMessage);
 		} finally {
 			setIsLoading(false);
 		}
@@ -127,7 +121,7 @@ const BakkerPage = () => {
 		setError(null);
 
 		try {
-			// Sender en anmodning til backend for at slette en bakke type
+			// Sender en anmodning (med token) til backend for at slette en bakke type
 			const response = await fetchWithAuth(
 				`http://localhost:8080/TrayType/${name}`,
 				{
@@ -156,7 +150,6 @@ const BakkerPage = () => {
 
 	return (
 		<div className="p-8">
-			{/* Sidens overskrift */}
 			<h1 className="text-3xl font-bold mb-6 text-center">BAKKE TYPER</h1>
 
 			{/* Fejlmeddelelse vises, hvis der er en */}
@@ -233,7 +226,7 @@ const BakkerPage = () => {
 					className="transition w-full bg-colorprimary font-semibold hover:bg-green-700 text-white py-2 mt-4 rounded-2xl"
 					disabled={isLoading}
 				>
-					{isLoading ? "HENTER DATA FRA BACKEND" : "OPRET BAKKE TYPE"}
+					{isLoading ? "HENTER DATA FRA DATABASEN" : "OPRET BAKKE TYPE"}
 				</button>
 			</form>
 

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { fetchWithAuth } from "@/components/authentication/authentication";
 
-// Brugergrænseflade som definerer brugerens struktur
+// interface som definerer bruger objekt struktur
 interface User {
 	name: string;
 	role: "Gardener" | "Administrator" | "Manager";
@@ -12,7 +12,7 @@ interface User {
 }
 
 const BrugereSide = () => {
-	// Tilstandsvariabler til at styre komponentens data og UI
+	// Tilstandsvariabler til at styre sidens data og UI
 	const [users, setUsers] = useState<User[]>([]);
 	const [inactiveUsers, setInactiveUsers] = useState<User[]>([]);
 
@@ -37,7 +37,7 @@ const BrugereSide = () => {
 		setIsLoading(true);
 		setError(null);
 		try {
-			// Send anmodning for at hente brugere
+			// Send anmodning (med token) for at hente brugere
 			const response = await fetchWithAuth("http://localhost:8080/Users", {
 				method: "GET",
 				headers: {
@@ -83,7 +83,7 @@ const BrugereSide = () => {
 		setError(null);
 
 		try {
-			// Send anmodning for at oprette bruger
+			// Send anmodning (med token) til backend for at oprette bruger
 			const response = await fetchWithAuth("http://localhost:8080/User", {
 				method: "POST",
 				headers: {
@@ -125,7 +125,7 @@ const BrugereSide = () => {
 		setError(null);
 
 		try {
-			// Send anmodning for at reaktivere bruger
+			// Send anmodning (med token) for at reaktivere bruger
 			const response = await fetchWithAuth(
 				`http://localhost:8080/Users/${name}/activate`,
 				{
@@ -136,7 +136,7 @@ const BrugereSide = () => {
 				},
 			);
 
-			// Håndter fejl ved reaktivering
+			// Håndter fejl ved reaktivering af bruger
 			if (!response.ok) {
 				const errorText = await response.text();
 				throw new Error(errorText || "Kunne ikke reaktivere brugeren");
@@ -158,7 +158,7 @@ const BrugereSide = () => {
 		setError(null);
 
 		try {
-			// Send anmodning for at inaktivere bruger
+			// Send anmodning (med token) for at inaktivere bruger
 			const response = await fetchWithAuth(
 				`http://localhost:8080/Users/${name}`,
 				{
@@ -259,7 +259,7 @@ const BrugereSide = () => {
 					className="transition w-full bg-colorprimary font-semibold hover:bg-green-700 text-white py-2 mt-4 rounded-2xl"
 					disabled={isLoading}
 				>
-					{isLoading ? "HENTER DATA FRA BACKEND" : "OPRET BRUGER"}
+					{isLoading ? "HENTER DATA FRA DATABASEN" : "OPRET BRUGER"}
 				</button>
 			</form>
 
