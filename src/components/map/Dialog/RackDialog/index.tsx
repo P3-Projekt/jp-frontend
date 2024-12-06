@@ -24,12 +24,13 @@ import { RackData } from "@/components/map/Rack";
 import { Droplets, Loader2, Scissors, X } from "lucide-react";
 import { CircularProgressbar } from "react-circular-progressbar";
 import { BatchData } from "../../Batch";
-import { toast } from "@/hooks/use-toast";
 import { getUser } from "@/components/authentication/authentication";
+
+import { ToastMessage } from "@/functions/ToastMessage/ToastMessage";
 
 let rackToDisplayUnSynced: RackData | null = null;
 
-export function setRackToBeDisplayed(rack: RackData) {
+export function setRackToBeDisplayed(rack: RackData): void {
 	rackToDisplayUnSynced = rack;
 }
 
@@ -68,7 +69,7 @@ const RackDialog: React.FC<RackDialogProps> = ({
 
 	const currentDate = new Date().toISOString().split("T")[0]; // Get current date in YYYY-MM-DD format
 
-	function taskIsDue(batch: BatchData) {
+	function taskIsDue(batch: BatchData): boolean {
 		return new Date(currentDate) >= new Date(batch.nextTask.dueDate);
 	}
 
@@ -90,6 +91,7 @@ const RackDialog: React.FC<RackDialogProps> = ({
 								<div className="ml-auto -mr-3">
 									<X
 										className="size-14 text-black cursor-pointer"
+										aria-label={"Luk reol vindue"}
 										onClick={() => {
 											setShowDialog(false);
 										}}
@@ -100,7 +102,6 @@ const RackDialog: React.FC<RackDialogProps> = ({
 						<DialogDescription>
 							<div className="min-h-full gap-x-5 flex flex-row justify-between content-center">
 								{/* rack information */}
-								{/* skal kunne laves om alt efter hvilken batch der klikkes på */}
 								<div className="h-[320px] self-center items-start basis-2/5 flex flex-col bg-blue-200 text-xl text-black rounded border-2 border-black pl-2 pr-2">
 									<div>
 										Næste opgave:{" "}
@@ -152,6 +153,7 @@ const RackDialog: React.FC<RackDialogProps> = ({
 									>
 										<Button
 											disabled={taskCompleting}
+											aria-label={"Udfør opgave"}
 											className={
 												`hover:cursor-pointer font-bold` +
 												buttonVariants({
@@ -162,7 +164,7 @@ const RackDialog: React.FC<RackDialogProps> = ({
 												setCompleteConfirm(true);
 											}}
 										>
-											{taskCompleting == false ? (
+											{!taskCompleting ? (
 												"Udfør opgave"
 											) : (
 												<Loader2 className="animate-spin" />
@@ -187,11 +189,11 @@ const RackDialog: React.FC<RackDialogProps> = ({
 												<div className="h-full w-full overflow-x-scroll ml-2 bg-gray-200 justify-between content-center pl-2 pr-2 self-center border-black border-2">
 													<div className="h-4/5 w-full flex flex-row items-center gap-x-1">
 														{/* Dynamiclly adding batches */}
-														{shelf.batches.map((batch) => (
+														{shelf.batches.map((batch: BatchData) => (
 															<div
 																key={batch.id}
 																className={`flex flex-row h-full content-center items-center self-center pl-1 pr-1 text-black border-black border rounded  font-semibold hover:cursor-pointer ${selectedBatch === batch ? "bg-blue-200" : ""}`}
-																onClick={() => {
+																onClick={(): void => {
 																	// Her vælges den specifikke batch:
 																	if (selectedBatch === batch) {
 																		setSelectedBatch(null);
@@ -211,15 +213,16 @@ const RackDialog: React.FC<RackDialogProps> = ({
 																	<Scissors
 																		className={`text-green-600 size-5`}
 																	/>
-																) : (
+																) : batch.nextTask.progress >= 0 ||
+																  batch.nextTask.progress != null ? (
 																	<CircularProgressbar
-																		value={batch?.nextTask.progress}
+																		value={batch.nextTask.progress}
 																		className={`size-4 w-fit ml-1`}
 																		strokeWidth={25}
 																		minValue={0}
 																		maxValue={100}
 																	/>
-																)}
+																) : null}
 															</div>
 														))}
 													</div>
@@ -245,8 +248,9 @@ const RackDialog: React.FC<RackDialogProps> = ({
 					</AlertDialogHeader>
 					<AlertDialogFooter>
 						<Button
-							className={`` + buttonVariants({ variant: "cancel" })}
-							onClick={() => {
+							aria-label={"Annuller udførelse"}
+							className={buttonVariants({ variant: "cancel" })}
+							onClick={(): void => {
 								// Cancel completion
 								setCompleteConfirm(false);
 							}}
@@ -254,9 +258,10 @@ const RackDialog: React.FC<RackDialogProps> = ({
 							Annuller
 						</Button>
 						<Button
+							aria-label={"Bekræft udførelse"}
 							disabled={taskCompleting}
-							className={`` + buttonVariants({ variant: "green" })}
-							onClick={() => {
+							className={buttonVariants({ variant: "green" })}
+							onClick={(): void => {
 								setTaskCompleting(true);
 								// Udfør opgaven
 								try {
@@ -270,37 +275,41 @@ const RackDialog: React.FC<RackDialogProps> = ({
 											body: JSON.stringify({ username: getUser() }),
 										},
 									)
-										.then((response) => {
+										.then((response: Response): void => {
 											// Check if the response is ok
 											if (!response.ok) {
-												toast({
-													variant: "destructive",
-													title: "Noget gik galt",
-													description:
-														"Opgaven kunne ikke gennemføres - prøv igen.",
+												ToastMessage({
+													title: "Uventet fejl!",
+													message:
+														"Vi stødte på et problem, vent og prøv igen.",
+													type: "error",
 												});
 												throw new Error("Network response was not ok");
 											} else {
+												ToastMessage({
+													title: "Opgave udført",
+													message: "Opgaven er blevet udført",
+													type: "success",
+												});
 												window.location.reload();
 											}
 										})
 										// Error handling
-										.catch((err) => {
-											toast({
-												variant: "destructive",
-												title: "Noget gik galt",
-												description:
-													"Opgaven kunne ikke gennemføres - prøv igen.",
+										.catch((err): void => {
+											ToastMessage({
+												title: "Noget gik galt!",
+												message: "Opgaven kunne ikke udføres, prøv igen.",
+												type: "error",
 											});
 											console.error("Error deleting shelf: " + err);
 											setTaskCompleting(false);
 											setCompleteConfirm(false);
 										});
 								} catch (err) {
-									toast({
-										variant: "destructive",
-										title: "Noget gik galt",
-										description: "Opgaven kunne ikke gennemføres - prøv igen.",
+									ToastMessage({
+										title: "Noget gik galt!",
+										message: "Opgaven kunne ikke udføres, prøv igen.",
+										type: "error",
 									});
 									console.error("Fejl under udføring af opgave: " + err);
 									setTaskCompleting(false);
@@ -311,7 +320,7 @@ const RackDialog: React.FC<RackDialogProps> = ({
 								setShowDialog(false);
 							}}
 						>
-							{taskCompleting == false ? (
+							{!taskCompleting ? (
 								"Bekræft"
 							) : (
 								<Loader2 className="animate-spin" />

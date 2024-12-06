@@ -7,15 +7,15 @@ import { DisplayMode } from "@/components/map/CanvasComponent";
 
 import { ShelfData, Shelf } from "@/components/map/Shelf";
 
-import { useToast } from "@/hooks/use-toast";
+import { ToastMessage, UnexpectedErrorToast } from "@/functions/ToastMessage/ToastMessage";
 
 import { Plus, Minus, Trash2 } from "lucide-react";
 import { LoadingSpinner } from "@/components/LoadingScreen/LoadingSpinner";
 import { fetchWithAuth } from "@/components/authentication/authentication";
 
 //Constants
-export const rackWidth = 100;
-export const rackHeight = 200;
+export const rackWidth: number = 100;
+export const rackHeight: number = 200;
 
 export interface RackData {
 	id: number;
@@ -59,8 +59,6 @@ const Rack: React.FC<RackProps> = ({
 			mouseDownHandler(e);
 		}
 	};
-
-	const { toast } = useToast();
 
 	return (
 		// Rack container
@@ -115,16 +113,16 @@ const Rack: React.FC<RackProps> = ({
 									}
 
 									if (rackShelves.length === 0) {
-										toast({
-											variant: "destructive",
+										ToastMessage({
 											title: "Noget gik galt",
-											description: "Der er ingen hylder at fjerne",
+											message: "Der er ingen hylder at fjerne",
+											type: "error",
 										});
 									} else if (rackShelves[0].batches.length != 0) {
-										toast({
-											variant: "destructive",
+										ToastMessage({
 											title: "Noget gik galt",
-											description: "Kan ikke fjerne hylde med batch.",
+											message: "Kan ikke fjerne hylde med batch.",
+											type: "error",
 										});
 										return;
 									} else {
@@ -138,26 +136,32 @@ const Rack: React.FC<RackProps> = ({
 											.then((response) => {
 												// Check if the response is ok
 												if (!response.ok) {
-													toast({
-														variant: "destructive",
-														title: "Noget gik galt",
-														description:
-															"Hylden kunne ikke slettes - prøv igen.",
+													ToastMessage({
+														title: "Uventet fejl!",
+														message:
+															"Vi stødte på et problem, vent lidt og prøv igen",
+														type: "error",
 													});
 													throw new Error("Network response was not ok");
 												}
 												return response.json();
 											})
-											.then((data) => {
+											.then((data): void => {
 												setRackShelves(data.shelves);
+												ToastMessage({
+													title: "Hylde fjernet",
+													message: "Hylden er blevet fjernet.",
+													type: "success",
+												});
 											})
 
 											// Error handling
-											.catch((err) => {
-												toast({
-													variant: "destructive",
-													title: "Noget gik galt",
-													description: "Hylden kunne ikke slettes - prøv igen.",
+											.catch((err): void => {
+												ToastMessage({
+													title: "Uventet fejl!",
+													message:
+														"Hylden kunne ikke fjernes, vent og prøv igen.",
+													type: "error",
 												});
 												console.error("Error deleting shelf: " + err);
 											});
@@ -174,6 +178,7 @@ const Rack: React.FC<RackProps> = ({
 								onMouseDown={(e) => {
 									e.stopPropagation();
 								}}
+								aria-label={"Tilføj hylde"}
 								onClick={() => {
 									if (displayMode === DisplayMode.editPrototype) {
 										return;
@@ -181,10 +186,10 @@ const Rack: React.FC<RackProps> = ({
 									// Check if there are more or equal to 7 shelves
 									if (rackShelves.length >= 7) {
 										// send Toast of error message!
-										toast({
-											variant: "destructive",
-											title: "Noget gik galt",
-											description: "Kan ikke tilføje mere end 7 hylder.",
+										ToastMessage({
+											title: "Noget gik galt!",
+											message: "Der kan ikke være mere end 7 hylder på én roel",
+											type: "error",
 										});
 										return;
 									} else {
@@ -198,23 +203,28 @@ const Rack: React.FC<RackProps> = ({
 											.then((response) => {
 												// Check if the response is ok
 												if (!response.ok) {
-													toast({
-														variant: "destructive",
-														title: "Noget gik galt",
-														description:
-															"Kunne ikke tilføje hylden - prøv igen.",
+													ToastMessage({
+														title: "Uventet fejl!",
+														message:
+															"Vi stødte på et problem, vent lidt og prøv igen",
+														type: "error",
 													});
 													throw new Error("Network response was not ok");
 												}
+												ToastMessage({
+													title: "Hylde tilføjet",
+													message: "Der er blev tilføjet en hylde.",
+													type: "success",
+												});
 												return response.json();
 											})
 											.then((data) => setRackShelves(data.shelves))
 											// Error handling
-											.catch((err) => {
-												toast({
-													variant: "destructive",
-													title: "Noget gik galt",
-													description: "Kunne ikke tilføje hylden - prøv igen.",
+											.catch((err): void => {
+												ToastMessage({
+													title: "Uventet fejl!",
+													message: `Hylden kunne ikke oprettes, vent og prøv igen.`,
+													type: "error",
 												});
 												console.error("Error deleting shelf: " + err);
 											});
@@ -231,6 +241,7 @@ const Rack: React.FC<RackProps> = ({
 								onMouseDown={(e) => {
 									e.stopPropagation();
 								}}
+								aria-label={"Fjern reol"}
 								onClick={() => {
 									if (displayMode === DisplayMode.editPrototype) {
 										return;
@@ -243,11 +254,10 @@ const Rack: React.FC<RackProps> = ({
 										) != 0
 									) {
 										// send Toast as error message!
-										toast({
-											variant: "destructive",
+										ToastMessage({
 											title: "Noget gik galt",
-											description:
-												"Reolen skal være tom for batches for at kunne slette den",
+											message: "Tøm reolen før du kan fjerne den.",
+											type: "error"
 										});
 										return;
 									} else {
@@ -258,25 +268,21 @@ const Rack: React.FC<RackProps> = ({
 											.then((response) => {
 												// Check if the response is ok
 												if (!response.ok) {
-													toast({
-														variant: "destructive",
-														title: "Noget gik galt",
-														description:
-															"Kunne ikke slette reolen - Prøv igen.",
-													});
+													UnexpectedErrorToast();
 													throw new Error("Network response was not ok");
 												} else {
 													if (removeRack) {
+														ToastMessage({
+															title: "Reol fjernet",
+															message: "Reolen er blevet fjernet.",
+															type: "success",
+														});
 														removeRack();
 													}
 												}
 											})
 											.catch((err) => {
-												toast({
-													variant: "destructive",
-													title: "Noget gik galt",
-													description: "Kunne ikke slette reolen - prøv igen.",
-												});
+												UnexpectedErrorToast();
 												console.error("Error deleting rack: " + err);
 											});
 									}

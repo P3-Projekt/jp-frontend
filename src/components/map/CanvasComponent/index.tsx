@@ -1,11 +1,4 @@
 "use client";
-/*
-TODO:
-	- (måske) gem i localstorage, alle racks hentet fra databasen, og kun tjek om der er sket ændringre siden sidste gang. Slipper muligvis for at skulle hente alle racks hver gang.
-	- Error handling - tjek om racksene er oven i hindanden, og giv en fejlbesked.
-
-*/
-
 import React, {
 	useState,
 	useCallback,
@@ -15,6 +8,7 @@ import React, {
 } from "react";
 import Rack, { RackData, rackHeight, rackWidth } from "@/components/map/Rack";
 import { fetchWithAuth } from "@/components/authentication/authentication";
+import { ToastMessage } from "@/functions/ToastMessage/ToastMessage";
 
 export enum DisplayMode {
 	view,
@@ -25,15 +19,15 @@ export enum DisplayMode {
 }
 
 // Grid size for snapping
-const GRID_SIZE = 50;
+const GRID_SIZE: number = 50;
 
 // Helper function to snap moving rack coordinates to grid
 export const snapToGrid = (value: number) =>
 	Math.round(value / GRID_SIZE) * GRID_SIZE;
 
-async function updateRackPosition(rackData: RackData) {
+async function updateRackPosition(rackData: RackData): Promise<void> {
 	try {
-		const response = await fetchWithAuth(
+		const response : Response = await fetchWithAuth(
 			"http://localhost:8080/Rack/" + rackData.id + "/Position",
 			{
 				method: "PUT",
@@ -48,9 +42,19 @@ async function updateRackPosition(rackData: RackData) {
 		);
 
 		if (!response.ok) {
+			ToastMessage({
+				title: "Uventet fejl!",
+				message: "Vi stødte på et problem, vent og prøv igen.",
+				type: "error",
+			});
 			throw new Error("Bad response code");
 		}
 	} catch (e) {
+		ToastMessage({
+			title: "Noget gik galt!",
+			message: "Kunne opdatere reol placeringen",
+			type: "error",
+		});
 		console.error("Error updating rack position: " + e);
 	}
 }
@@ -84,22 +88,33 @@ const CanvasComponent = forwardRef<
 	);
 
 	// Fetch racks from the backend
-	useEffect(() => {
+	useEffect((): void => {
 		fetchWithAuth("http://localhost:8080/Racks", {})
-			.then((response) => {
+			.then((response: Response) => {
 				// Check if the response is ok
 				if (!response.ok) {
+					ToastMessage({
+						title: "Uventet fejl!",
+						message: "Vi stødte på et problem, vent og prøv igen.",
+						type: "error",
+					});
 					throw new Error("Network response was not ok");
 				}
 				return response.json();
 			})
 
 			// Set the boxes state to the racks
-			.then((racks) => {
+			.then((racks): void => {
 				setRacks(racks);
 			})
+
 			// Error handling
-			.catch((err) => {
+			.catch((err): void => {
+				ToastMessage({
+					title: "Noget gik galt!",
+					message: "Vi kunne ikke hente reolerne, prøv at genindlæse siden.",
+					type: "error",
+				});
 				console.error("Error getting racks: " + err);
 			});
 	}, []);
@@ -119,7 +134,12 @@ const CanvasComponent = forwardRef<
 				});
 
 				if (!response.ok) {
-					throw new Error("Bad response code");
+					ToastMessage({
+						title: "Uventet fejl!",
+						message: "Vi stødte på et problem, vent og prøv igen.",
+						type: "error",
+					});
+					throw new Error("Bad response code" + response);
 				}
 
 				const newRack: RackData = await response.json();
@@ -172,10 +192,6 @@ const CanvasComponent = forwardRef<
 		[addNewRackFetch, racks, isPositionOverlapping, loadingRacks],
 	);
 
-	useEffect(() => {
-		console.log("ref", ref);
-	}, [ref]);
-
 	useImperativeHandle(ref, () => {
 		return {
 			newRack: newRack,
@@ -185,8 +201,8 @@ const CanvasComponent = forwardRef<
 	}, [panOffset, newRack, isPositionOverlapping]);
 
 	const updateRack = useCallback(
-		(rack: RackData, index: number) => {
-			const newRacks = racks.map((box, i) =>
+		(rack: RackData, index: number): void => {
+			const newRacks = racks.map((box: RackData, i: number) =>
 				i === index ? { ...box, ...rack } : box,
 			);
 			setRacks(newRacks);
@@ -222,26 +238,37 @@ const CanvasComponent = forwardRef<
 				return;
 			}
 
-			const rect = (
+			const rect: DOMRect = (
 				event.currentTarget as HTMLDivElement
 			).getBoundingClientRect();
-			const mouseX = event.clientX - rect.left;
-			const mouseY = event.clientY - rect.top;
+			const mouseX: number = event.clientX - rect.left;
+			const mouseY: number = event.clientY - rect.top;
 
 			// Convert client position to absolute position by removing pan offset and centering the boxes
-			const xCoordinate = snapToGrid(mouseX - panOffset.x - rackWidth / 2);
-			const yCoordinate = snapToGrid(mouseY - panOffset.y - rackHeight / 2);
+			const xCoordinate: number = snapToGrid(
+				mouseX - panOffset.x - rackWidth / 2,
+			);
+			const yCoordinate: number = snapToGrid(
+				mouseY - panOffset.y - rackHeight / 2,
+			);
 
 			// Check for overlap and snap to grid if not overlapping
-			const isOverlapping = racks.some((box, index) => {
-				if (index === selectedRackIndex) return false;
-				const xDelta = Math.abs(box.position.x - xCoordinate);
-				const yDelta = Math.abs(box.position.y - yCoordinate);
-				return xDelta < rackWidth && yDelta < rackHeight;
-			});
+			const isOverlapping: boolean = racks.some(
+				(box: RackData, index: number): boolean => {
+					if (index === selectedRackIndex) return false;
+					const xDelta: number = Math.abs(box.position.x - xCoordinate);
+					const yDelta: number = Math.abs(box.position.y - yCoordinate);
+					ToastMessage({
+						title: "Noget gik galt!",
+						message: "Reolen overlapper en anden reol",
+						type: "error",
+					});
+					return xDelta < rackWidth && yDelta < rackHeight;
+				},
+			);
 
 			// Determind if a rack has been moved
-			const hasRackBeenMoved =
+			const hasRackBeenMoved: boolean =
 				xCoordinate !== racks[selectedRackIndex].position.x ||
 				yCoordinate !== racks[selectedRackIndex].position.y;
 
@@ -313,7 +340,7 @@ const CanvasComponent = forwardRef<
 	useEffect(() => {
 		document.addEventListener("mouseup", handleMouseUp);
 
-		return () => {
+		return (): void => {
 			document.removeEventListener("mouseup", handleMouseUp);
 		};
 	}, [hasBeenMoved, selectedRackIndex, racks, handleMouseUp]);
@@ -344,7 +371,7 @@ const CanvasComponent = forwardRef<
 				}}
 				className="absolute inset-0"
 			>
-				{racks.map((box, index) => (
+				{racks.map((box: RackData, index: number) => (
 					<Rack
 						key={box.id}
 						displayMode={displayMode}

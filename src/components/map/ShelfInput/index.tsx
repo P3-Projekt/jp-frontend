@@ -3,6 +3,7 @@ import {
 	useShelfContext,
 } from "@/app/pregermination/context";
 import React, { useEffect, useState } from "react";
+import { ToastMessage } from "@/functions/ToastMessage/ToastMessage";
 
 export interface ShelfProps {
 	index: number;
@@ -15,11 +16,15 @@ const ShelfBox: React.FC<ShelfProps> = ({ index, rack }) => {
 	const [availableSpace, setAvailableSpace] = useState(0); //The maximal space available on the shelf
 	const { placedAmount, setPlacedAmount, batchAmount } =
 		usePlacedAmountContext();
-	//console.log(`Rendering shelf ${index} on rack ${rack}`);
 
-	useEffect(() => {
+	useEffect((): void => {
 		setCurrentValue(0);
 		if (shelfMap === undefined) {
+			ToastMessage({
+				title: "Noget gik galt!",
+				message: "Hylderne er ikke defineret. Prøv at genindlæse siden.",
+				type: "error",
+			});
 			throw new TypeError("shelfMap from useShelfContext is undefined");
 		}
 		const shelfArray = shelfMap.shelves.get(rack);
@@ -29,43 +34,51 @@ const ShelfBox: React.FC<ShelfProps> = ({ index, rack }) => {
 				setAvailableSpace(space);
 			}
 		} else {
-			//console.log("Setting space to 0");
 			setAvailableSpace(0);
 		}
 	}, [shelfMap, rack, index]);
 
-	const getMax = (currentlyPlaced: number) => {
+	const getMax = (currentlyPlaced: number): number => {
 		if (batchAmount === null) {
+			ToastMessage({
+				title: "Uventet fejl",
+				message: "Forventede en ikke-nul værdi for batch mængde",
+				type: "error",
+			});
 			throw new TypeError(
 				"Expected a non-null value for batchAmount, getMax should only be called when a batch is selected and then batchAmount should not be null",
 			);
 		}
-
-		//console.log(`batchAmount: ${batchAmount}, placedAmount: ${placedAmount}, ${currentlyPlaced}`);
-		const valueDifference = currentlyPlaced - currentValue; // Get the difference from the new input and the previous input
-		const leftToBePlaced =
+		const valueDifference: number = currentlyPlaced - currentValue; // Get the difference from the new input and the previous input
+		const leftToBePlaced: number =
 			batchAmount - placedAmount + currentlyPlaced - valueDifference; // Calculate the amount left to be placed
-		//console.log(`leftToBePlaced: ${leftToBePlaced}`);
 		return leftToBePlaced < availableSpace ? leftToBePlaced : availableSpace; // Return the smaller of leftToBePlaced and availableSpace
 	};
 
 	const validateAndSetInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-		let input = Number(event.target.value);
-		const max = getMax(input);
+		let input: number = Number(event.target.value);
+		const max: number = getMax(input);
 		if (input < 0) {
 			//Input may not be negative
 			input = 0;
+			ToastMessage({
+				title: "Noget gik galt!",
+				message: "Input må ikke være negativt",
+				type: "error",
+			});
 		} else if (input > max) {
 			//Input may not be more than max
 			input = max;
+			ToastMessage({
+				title: "Noget gik galt!",
+				message: "Input må ikke over maksimum",
+				type: "error",
+			});
 		}
 
-		//console.log("Set input to: " + input + ", max is: " + max);
-		//event.target.value = input.toString();
-		const valueDifference = input - currentValue;
-		const newPlacedAmount = placedAmount + valueDifference;
+		const valueDifference: number = input - currentValue;
+		const newPlacedAmount: number = placedAmount + valueDifference;
 		setPlacedAmount(newPlacedAmount);
-		//console.log("Placed amount was before: " + placedAmount + " and is now: " + newPlacedAmount);
 		setCurrentValue(input);
 	};
 
@@ -78,7 +91,7 @@ const ShelfBox: React.FC<ShelfProps> = ({ index, rack }) => {
 						type="number"
 						min={0}
 						value={currentValue}
-						onChange={(e) => {
+						onChange={(e): void => {
 							validateAndSetInput(e);
 						}}
 						className="w-12 h-4 bg-sidebarcolor rounded border border-colorprimary text-black text-center text-sm"
