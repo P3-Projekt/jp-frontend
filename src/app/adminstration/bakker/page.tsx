@@ -5,31 +5,30 @@ import Image from 'next/image';
 import { useRouter } from "next/navigation";
 import { fetchWithAuth } from "@/components/authentication/authentication";
 
-
-//bakke type interface
+// Definerer interface til bakke type data
 type BakkeType = {
-  name: string;
-  lengthCm: number;
-  widthCm: number;
+  name: string;    
+  lengthCm: number; 
+  widthCm: number;  
 };
 
 const BakkerPage = () => {
   const router = useRouter();
-  const [bakketyper, setBakketyper] = useState<BakkeType[]>([]);
-  const [formData, setFormData] = useState<BakkeType>({
+  const [bakketyper, setBakketyper] = useState<BakkeType[]>([]); // Liste over bakke typer hentet fra backend
+  const [formData, setFormData] = useState<BakkeType>({ // Formular data for at oprette ny bakke type
     name: '',
     lengthCm: 0,
     widthCm: 0,
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false); // Indikator for dataindlæsning
+  const [error, setError] = useState<string | null>(null); // Fejlbeskeder til brugeren
 
-  // hent traytypes når siden loades
+  // Hent bakke typer fra backend når siden loades første gang
   useEffect(() => {
     fetchTrayTypes();
   }, []);
 
-  // funktion til at hente bakketyper fra backend
+  // Funktion til at hente bakke typer fra backend
   const fetchTrayTypes = async () => {
     setIsLoading(true);
     setError(null);
@@ -43,33 +42,33 @@ const BakkerPage = () => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(
-          errorText || "Kunne ikke hente bakke typer fra databasen",
-        );
+        throw new Error(errorText || "Kunne ikke hente bakke typer fra databasen");
       }
 
       const data = await response.json();
-      setBakketyper(data);
+      setBakketyper(data); // Opdater liste over bakke typer
     } catch (err) {
       setError("Kunne ikke hente bakke typer fra databasen");
-      console.error("Kunne ikke hente bakke typer fra databasen:", err);
+      console.error("Fejl ved hentning af bakke typer:", err);
 
       if (err instanceof Error && err.message === 'No authentication token found') {
-        router.push('/login');
+        router.push('/login'); // Naviger til login hvis token mangler
       }
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Håndtere bakke input ændringer
+  // Håndter ændringer i formular felter
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: name === 'name' ? value : +value }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === 'name' ? value : +value, // Konverter numeriske felter
+    }));
   };
 
-
-  // håndtere sendingen af formen så en bakke type skabes i backend
+  // Håndter formular indsendelse for at oprette ny bakke type
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -81,11 +80,7 @@ const BakkerPage = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          name: formData.name,
-          lengthCm: formData.lengthCm,
-          widthCm: formData.widthCm
-        })
+        body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
@@ -93,24 +88,21 @@ const BakkerPage = () => {
         throw new Error(errorText || 'Kunne ikke skabe bakke typen');
       }
 
-      // genopfrisk listen af bakke typer
-      await fetchTrayTypes();
-
-      // nulstil formen
-      setFormData({ name: '', lengthCm: 0, widthCm: 0 });
+      await fetchTrayTypes(); // Opdater liste efter oprettelse
+      setFormData({ name: '', lengthCm: 0, widthCm: 0 }); // Nulstil formular
     } catch (err: any) {
       if (err.message.includes('already exists')) {
-        setError('Bakke typen eksistere allerede');
+        setError('Bakke typen eksisterer allerede');
       } else {
         setError('Kunne ikke skabe bakke typen');
       }
-      console.error('Kunne ikke skabe bakke typen:', err);
+      console.error('Fejl ved oprettelse af bakke type:', err);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // funktion til at slette bakke typer
+  // Funktion til at slette en bakke type
   const handleDelete = async (name: string) => {
     setIsLoading(true);
     setError(null);
@@ -119,7 +111,7 @@ const BakkerPage = () => {
       const response = await fetchWithAuth(`http://localhost:8080/TrayType/${name}`, {
         method: 'DELETE',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
       });
 
@@ -128,11 +120,10 @@ const BakkerPage = () => {
         throw new Error(errorText || 'Kunne ikke slette bakke typen');
       }
 
-      // Genopfrisk tabelen med bakker
-      await fetchTrayTypes();
+      await fetchTrayTypes(); // Opdater liste efter sletning
     } catch (err) {
       setError('Kunne ikke slette bakke typen');
-      console.error('Kunne ikke slette bakke typen:', err);
+      console.error('Fejl ved sletning af bakke type:', err);
     } finally {
       setIsLoading(false);
     }
@@ -142,14 +133,14 @@ const BakkerPage = () => {
     <div className="p-8">
       <h1 className="text-3xl font-bold mb-6 text-center">BAKKE TYPER</h1>
 
-      {/*box til fejlbeskeder i toppen*/}
+      {/* Fejlmeddelelse øverst på siden */}
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
           {error}
         </div>
       )}
 
-      {/* Form til at lave nye bakke typer*/}
+      {/* Formular til oprettelse af nye bakke typer */}
       <form
         className="bg-sidebarcolor p-6 rounded-lg shadow-xl mb-8 border"
         onSubmit={handleSubmit}
@@ -157,7 +148,7 @@ const BakkerPage = () => {
         <h2 className="text-lg font-semibold mb-6">OPRET EN BAKKE TYPE</h2>
         <div className="flex gap-6 grid grid-cols-3">
 
-          {/*Navne felt*/}
+          {/* Navne felt */}
           <div className="flex-col">
             <label className="font-semibold">Navn:</label>
             <input
@@ -173,7 +164,7 @@ const BakkerPage = () => {
             />
           </div>
 
-          {/*Længde felt*/}
+          {/* Længde felt */}
           <div className="flex-col">
             <label className="font-semibold">Længde:</label>
             <input
@@ -190,7 +181,7 @@ const BakkerPage = () => {
             />
           </div>
 
-          {/*Bredde felt*/}
+          {/* Bredde felt */}
           <div className="flex-col">
             <label className="font-semibold">Bredde:</label>
             <input
@@ -208,18 +199,17 @@ const BakkerPage = () => {
           </div>
         </div>
 
-        {/*Opret knap*/}
+        {/* Knap til oprettelse */}
         <button
           type="submit"
           className="transition w-full bg-green-700 font-semibold hover:bg-green-800 text-white py-2 mt-4 rounded-2xl"
-
           disabled={isLoading}
         >
-          {isLoading ? 'HENTER DATA FRA BACKEND' : 'OPRET'}
+          {isLoading ? 'HENTER DATA FRA BACKEND' : 'OPRET BAKKE TYPE'}
         </button>
       </form>
 
-      {/* Table til bakke typer */}
+      {/* Tabel til visning af bakke typer */}
       <div className="bg-sidebarcolor p-6 rounded-lg shadow-xl border mb-8">
         <h2 className="text-lg font-semibold mb-6">BAKKE TYPE OVERSIGT</h2>
         <table className="w-full table-auto border-collapse">
