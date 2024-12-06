@@ -29,7 +29,7 @@ const ShelfBox: React.FC<ShelfProps> = ({ index, rack }) => {
 		}
 		const shelfArray = shelfMap.shelves.get(rack);
 		if (shelfArray !== undefined) {
-			const space: number = shelfArray.at(index);
+			const space = shelfArray.at(index);
 			if (space) {
 				setAvailableSpace(space);
 			}
