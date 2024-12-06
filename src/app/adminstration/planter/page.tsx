@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from "next/navigation";
+import { fetchWithAuth } from "@/components/authentication/authentication";
 
 //plantetype interface
 interface PlantType {
@@ -38,35 +39,15 @@ const PlanterPage = () => {
     fetchPlantTypes();
   }, []);
 
-    // When checking authentication
-    const authToken = localStorage.getItem('authToken');
-    if (authToken && isTokenExpired(authToken)) {
-      // Clear the expired token and redirect to login
-      localStorage.removeItem('authToken');
-      router.push('/login');
-    }
-  
-    function isTokenExpired(token: string) {
-      try {
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace('-', '+').replace('_', '/');
-        const payload = JSON.parse(window.atob(base64));
-        return payload.exp < Date.now() / 1000;
-      } catch (error) {
-        return true; // If token is invalid, consider it expired
-      }
-    }
-
   // function til at hente plantetyper fra backend
   const fetchPlantTypes = async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch('http://localhost:8080/PlantTypes', {
+      const response = await fetchWithAuth('http://localhost:8080/PlantTypes', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          "Authorization": `Bearer ${authToken}`
         },
       });
 
@@ -126,11 +107,10 @@ const PlanterPage = () => {
     };
 
     try {
-      const response = await fetch('http://localhost:8080/PlantType', {
+      const response = await fetchWithAuth('http://localhost:8080/PlantType', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          "Authorization": `Bearer ${authToken}`
         },
         body: JSON.stringify(createPlantTypeRequest),
       });
@@ -143,7 +123,7 @@ const PlanterPage = () => {
       // hent plantetyper fra backend igen
       await fetchPlantTypes();
 
-      // reset af formen
+      // reset formen
       setFormData({
         navn: '',
         spiring: '',
@@ -169,11 +149,10 @@ const PlanterPage = () => {
     setError(null);
 
     try {
-      const response = await fetch(`http://localhost:8080/PlantType/${plantTypeName}`, {
+      const response = await fetchWithAuth(`http://localhost:8080/PlantType/${plantTypeName}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          "Authorization": `Bearer ${authToken}`
         },
       });
 

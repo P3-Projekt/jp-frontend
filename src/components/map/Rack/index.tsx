@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import RackDialog, { setRackToBeDisplayed } from "../Dialog/RackDialog";
 import ShelfBox from "@/components/Rack/Shelf";
+import { fetchWithAuth } from "@/components/authentication/authentication";
 
 import { DisplayMode } from "@/components/map/CanvasComponent";
 
@@ -102,7 +103,7 @@ const DraggableBox: React.FC<DraggableBoxProps> = ({
 										});
 									} else {
 										// remove shelf from top
-										fetch(`http://localhost:8080/Rack/${rackData.id}/Shelf`, {
+										fetchWithAuth(`http://localhost:8080/Rack/${rackData.id}/Shelf`, {
 											method: "DELETE",
 										})
 											.then((response) => {
@@ -148,7 +149,7 @@ const DraggableBox: React.FC<DraggableBoxProps> = ({
 										return;
 									} else {
 										// Add shelf to top
-										fetch(`http://localhost:8080/Rack/${rackData.id}/Shelf`, {
+										fetchWithAuth(`http://localhost:8080/Rack/${rackData.id}/Shelf`, {
 											method: "POST",
 										})
 											.then((response) => {

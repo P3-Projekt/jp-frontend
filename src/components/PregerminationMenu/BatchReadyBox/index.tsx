@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { fetchWithAuth } from "@/components/authentication/authentication";
 import {
 	useShelfContext,
 	usePlacedAmountContext,
@@ -40,7 +41,7 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
 
 	const fetchMaxBatchesOnShelves = async (batchId: number) => {
 		try {
-			const response = await fetch(
+			const response = await fetchWithAuth(
 				`http://localhost:8080/Batch/${batchId}/MaxAmountOnShelves`,
 			);
 

@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from "next/navigation";
+import { fetchWithAuth } from "@/components/authentication/authentication";
+
 
 //bakke type interface
 type BakkeType = {
@@ -32,11 +34,10 @@ const BakkerPage = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch("http://localhost:8080/TrayTypes", {
+      const response = await fetchWithAuth("http://localhost:8080/TrayTypes", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${authToken}`
         },
       });
 
@@ -61,25 +62,6 @@ const BakkerPage = () => {
     }
   };
 
-  function isTokenExpired(token: string) {
-    try {
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace('-', '+').replace('_', '/');
-      const payload = JSON.parse(window.atob(base64));
-      return payload.exp < Date.now() / 1000;
-    } catch (error) {
-      return true; // If token is invalid, consider it expired
-    }
-  }
-
-  // When checking authentication
-  const authToken = localStorage.getItem('authToken');
-  if (authToken && isTokenExpired(authToken)) {
-    // Clear the expired token and redirect to login
-    localStorage.removeItem('authToken');
-    router.push('/login');
-  }
-
   // Håndtere bakke input ændringer
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -94,11 +76,10 @@ const BakkerPage = () => {
     setError(null);
 
     try {
-      const response = await fetch('http://localhost:8080/TrayType', {
+      const response = await fetchWithAuth('http://localhost:8080/TrayType', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          "Authorization": `Bearer ${authToken}`
         },
         body: JSON.stringify({
           name: formData.name,
@@ -135,10 +116,10 @@ const BakkerPage = () => {
     setError(null);
 
     try {
-      const response = await fetch(`http://localhost:8080/TrayType/${name}`, {
+      const response = await fetchWithAuth(`http://localhost:8080/TrayType/${name}`, {
         method: 'DELETE',
         headers: {
-          'Content-Type': 'application/json', "Authorization": `Bearer ${authToken}`
+          'Content-Type': 'application/json'
         },
       });
 

@@ -5,6 +5,7 @@ import BatchReadyBox from "@/components/PregerminationMenu/BatchReadyBox/index";
 import { ShelfProvider } from "./context";
 import { PlacedAmountProvider } from "./context";
 import RackBox from "@/components/Rack";
+import { fetchWithAuth } from "@/components/authentication/authentication";
 
 interface Batch {
 	batchId: number;
@@ -41,7 +42,7 @@ const PreGerminationPage: React.FC = () => {
 	useEffect(() => {
 		const fetchBatchData = async () => {
 			try {
-				const response = await fetch(
+				const response = await fetchWithAuth(
 					"http://localhost:8080/PreGerminatingBatches",
 				); // Fetch pregerminating batches
 
@@ -86,7 +87,7 @@ const PreGerminationPage: React.FC = () => {
 
 		const fetchRackData = async () => {
 			try {
-				const response = await fetch("http://localhost:8080/Racks");
+				const response = await fetchWithAuth("http://localhost:8080/Racks");
 
 				if (!response.ok) {
 					throw new Error("Fetching rack data failed");

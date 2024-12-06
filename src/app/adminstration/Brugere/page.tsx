@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from "next/navigation";
+import { fetchWithAuth } from "@/components/authentication/authentication";
 
 interface User {
   name: string;
@@ -27,42 +28,15 @@ const BrugereSide = () => {
     fetchUsers();
   }, []);
 
-  // When checking authentication
-  const authToken = localStorage.getItem('authToken');
-  if (authToken && isTokenExpired(authToken)) {
-    // Clear the expired token and redirect to login
-    localStorage.removeItem('authToken');
-    router.push('/login');
-  }
-
-  function isTokenExpired(token: string) {
-    try {
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace('-', '+').replace('_', '/');
-      const payload = JSON.parse(window.atob(base64));
-      return payload.exp < Date.now() / 1000;
-    } catch (error) {
-      return true; // If token is invalid, consider it expired
-    }
-  }
-
   // funktion til at hente brugere fra backend
   const fetchUsers = async () => {
     setIsLoading(true);
     setError(null);
     try {
-      // Retrieve the auth token from local storage
-      const authToken = localStorage.getItem('authToken');
-
-      // Check if token exists
-      if (!authToken) {
-        throw new Error('No authentication token found');
-      }
-      const response = await fetch('http://localhost:8080/Users', {
+      const response = await fetchWithAuth('http://localhost:8080/Users', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          "Authorization": `Bearer ${authToken}`
         },
       });
 
@@ -102,11 +76,10 @@ const BrugereSide = () => {
     setError(null);
 
     try {
-      const response = await fetch('http://localhost:8080/User', {
+      const response = await fetchWithAuth('http://localhost:8080/User', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          "Authorization": `Bearer ${authToken}`
         },
         body: JSON.stringify({
           name: formData.name,
@@ -143,11 +116,10 @@ const BrugereSide = () => {
     setError(null);
 
     try {
-      const response = await fetch(`http://localhost:8080/Users/${name}/activate`, {
+      const response = await fetchWithAuth(`http://localhost:8080/Users/${name}/activate`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          "Authorization": `Bearer ${authToken}`
         },
       });
 
@@ -172,11 +144,10 @@ const BrugereSide = () => {
     setError(null);
 
     try {
-      const response = await fetch(`http://localhost:8080/Users/${name}`, {
+      const response = await fetchWithAuth(`http://localhost:8080/Users/${name}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          "Authorization": `Bearer ${authToken}`
         },
       });
 

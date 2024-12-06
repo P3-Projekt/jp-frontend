@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from "next/navigation";
+import { fetchWithAuth } from "@/components/authentication/authentication";
 
 // Batch type interface
 type BatchType = {
@@ -40,28 +41,14 @@ const BatchesPage = () => {
     // hent batches, plantetyper, og bakke typer ved load a siden
     useEffect(() => {
         const authToken = localStorage.getItem('authToken');
-        
         if (authToken) {
-          //få brugernavn fra token
-          const username = extractUsernameFromToken(authToken);
-          setCurrentUser(username);
-    
-          // Check if token is expired
-          if (isTokenExpired(authToken)) {
-            // fjern token og send til login page hvis token er udløbet
-            localStorage.removeItem('authToken');
-            router.push('/login');
-          } else {
-            // Hent data hvis token er valid
-            fetchBatches();
-            fetchPlantTypes();
-            fetchTrayTypes();
-          }
-        } else {
-          // No token, redirect to login
-          router.push('/login');
+            const username = extractUsernameFromToken(authToken);
+            setCurrentUser(username);
         }
-      }, []);
+        fetchBatches();
+        fetchPlantTypes();
+        fetchTrayTypes();
+    }, []);
 
     function extractUsernameFromToken(token: string): string {
         try {
@@ -75,35 +62,15 @@ const BatchesPage = () => {
         }
     }
 
-    function isTokenExpired(token: string) {
-        try {
-            const base64Url = token.split('.')[1];
-            const base64 = base64Url.replace('-', '+').replace('_', '/');
-            const payload = JSON.parse(window.atob(base64));
-            return payload.exp < Date.now() / 1000;
-        } catch (error) {
-            return true; // If token is invalid, consider it expired
-        }
-    }
-
-    // When checking authentication
-    const authToken = localStorage.getItem('authToken');
-    if (authToken && isTokenExpired(authToken)) {
-        // Clear the expired token and redirect to login
-        localStorage.removeItem('authToken');
-        router.push('/login');
-    }
-
     // hent batches fra backend
     const fetchBatches = async () => {
         setIsLoading(true);
         setError(null);
         try {
-            const response = await fetch('http://localhost:8080/Batches', {
+            const response = await fetchWithAuth('http://localhost:8080/Batches', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    "Authorization": `Bearer ${authToken}`
                 },
             });
 
@@ -127,11 +94,10 @@ const BatchesPage = () => {
     // hent plante typer fra backend
     const fetchPlantTypes = async () => {
         try {
-            const response = await fetch('http://localhost:8080/PlantTypes', {
+            const response = await fetchWithAuth('http://localhost:8080/PlantTypes', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    "Authorization": `Bearer ${authToken}`
                 },
             });
 
@@ -150,11 +116,10 @@ const BatchesPage = () => {
     // hent traytypes fra backend
     const fetchTrayTypes = async () => {
         try {
-            const response = await fetch('http://localhost:8080/TrayTypes', {
+            const response = await fetchWithAuth('http://localhost:8080/TrayTypes', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    "Authorization": `Bearer ${authToken}`
                 },
             });
 
@@ -187,11 +152,10 @@ const BatchesPage = () => {
         const authToken = localStorage.getItem('authToken');
 
         try {
-            const response = await fetch('http://localhost:8080/Batch', {
+            const response = await fetchWithAuth('http://localhost:8080/Batch', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    "Authorization": `Bearer ${authToken}`
                 },
                 body: JSON.stringify({
                     plantTypeId: formData.plantTypeId,
@@ -327,18 +291,20 @@ const BatchesPage = () => {
                                 <td colSpan={7} className="text-center py-4">Indlæser batches...</td>
                             </tr>
                         ) : (
-                            batches.map((batch) => (
-                                <tr key={batch.batchId} className="odd:bg-white even:bg-gray-200">
-                                    <td className="p-2 border text-center">{batch.batchId}</td>
-                                    <td className="p-2 border text-center">{batch.createdBy}</td>
-                                    <td className="p-2 border text-center">{batch.plantName}</td>
-                                    <td className="p-2 border text-center">{batch.trayName}</td>
-                                    <td className="p-2 border text-center">{batch.amount}</td>
-                                    <td className="p-2 border text-center">{batch.creationDate}</td>
-                                    <td className="p-2 border text-center">{batch.harvestDate}</td>
-
-                                </tr>
-                            ))
+                            batches
+                                .slice() // logik for at sortere i omvendt rækkefølge af hvad den ellers ville gøre
+                                .sort((a, b) => b.batchId - a.batchId)
+                                .map((batch) => (
+                                    <tr key={batch.batchId} className="odd:bg-white even:bg-gray-200">
+                                        <td className="p-2 border text-center">{batch.batchId}</td>
+                                        <td className="p-2 border text-center">{batch.createdBy}</td>
+                                        <td className="p-2 border text-center">{batch.plantName}</td>
+                                        <td className="p-2 border text-center">{batch.trayName}</td>
+                                        <td className="p-2 border text-center">{batch.amount}</td>
+                                        <td className="p-2 border text-center">{batch.creationDate}</td>
+                                        <td className="p-2 border text-center">{batch.harvestDate}</td>
+                                    </tr>
+                                ))
                         )}
                     </tbody>
                 </table>
