@@ -8,7 +8,10 @@ import { DisplayMode } from "@/components/map/CanvasComponent";
 
 import { ShelfData, Shelf } from "@/components/map/Shelf";
 
-import { ToastMessage, UnexpectedErrorToast } from "@/functions/ToastMessage/ToastMessage";
+import {
+	ToastMessage,
+	UnexpectedErrorToast,
+} from "@/functions/ToastMessage/ToastMessage";
 
 import { Plus, Minus, Trash2 } from "lucide-react";
 import { LoadingSpinner } from "@/components/LoadingScreen/LoadingSpinner";
@@ -76,11 +79,11 @@ const Rack: React.FC<RackProps> = ({
 			}
 		>
 			<div
-				className={
-					`absolute flex flex-col rounded-lg p-1 outline outline-1 outline-offset-0 ${className} 
-					${(overrideColor ? overrideColor : " bg-colorprimary ") +
-					(isSelected ? " scale-105 border-black " : "cursor-grab")}`
-				}
+				className={`absolute flex flex-col rounded-lg p-1 outline outline-1 outline-offset-0 ${className} 
+					${
+						(overrideColor ? overrideColor : " bg-colorprimary ") +
+						(isSelected ? " scale-105 border-black " : "cursor-grab")
+					}`}
 				onMouseDown={mouseDownHandlerWrapper}
 				style={{
 					left: rackData.position.x, // Adjust for pan offset visually only
@@ -260,7 +263,7 @@ const Rack: React.FC<RackProps> = ({
 										ToastMessage({
 											title: "Noget gik galt",
 											message: "Tøm reolen før du kan fjerne den.",
-											type: "error"
+											type: "error",
 										});
 										return;
 									} else {

@@ -94,15 +94,16 @@ export const EditMenu: React.FC<{
 	};
 
 	const handleMouseMove = useCallback(
-		(e: MouseEvent) : void => {
+		(e: MouseEvent): void => {
 			if (
 				isMouseDown &&
 				elementRef.current &&
 				canvasRef.current &&
 				canvasComponentRef.current
 			) {
-				const containerOffset : DOMRect = elementRef.current.getBoundingClientRect();
-				const canvasOffset : DOMRect = canvasRef.current.getBoundingClientRect();
+				const containerOffset: DOMRect =
+					elementRef.current.getBoundingClientRect();
+				const canvasOffset: DOMRect = canvasRef.current.getBoundingClientRect();
 
 				const { canvasRelativeX, canvasRelativeY } =
 					getPositionRelativeToCanvas(e);
@@ -119,11 +120,11 @@ export const EditMenu: React.FC<{
 					setIsRackRed(false);
 				}
 
-				const canvasRelativeToContainerX : number =
+				const canvasRelativeToContainerX: number =
 					canvasOffset.left -
 					containerOffset.left +
 					canvasComponentRef.current.getOffset().x;
-				const canvasRelativeToContainerY : number =
+				const canvasRelativeToContainerY: number =
 					canvasOffset.top -
 					containerOffset.top +
 					canvasComponentRef.current.getOffset().y;

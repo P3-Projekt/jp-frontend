@@ -6,7 +6,7 @@ interface ToastMessageProps {
 	type: "success" | "error" | "default";
 }
 
-export function UnexpectedErrorToast(){
+export function UnexpectedErrorToast() {
 	return ToastMessage({
 		title: "Noget gik galt",
 		message: "Kunne ikke slette reolen - prøv igen.",

@@ -29,7 +29,7 @@ export const snapToGrid = (value: number) =>
 
 async function updateRackPosition(rackData: RackData): Promise<void> {
 	try {
-		const response : Response = await fetchWithAuth(
+		const response: Response = await fetchWithAuth(
 			"http://localhost:8080/Rack/" + rackData.id + "/Position",
 			{
 				method: "PUT",
