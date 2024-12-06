@@ -33,7 +33,7 @@ const BakkerPage = () => {
 		setIsLoading(true);
 		setError(null);
 		try {
-			// Sender en anmodning til backend for at hente bakke typer
+			// Sender en anmodning (med token) til backend for at hente bakke typer
 			const response = await fetchWithAuth("http://localhost:8080/TrayTypes", {
 				method: "GET",
 				headers: {
@@ -84,7 +84,7 @@ const BakkerPage = () => {
 		setError(null);
 
 		try {
-			// Sender en anmodning til backend for at oprette ny bakke type
+			// Sender en anmodning (med token) til backend for at oprette ny bakke type
 			const response = await fetchWithAuth("http://localhost:8080/TrayType", {
 				method: "POST",
 				headers: {
@@ -121,7 +121,7 @@ const BakkerPage = () => {
 		setError(null);
 
 		try {
-			// Sender en anmodning til backend for at slette en bakke type
+			// Sender en anmodning (med token) til backend for at slette en bakke type
 			const response = await fetchWithAuth(
 				`http://localhost:8080/TrayType/${name}`,
 				{
@@ -272,6 +272,7 @@ const BakkerPage = () => {
 											/>
 										</button>
 									</td>
+
 									{/* Detaljer for hver bakke type */}
 									<td className="p-2 border text-center">{bakke.name}</td>
 									<td className="p-2 border text-center">{bakke.lengthCm}</td>

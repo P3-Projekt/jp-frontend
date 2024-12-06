@@ -13,7 +13,7 @@ interface PlantType {
 	wateringSchedule: number[];
 }
 
-// Mapping til at oversætte positioner til mere læsbare tekster
+// Mapping til at oversætte positioner til dansk
 const positionDisplayMap = {
 	NoPreferred: "Ligegyldigt",
 	Low: "Nederst",
@@ -66,7 +66,6 @@ const PlanterPage = () => {
 			const data = await response.json();
 			setPlanterTyper(data);
 		} catch (error) {
-			// Vis fejlbesked hvis hentning fejler
 			setError("Kunne ikke hente plante typer fra database");
 			console.error("Kunne ikke hente plante typer fra database:", error);
 		} finally {
@@ -118,7 +117,7 @@ const PlanterPage = () => {
 		};
 
 		try {
-			// Send anmodning til backend for at oprette ny plantetype
+			// Send anmodning (med token) til backend for at oprette ny plantetype
 			const response = await fetchWithAuth("http://localhost:8080/PlantType", {
 				method: "POST",
 				headers: {
@@ -161,7 +160,7 @@ const PlanterPage = () => {
 		setError(null);
 
 		try {
-			// Send anmodning til backend for at slette plantetype
+			// Send anmodning (med token) til backend for at slette plantetype
 			const response = await fetchWithAuth(
 				`http://localhost:8080/PlantType/${plantTypeName}`,
 				{

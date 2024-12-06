@@ -70,7 +70,7 @@ const BatchesPage = () => {
 		setIsLoading(true);
 		setError(null);
 		try {
-			// Send anmodning til backend
+			// Send anmodning (med token) til backend
 			const response = await fetchWithAuth("http://localhost:8080/Batches", {
 				method: "GET",
 				headers: {
@@ -98,7 +98,7 @@ const BatchesPage = () => {
 	// Hent plantetyper fra backend
 	const fetchPlantTypes = async () => {
 		try {
-			// Send anmodning for at hente plantetyper
+			// Send anmodning (med token) for at hente plantetyper
 			const response = await fetchWithAuth("http://localhost:8080/PlantTypes", {
 				method: "GET",
 				headers: {
@@ -121,7 +121,7 @@ const BatchesPage = () => {
 	// Hent bakketyper fra backend
 	const fetchTrayTypes = async () => {
 		try {
-			// Send anmodning for at hente bakketyper
+			// Send anmodning (med token) for at hente bakketyper
 			const response = await fetchWithAuth("http://localhost:8080/TrayTypes", {
 				method: "GET",
 				headers: {
@@ -190,8 +190,6 @@ const BatchesPage = () => {
 				amount: 0,
 			});
 		} catch (err: unknown) {
-			// Use 'unknown' type instead of 'any'
-			// Type guard to check if err is an Error
 			const errorMessage = err instanceof Error ? err.message : String(err);
 			setError(errorMessage || "Kunne ikke oprette batch");
 			console.error("Kunne ikke oprette batch:", err);
