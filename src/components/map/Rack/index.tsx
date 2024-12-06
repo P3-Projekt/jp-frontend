@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import RackDialog, { setRackToBeDisplayed } from "../Dialog/RackDialog";
+
 import ShelfBox from "@/components/map/ShelfInput";
 
 import { DisplayMode } from "@/components/map/CanvasComponent";
@@ -32,6 +33,7 @@ interface RackProps {
 	overrideColor?: string;
 	removeRack?: () => void;
 	getLocations?: (batchId: number) => string[];
+	className?: string;
 }
 
 const Rack: React.FC<RackProps> = ({
@@ -42,6 +44,7 @@ const Rack: React.FC<RackProps> = ({
 	overrideColor,
 	removeRack,
 	getLocations,
+	className,
 }) => {
 	// State for position and dragging
 	const [showDialog, setShowDialog] = useState<boolean>(false);
@@ -74,9 +77,9 @@ const Rack: React.FC<RackProps> = ({
 		>
 			<div
 				className={
-					"absolute flex flex-col rounded-lg p-1 outline outline-1 outline-offset-0 " +
-					(overrideColor ? overrideColor : "bg-colorprimary ") +
-					(isSelected ? " scale-105 border-black" : "")
+					`absolute flex flex-col rounded-lg p-1 outline outline-1 outline-offset-0 ${className} 
+					${(overrideColor ? overrideColor : " bg-colorprimary ") +
+					(isSelected ? " scale-105 border-black " : "cursor-grab")}`
 				}
 				onMouseDown={mouseDownHandlerWrapper}
 				style={{
@@ -84,7 +87,7 @@ const Rack: React.FC<RackProps> = ({
 					top: rackData.position.y, // Adjust for pan offset visually only
 					width: rackWidth,
 					height: rackHeight,
-					border: isSelected ? "2px solid black" : "none",
+					border: isSelected ? "2px solid black" : "",
 				}}
 			>
 				<div className="rounded-lg mb-1">

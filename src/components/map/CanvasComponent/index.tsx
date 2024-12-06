@@ -9,6 +9,8 @@ import React, {
 import Rack, { RackData, rackHeight, rackWidth } from "@/components/map/Rack";
 import { fetchWithAuth } from "@/components/authentication/authentication";
 import { ToastMessage } from "@/functions/ToastMessage/ToastMessage";
+import { useSearchParams } from "next/navigation";
+import "./style.css";
 
 export enum DisplayMode {
 	view,
@@ -86,6 +88,26 @@ const CanvasComponent = forwardRef<
 	const [loadingRacks, setLoadingRacks] = useState<Map<number, RackData>>(
 		new Map(),
 	);
+	const [highlightedRackId, setHighlightedRackId] = useState<string | null>(
+		null,
+	);
+
+	// Get search params
+	const searchParams = useSearchParams();
+	const highlightedId = searchParams.get("id");
+
+	useEffect(() => {
+		if (highlightedId) {
+			setHighlightedRackId(highlightedId);
+
+			const timer = setTimeout(() => {
+				console.log("clearing");
+				setHighlightedRackId(null);
+			}, 3000);
+
+			return () => clearTimeout(timer);
+		}
+	}, [highlightedId]);
 
 	// Fetch racks from the backend
 	useEffect((): void => {
@@ -375,6 +397,9 @@ const CanvasComponent = forwardRef<
 						mouseDownHandler={() => {
 							rackMouseDownHandler(index);
 						}}
+						className={
+							Number(highlightedRackId) === box.id ? "highlighted blink" : ""
+						}
 						removeRack={() => {
 							removeRack(index);
 						}}
