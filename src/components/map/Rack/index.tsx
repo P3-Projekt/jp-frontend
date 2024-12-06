@@ -29,8 +29,8 @@ interface RackProps {
 	isSelected: boolean | undefined;
 	mouseDownHandler: ((e: React.MouseEvent<HTMLDivElement>) => void) | undefined;
 	displayMode: DisplayMode;
-	isLoading: boolean;
 	overrideColor?: string;
+	removeRack?: () => void;
 }
 
 const Rack: React.FC<RackProps> = ({
@@ -38,8 +38,8 @@ const Rack: React.FC<RackProps> = ({
 	isSelected,
 	mouseDownHandler,
 	displayMode,
-	isLoading,
 	overrideColor,
+	removeRack
 }) => {
 	// State for position and dragging
 	const [showDialog, setShowDialog] = useState<boolean>(false);
@@ -74,8 +74,8 @@ const Rack: React.FC<RackProps> = ({
 		>
 			<div
 				className={
-					"absolute flex flex-col rounded-lg p-1 outline bg-colorprimary outline-1 outline-offset-0 " +
-					overrideColor +
+					"absolute flex flex-col rounded-lg p-1 outline outline-1 outline-offset-0 " +
+					(overrideColor ? overrideColor : "bg-colorprimary ") +
 					(isSelected ? " scale-105 border-black" : "")
 				}
 				onMouseDown={mouseDownHandlerWrapper}
@@ -101,13 +101,13 @@ const Rack: React.FC<RackProps> = ({
 							<Minus
 								className={
 									"stroke-white " +
-									(displayMode === DisplayMode.edit && !isLoading
+									(displayMode === DisplayMode.edit
 										? "hover:cursor-pointer hover:scale-110 hover:stroke-gray-100"
 										: undefined)
 								}
 								onMouseDown={(e) => {e.stopPropagation();}}
 								onClick={() => {
-									if (displayMode === DisplayMode.editPrototype || isLoading) {
+									if (displayMode === DisplayMode.editPrototype) {
 										return;
 									}
 
@@ -126,7 +126,7 @@ const Rack: React.FC<RackProps> = ({
 										});
 									} else {
 										// remove shelf from top
-										fetch(`http://localhost:8080/Rack/${rackData.id}/Shelf`, {
+										fetchWithAuth(`http://localhost:8080/Rack/${rackData.id}/Shelf`, {
 											method: "DELETE",
 										})
 											.then((response) => {
@@ -161,13 +161,13 @@ const Rack: React.FC<RackProps> = ({
 							<Plus
 								className={
 									"stroke-white " +
-									(displayMode === DisplayMode.edit && !isLoading
+									(displayMode === DisplayMode.edit
 										? "hover:cursor-pointer hover:scale-110 hover:stroke-gray-100"
 										: undefined)
 								}
 								onMouseDown={(e) => {e.stopPropagation();}}
 								onClick={() => {
-									if (displayMode === DisplayMode.editPrototype || isLoading) {
+									if (displayMode === DisplayMode.editPrototype) {
 										return;
 									}
 									// Check if there are more or equal to 7 shelves
@@ -181,7 +181,7 @@ const Rack: React.FC<RackProps> = ({
 										return;
 									} else {
 										// Add shelf to top
-										fetch(`http://localhost:8080/Rack/${rackData.id}/Shelf`, {
+										fetchWithAuth(`http://localhost:8080/Rack/${rackData.id}/Shelf`, {
 											method: "POST",
 										})
 											.then((response) => {
@@ -213,23 +213,23 @@ const Rack: React.FC<RackProps> = ({
 							<Trash2
 								className={
 									"stroke-white " +
-									(displayMode === DisplayMode.edit && !isLoading
+									(displayMode === DisplayMode.edit
 										? "hover:cursor-pointer hover:scale-110 hover:stroke-gray-100"
 										: undefined)
 								}
 								onMouseDown={(e) => {e.stopPropagation();}}
 								onClick={() => {
-									if (displayMode === DisplayMode.editPrototype || isLoading) {
+									if (displayMode === DisplayMode.editPrototype) {
 										return;
 									}
 									// Check if rack is empty
-									if (rackShelves.length != 0) {
+									if (rackShelves.reduce((acc, shelf) => acc + shelf.batches.length, 0) != 0) {
 										// send Toast as error message!
 										toast({
 											variant: "destructive",
 											title: "Noget gik galt",
 											description:
-												"Reolen skal være tom for at kunne fjerne den.",
+												"Reolen skal være tom for batches for at kunne slette den",
 										});
 										return;
 									} else {
@@ -248,7 +248,9 @@ const Rack: React.FC<RackProps> = ({
 													});
 													throw new Error("Network response was not ok");
 												} else {
-													console.log("Rack deleted")
+													if(removeRack){
+														removeRack();
+													}
 												}
 											})
 											.catch((err) => {
@@ -269,7 +271,7 @@ const Rack: React.FC<RackProps> = ({
 
 				{/* Shelf container */}
 				<div className="flex flex-1 flex-col space-y-1">
-					{isLoading ? (
+					{displayMode === DisplayMode.loading ? (
 						<LoadingSpinner
 							size={50}
 							className="stroke-white container mt-10"

@@ -21,6 +21,7 @@ export enum DisplayMode {
 	edit,
 	editPrototype,
 	input,
+	loading
 }
 
 // Grid size for snapping
@@ -78,7 +79,7 @@ const CanvasComponent = forwardRef<
 	const [panStart, setPanStart] = useState({ x: 0, y: 0 });
 	const [isPanning, setIsPanning] = useState(false);
 	const [hasBeenMoved, setHasBeenMoved] = useState(false);
-	const [loadingRackIndexes, setLoadingRackIndexes] = useState<number[]>([]);
+	const [loadingRacks, setLoadingRacks] = useState<Map<number, RackData>>(new Map());
 
 	// Fetch racks from the backend
 	useEffect(() => {
@@ -102,17 +103,16 @@ const CanvasComponent = forwardRef<
 	}, []);
 
 	const addNewRackFetch = useCallback(
-		async (xCoordinate: number, yCoordinate: number, index: number) => {
+		async (tempId : number, data : RackData) => {
 			try {
-				setLoadingRackIndexes([...loadingRackIndexes, index]);
 				const response = await fetchWithAuth("http://localhost:8080/Rack", {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
 					},
 					body: JSON.stringify({
-						xCoordinate: xCoordinate,
-						yCoordinate: yCoordinate,
+						xCoordinate: data.position.x,
+						yCoordinate: data.position.y,
 					}),
 				});
 
@@ -121,19 +121,18 @@ const CanvasComponent = forwardRef<
 				}
 
 				const newRack: RackData = await response.json();
-				console.log("New rack", newRack);
-				console.log(racks.length);
-				const newRacks: RackData[] = racks.map((box, i) =>
-					i === index ? newRack : box,
-				);
-				console.log(newRacks);
+				//Remove from loading
+				const newLoadingRacks = new Map(loadingRacks);
+				newLoadingRacks.delete(tempId);
+				setLoadingRacks(newLoadingRacks);
+				//Add to racks
+				const newRacks = [...racks, newRack];
 				setRacks(newRacks);
-				setLoadingRackIndexes(loadingRackIndexes.filter((i) => i !== index));
 			} catch (e) {
 				console.error("Error adding new rack: " + e);
 			}
 		},
-		[racks, loadingRackIndexes],
+		[racks, loadingRacks],
 	);
 
 	const isPositionOverlapping = useCallback(
@@ -152,19 +151,22 @@ const CanvasComponent = forwardRef<
 			if (isPositionOverlapping({ x: xPosition, y: yPosition })) {
 				return;
 			}
-			const newRackIndex = racks.length;
-			const newRacks = [
-				...racks,
-				{
-					id: -1,
-					position: { x: xPosition, y: yPosition },
-					shelves: [],
-				},
-			];
-			setRacks(newRacks);
-			addNewRackFetch(xPosition, yPosition, newRackIndex);
+
+			const tempId = Math.max(...racks.map((rack) => rack.id), ...loadingRacks.keys()) + 1;
+
+			const newRack = {
+				id: tempId,
+				position: { x: xPosition, y: yPosition },
+				shelves: [],
+			}
+
+			const newLoadingRacks = new Map(loadingRacks);
+			newLoadingRacks.set(tempId, newRack);
+			setLoadingRacks(newLoadingRacks);
+
+			addNewRackFetch(tempId, newRack);
 		},
-		[addNewRackFetch, racks, isPositionOverlapping],
+		[addNewRackFetch, racks, isPositionOverlapping, loadingRacks],
 	);
 
 	useEffect(() => {
@@ -281,6 +283,11 @@ const CanvasComponent = forwardRef<
 		}
 	};
 
+	const removeRack = useCallback(function (indexToRemove: number){
+		const newRacks = racks.filter((box, i) => i !== indexToRemove);
+		setRacks(newRacks);
+	}, [racks]);
+
 	useEffect(() => {
 		document.addEventListener("mouseup", handleMouseUp);
 
@@ -321,10 +328,19 @@ const CanvasComponent = forwardRef<
 						displayMode={displayMode}
 						rackData={box}
 						isSelected={selectedRackIndex === index}
-						isLoading={loadingRackIndexes.some((i) => i === index)}
 						mouseDownHandler={() => {
 							rackMouseDownHandler(index);
 						}}
+						removeRack={() => {removeRack(index)}}
+					/>
+				))}
+				{Array.from(loadingRacks.values()).map((box) => (
+					<Rack
+						key={box.id}
+						displayMode={DisplayMode.loading}
+						rackData={box}
+						isSelected={false}
+						mouseDownHandler={() => {}}
 					/>
 				))}
 			</div>
