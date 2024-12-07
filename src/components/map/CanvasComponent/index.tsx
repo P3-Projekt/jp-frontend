@@ -10,6 +10,7 @@ import Rack, { RackData, rackHeight, rackWidth } from "@/components/map/Rack";
 import { fetchWithAuth } from "@/components/authentication/authentication";
 import { ToastMessage } from "@/functions/ToastMessage/ToastMessage";
 import { useSearchParams } from "next/navigation";
+import { endpoint } from "@/config/config";
 import "./style.css";
 
 export enum DisplayMode {
@@ -30,7 +31,7 @@ export const snapToGrid = (value: number) =>
 async function updateRackPosition(rackData: RackData): Promise<void> {
 	try {
 		const response: Response = await fetchWithAuth(
-			"http://localhost:8080/Rack/" + rackData.id + "/Position",
+			endpoint + "/Rack/" + rackData.id + "/Position",
 			{
 				method: "PUT",
 				headers: {
@@ -101,7 +102,6 @@ const CanvasComponent = forwardRef<
 			setHighlightedRackId(highlightedId);
 
 			const timer = setTimeout(() => {
-				console.log("clearing");
 				setHighlightedRackId(null);
 			}, 3000);
 
@@ -111,7 +111,7 @@ const CanvasComponent = forwardRef<
 
 	// Fetch racks from the backend
 	useEffect((): void => {
-		fetchWithAuth("http://localhost:8080/Racks", {})
+		fetchWithAuth(endpoint + "/Racks", {})
 			.then((response: Response) => {
 				// Check if the response is ok
 				if (!response.ok) {
@@ -144,7 +144,7 @@ const CanvasComponent = forwardRef<
 	const addNewRackFetch = useCallback(
 		async (tempId: number, data: RackData) => {
 			try {
-				const response = await fetchWithAuth("http://localhost:8080/Rack", {
+				const response = await fetchWithAuth(endpoint + "/Rack", {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",

@@ -5,6 +5,7 @@ import {
 	fetchWithAuth,
 	getUser,
 } from "@/components/authentication/authentication";
+import { endpoint } from "@/config/config";
 
 // Interface til at definere batch-typen med dens egenskaber
 type BatchType = {
@@ -59,7 +60,7 @@ const BatchesPage = () => {
 		setError(null);
 		try {
 			// Send anmodning (med token) til backend
-			const response = await fetchWithAuth("http://localhost:8080/Batches", {
+			const response = await fetchWithAuth(endpoint + "/Batches", {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
@@ -74,7 +75,6 @@ const BatchesPage = () => {
 			// Opdater batches state med modtaget data
 			const data = await response.json();
 			setBatches(data);
-			console.log("Hentet Data:", data);
 		} catch (err) {
 			setError("Kunne ikke hente batches fra databasen");
 			console.error("Kunne ikke hente batches fra databasen:", err);
@@ -87,7 +87,7 @@ const BatchesPage = () => {
 	const fetchPlantTypes = async () => {
 		try {
 			// Send anmodning (med token) for at hente plantetyper
-			const response = await fetchWithAuth("http://localhost:8080/PlantTypes", {
+			const response = await fetchWithAuth(endpoint + "/PlantTypes", {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
@@ -110,7 +110,7 @@ const BatchesPage = () => {
 	const fetchTrayTypes = async () => {
 		try {
 			// Send anmodning (med token) for at hente bakketyper
-			const response = await fetchWithAuth("http://localhost:8080/TrayTypes", {
+			const response = await fetchWithAuth(endpoint + "/TrayTypes", {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
@@ -149,7 +149,7 @@ const BatchesPage = () => {
 
 		try {
 			// Send anmodning til backend for at oprette ny batch
-			const response = await fetchWithAuth("http://localhost:8080/Batch", {
+			const response = await fetchWithAuth(endpoint + "/Batch", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",

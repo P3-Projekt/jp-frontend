@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { fetchWithAuth } from "@/components/authentication/authentication";
+import { endpoint } from "@/config/config";
 
 // interface som definerer bruger objekt struktur
 interface User {
@@ -38,7 +39,7 @@ const BrugereSide = () => {
 		setError(null);
 		try {
 			// Send anmodning (med token) for at hente brugere
-			const response = await fetchWithAuth("http://localhost:8080/Users", {
+			const response = await fetchWithAuth(endpoint + "/Users", {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
@@ -84,7 +85,7 @@ const BrugereSide = () => {
 
 		try {
 			// Send anmodning (med token) til backend for at oprette bruger
-			const response = await fetchWithAuth("http://localhost:8080/User", {
+			const response = await fetchWithAuth(endpoint + "/User", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -127,7 +128,7 @@ const BrugereSide = () => {
 		try {
 			// Send anmodning (med token) for at reaktivere bruger
 			const response = await fetchWithAuth(
-				`http://localhost:8080/Users/${name}/activate`,
+				`${endpoint}/Users/${name}/activate`,
 				{
 					method: "PUT",
 					headers: {
@@ -159,15 +160,12 @@ const BrugereSide = () => {
 
 		try {
 			// Send anmodning (med token) for at inaktivere bruger
-			const response = await fetchWithAuth(
-				`http://localhost:8080/Users/${name}`,
-				{
-					method: "DELETE",
-					headers: {
-						"Content-Type": "application/json",
-					},
+			const response = await fetchWithAuth(`${endpoint}/Users/${name}`, {
+				method: "DELETE",
+				headers: {
+					"Content-Type": "application/json",
 				},
-			);
+			});
 
 			// Håndter fejl ved inaktivering
 			if (!response.ok) {

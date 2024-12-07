@@ -10,6 +10,7 @@ import {
 } from "./context";
 import { fetchWithAuth } from "@/components/authentication/authentication";
 import CanvasComponent, { DisplayMode } from "@/components/map/CanvasComponent";
+import { endpoint } from "@/config/config";
 
 interface Batch {
 	batchId: number;
@@ -46,7 +47,7 @@ const PreGerminationPage: React.FC = () => {
 		const fetchBatchData = async () => {
 			try {
 				const response = await fetchWithAuth(
-					"http://localhost:8080/PreGerminatingBatches",
+					endpoint + "/PreGerminatingBatches",
 				); // Fetch pregerminating batches
 
 				if (!response.ok) {
@@ -55,15 +56,12 @@ const PreGerminationPage: React.FC = () => {
 
 				const result = await response.json();
 
-				console.log(result);
-
 				const today = new Date(); // Get todays date
 				const getDaysUntilReady = (dueDate: string) => {
 					const dueDateObj = new Date(dueDate); // Create date object from the dueDate from the Batch object
 					let diffDays = dueDateObj.getTime() - today.getTime(); // Get the difference in milliseconds
 					diffDays = Math.ceil(diffDays / 86400000); // Difference in milliseconds -> difference in days
 
-					//console.log("Today: " + today + ", due at: " + dueDateObj);
 					return diffDays;
 				};
 

@@ -18,6 +18,7 @@ import {
 } from "@/app/pregermination/context";
 import { fetchWithAuth } from "@/components/authentication/authentication";
 import { ToastMessage } from "@/functions/ToastMessage/ToastMessage";
+import { endpoint } from "@/config/config";
 
 interface BatchReadyProps {
 	batchId: number;
@@ -54,7 +55,7 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
 	const fetchMaxBatchesOnShelves = async (batchId: number) => {
 		try {
 			const response = await fetchWithAuth(
-				`http://localhost:8080/Batch/${batchId}/MaxAmountOnShelves`,
+				`${endpoint}/Batch/${batchId}/MaxAmountOnShelves`,
 			);
 
 			if (!response.ok) {
@@ -82,7 +83,7 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
 	const fetchBatchPosition = async (data: unknown) => {
 		try {
 			const response = await fetchWithAuth(
-				`http://localhost:8080/Batch/${batchId}/Position`,
+				`${endpoint}/Batch/${batchId}/Position`,
 				{
 					method: "PUT",
 					headers: {
@@ -94,8 +95,6 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
 					}),
 				},
 			);
-			console.log("Response_________");
-			console.log(JSON.stringify({ location: data, username: "demo" }));
 
 			if (!response.ok) {
 				throw new Error("Updating batch position failed");
@@ -107,9 +106,7 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
 
 	const handleConfirmPlaceClick = async () => {
 		setOpenDialog(false);
-		console.log(batchPositionMap);
 		const obj = mapToObject(batchPositionMap);
-		console.log(obj);
 		await fetchBatchPosition(obj);
 	};
 
@@ -138,17 +135,13 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
 	};
 
 	const handlePlaceClick = () => {
-		console.log("Place button clicked");
-
 		setOpenDialog(true);
 	};
 
 	const handleAutolocateClick = async () => {
-		console.log("Autolocate button clicked");
-
 		try {
 			const response = await fetchWithAuth(
-				`http://localhost:8080/Batch/${batchId}/Autolocate`,
+				`${endpoint}/Batch/${batchId}/Autolocate`,
 			);
 
 			if (!response.ok) {
@@ -158,15 +151,6 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
 			const result = await response.json();
 
 			const autolocateMap = new Map();
-			// for (const [key] of Object.entries(result)) {
-			// 	const innerObject = result[key];
-			// 	const outerKey = Number(key);
-
-			// 	autolocateMap.set(outerKey, new Map());
-			// 	for (const [innerKey, innerValue] of Object.entries(innerObject)) {
-			// 		autolocateMap.get(outerKey).set(Number(innerKey), Number(innerValue));
-			// 	}
-			// }
 
 			createNestedNumberMap(result, autolocateMap);
 
@@ -303,7 +287,6 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
 															})
 														}
 														onClick={() => {
-															console.log("Cancel clicked");
 															setOpenDialog(false);
 														}}
 													>
@@ -317,7 +300,6 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
 															})
 														}
 														onClick={() => {
-															console.log("Confirm clicked");
 															handleConfirmPlaceClick();
 														}}
 													>

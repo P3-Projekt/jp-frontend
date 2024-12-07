@@ -6,6 +6,7 @@ import WeekDay from "@/components/CalenderComponent/WeekDay";
 import { TaskProps } from "@/components/CalenderComponent/Task";
 import { fetchWithAuth } from "@/components/authentication/authentication";
 import { formatDate, getCurrentWeekNumber, getDatesInWeek } from "./util";
+import { endpoint } from "@/config/config";
 
 const KalenderPage: React.FC = () => {
 	// Get current week number
@@ -42,7 +43,7 @@ const KalenderPage: React.FC = () => {
 		const fetchTasks = async () => {
 			try {
 				const response = await fetchWithAuth(
-					`http://localhost:8080/Tasks?weekNumber=${weekNumber}`,
+					`${endpoint}/Tasks?weekNumber=${weekNumber}`,
 				);
 				if (!response.ok) {
 					throw new Error("Failed to fetch tasks");

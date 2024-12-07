@@ -25,6 +25,7 @@ import { Droplets, Loader2, Scissors, X } from "lucide-react";
 import { CircularProgressbar } from "react-circular-progressbar";
 import { BatchData } from "../../Batch";
 import { getUser } from "@/components/authentication/authentication";
+import { endpoint } from "@/config/config";
 
 import { ToastMessage } from "@/functions/ToastMessage/ToastMessage";
 
@@ -210,14 +211,12 @@ const RackDialog: React.FC<RackDialogProps> = ({
 																	/>
 																) : batch?.nextTask.category === "Harvest" &&
 																  taskIsDue(batch) ? (
-																	<Scissors
-																		className={`text-green-600 size-5`}
-																	/>
+																	<Scissors className={`text-red-600 size-5`} />
 																) : batch.nextTask.progress >= 0 ||
 																  batch.nextTask.progress != null ? (
 																	<CircularProgressbar
 																		value={batch.nextTask.progress}
-																		className={`size-4 w-fit ml-1`}
+																		className={`size-5 w-fit ml-1`}
 																		strokeWidth={25}
 																		minValue={0}
 																		maxValue={100}
@@ -266,7 +265,7 @@ const RackDialog: React.FC<RackDialogProps> = ({
 								// Udfør opgaven
 								try {
 									fetchWithAuth(
-										`http://localhost:8080/Task/${selectedBatch?.nextTask.id}/Complete`,
+										`${endpoint}/Task/${selectedBatch?.nextTask.id}/Complete`,
 										{
 											method: "PUT",
 											headers: {

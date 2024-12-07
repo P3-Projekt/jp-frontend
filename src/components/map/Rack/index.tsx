@@ -16,6 +16,7 @@ import {
 import { Plus, Minus, Trash2 } from "lucide-react";
 import { LoadingSpinner } from "@/components/LoadingScreen/LoadingSpinner";
 import { fetchWithAuth } from "@/components/authentication/authentication";
+import { endpoint } from "@/config/config";
 
 //Constants
 export const rackWidth: number = 100;
@@ -68,21 +69,19 @@ const Rack: React.FC<RackProps> = ({
 
 	return (
 		// Rack container
-		<div
-			className={
-				displayMode === DisplayMode.edit ||
-				displayMode === DisplayMode.editPrototype
-					? "cursor-grab active:cursor-grabbing"
-					: displayMode === DisplayMode.view
-						? "cursor-pointer"
-						: "cursor-default"
-			}
-		>
+		<div>
 			<div
 				className={`absolute flex flex-col rounded-lg p-1 outline outline-1 outline-offset-0 ${className} 
 					${
 						(overrideColor ? overrideColor : " bg-colorprimary ") +
-						(isSelected ? " scale-105 border-black " : "cursor-grab")
+						(isSelected ? " scale-105 border-black " : "cursor-grab ")
+					} ${
+						displayMode === DisplayMode.edit ||
+						displayMode === DisplayMode.editPrototype
+							? "cursor-grab active:cursor-grabbing"
+							: displayMode === DisplayMode.view
+								? "cursor-pointer"
+								: "cursor-default"
 					}`}
 				onMouseDown={mouseDownHandlerWrapper}
 				style={{
@@ -133,12 +132,9 @@ const Rack: React.FC<RackProps> = ({
 										return;
 									} else {
 										// remove shelf from top
-										fetchWithAuth(
-											`http://localhost:8080/Rack/${rackData.id}/Shelf`,
-											{
-												method: "DELETE",
-											},
-										)
+										fetchWithAuth(`${endpoint}/Rack/${rackData.id}/Shelf`, {
+											method: "DELETE",
+										})
 											.then((response) => {
 												// Check if the response is ok
 												if (!response.ok) {
@@ -200,12 +196,9 @@ const Rack: React.FC<RackProps> = ({
 										return;
 									} else {
 										// Add shelf to top
-										fetchWithAuth(
-											`http://localhost:8080/Rack/${rackData.id}/Shelf`,
-											{
-												method: "POST",
-											},
-										)
+										fetchWithAuth(`${endpoint}/Rack/${rackData.id}/Shelf`, {
+											method: "POST",
+										})
 											.then((response) => {
 												// Check if the response is ok
 												if (!response.ok) {
@@ -268,7 +261,7 @@ const Rack: React.FC<RackProps> = ({
 										return;
 									} else {
 										// Add shelf to top
-										fetchWithAuth(`http://localhost:8080/Rack/${rackData.id}`, {
+										fetchWithAuth(`${endpoint}/Rack/${rackData.id}`, {
 											method: "DELETE",
 										})
 											.then((response) => {

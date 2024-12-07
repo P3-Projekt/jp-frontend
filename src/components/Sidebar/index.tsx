@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import SidebarItem from "./SidebarItem";
-import sidebarConfig from "@/config/sidebar";
+import sidebarConfig from "@/config/config";
 import Image from "next/image";
 import Link from "next/link";
 

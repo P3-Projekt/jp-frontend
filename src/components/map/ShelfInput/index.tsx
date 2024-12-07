@@ -24,8 +24,8 @@ const ShelfBox: React.FC<ShelfData> = ({ position, rackId, id: shelfId }) => {
 		if (amount) {
 			autoLocateAmount = amount;
 		}
-
 		updateCurrentValue(autoLocateAmount);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [autolocateMap, position, rackId, shelfId]);
 
 	useEffect((): void => {
@@ -71,15 +71,8 @@ const ShelfBox: React.FC<ShelfData> = ({ position, rackId, id: shelfId }) => {
 		setCurrentValue(value);
 
 		if (value > 0) {
-			console.log(
-				`Shelf with id ${shelfId} and position ${position} settings its value to ${value}`,
-			);
-			console.log("Rack", rackId, "With shelf", shelfId, " Has ", value);
 			batchPositionMapSet(shelfId, value);
 		} else if (batchPositionMapHas(shelfId)) {
-			console.log(
-				`Shelf with id ${shelfId} and position ${position} deleting its value`,
-			);
 			batchPositionMapDelete(shelfId);
 		}
 	};
@@ -117,10 +110,7 @@ const ShelfBox: React.FC<ShelfData> = ({ position, rackId, id: shelfId }) => {
 
 	return (
 		// Shelf container
-		<div
-			className="flex-1 flex items-center justify-center rounded-lg bg-zinc-200"
-			onClick={() => console.log(rackId, shelfId)}
-		>
+		<div className="flex-1 flex items-center justify-center rounded-lg bg-zinc-200">
 			{availableSpace >= 0 && (
 				<div className="flex items-center">
 					<input

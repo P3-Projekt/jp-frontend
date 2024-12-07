@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { fetchWithAuth } from "@/components/authentication/authentication";
+import { endpoint } from "@/config/config";
 
 // Interface til definition af plantetyper med deres egenskaber
 interface PlantType {
@@ -48,7 +49,7 @@ const PlanterPage = () => {
 		setError(null);
 		try {
 			// Send anmodning til backend for at hente plantetyper
-			const response = await fetchWithAuth("http://localhost:8080/PlantTypes", {
+			const response = await fetchWithAuth(endpoint + "/PlantTypes", {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
@@ -118,7 +119,7 @@ const PlanterPage = () => {
 
 		try {
 			// Send anmodning (med token) til backend for at oprette ny plantetype
-			const response = await fetchWithAuth("http://localhost:8080/PlantType", {
+			const response = await fetchWithAuth(endpoint + "/PlantType", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -162,7 +163,7 @@ const PlanterPage = () => {
 		try {
 			// Send anmodning (med token) til backend for at slette plantetype
 			const response = await fetchWithAuth(
-				`http://localhost:8080/PlantType/${plantTypeName}`,
+				`${endpoint}/PlantType/${plantTypeName}`,
 				{
 					method: "DELETE",
 					headers: {
@@ -292,7 +293,7 @@ const PlanterPage = () => {
 									checked={formData.vanding.includes(day + 1)}
 									onChange={handleCheckboxChange}
 									className="w-9 h-9 accent-green-600"
-									disabled={isLoading}
+									disabled={isLoading || parseInt(formData.spiring) > day}
 								/>
 							</label>
 						))}

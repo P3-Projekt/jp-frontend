@@ -17,14 +17,14 @@
 }
 
 .CircularProgressbar .CircularProgressbar-path {
-	stroke: #000000;
+	stroke: #00a018;
 	stroke-linecap: round;
 	-webkit-transition: stroke-dashoffset 0.5s ease 0s;
 	transition: stroke-dashoffset 0.5s ease 0s;
 }
 
 .CircularProgressbar .CircularProgressbar-trail {
-	stroke: #d6d6d6;
+	stroke: #6e6e6e;
 	/* Used when trail is not full diameter, i.e. when props.circleRatio is set */
 	stroke-linecap: round;
 }
@@ -37,18 +37,9 @@
 }
 
 .CircularProgressbar .CircularProgressbar-background {
-	fill: #d6d6d6;
+	fill: #6e6e6e;
 }
 
-/*
- * Sample background styles. Use these with e.g.:
- *
- *   <CircularProgressbar
- *     className="CircularProgressbar-inverted"
- *     background
- *     percentage={50}
- *   />
- */
 .CircularProgressbar.CircularProgressbar-inverted
 	.CircularProgressbar-background {
 	fill: #3e98c7;

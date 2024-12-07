@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { fetchWithAuth } from "@/components/authentication/authentication";
+import { endpoint } from "@/config/config";
 
 // Definition af en bakke type med dens egenskaber
 type BakkeType = {
@@ -34,7 +35,7 @@ const BakkerPage = () => {
 		setError(null);
 		try {
 			// Sender en anmodning (med token) til backend for at hente bakke typer
-			const response = await fetchWithAuth("http://localhost:8080/TrayTypes", {
+			const response = await fetchWithAuth(endpoint + "/TrayTypes", {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
@@ -85,7 +86,7 @@ const BakkerPage = () => {
 
 		try {
 			// Sender en anmodning (med token) til backend for at oprette ny bakke type
-			const response = await fetchWithAuth("http://localhost:8080/TrayType", {
+			const response = await fetchWithAuth(endpoint + "/TrayType", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -122,15 +123,12 @@ const BakkerPage = () => {
 
 		try {
 			// Sender en anmodning (med token) til backend for at slette en bakke type
-			const response = await fetchWithAuth(
-				`http://localhost:8080/TrayType/${name}`,
-				{
-					method: "DELETE",
-					headers: {
-						"Content-Type": "application/json",
-					},
+			const response = await fetchWithAuth(`${endpoint}/TrayType/${name}`, {
+				method: "DELETE",
+				headers: {
+					"Content-Type": "application/json",
 				},
-			);
+			});
 
 			// Håndterer fejl ved sletning
 			if (!response.ok) {
