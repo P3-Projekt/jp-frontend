@@ -1,10 +1,9 @@
 import React from "react";
 import ShelfBox from "./Shelf";
-import { ShelfData } from "@/app/pregermination/page";
 import { RackData } from "@/app/pregermination/page";
 
 const RackBox: React.FC<RackData> = ({ id, shelves }) => {
-	console.log(shelves);
+	//console.log(shelves);
 
 	return (
 		// Rack container
@@ -17,7 +16,12 @@ const RackBox: React.FC<RackData> = ({ id, shelves }) => {
 			{/* Shelf container */}
 			<div className="flex flex-1 flex-col space-y-1">
 				{Array.from({ length: shelves.length }).map((_, index) => (
-					<ShelfBox key={`${id}#${index}`} position={index} rackId={id} id={shelves[index].id} />
+					<ShelfBox
+						key={`${id}#${index}`}
+						position={index}
+						rackId={id}
+						id={shelves[index].id}
+					/>
 				))}
 			</div>
 		</div>

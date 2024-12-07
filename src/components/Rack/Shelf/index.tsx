@@ -2,7 +2,7 @@ import {
 	usePlacedAmountContext,
 	useShelfContext,
 	useAutolocateContext,
-	useBatchPositionContext
+	useBatchPositionContext,
 } from "@/app/pregermination/context";
 import React, { useEffect, useState } from "react";
 import { ShelfData } from "@/app/pregermination/page";
@@ -11,20 +11,19 @@ const ShelfBox: React.FC<ShelfData> = ({ position, rackId, id: shelfId }) => {
 	const { shelfMap } = useShelfContext(); //Get the shelfMap which tells this shelf how much available space it has
 	const [currentValue, setCurrentValue] = useState(0); //The current input value which becomes the previous when the next input is entered
 	const [availableSpace, setAvailableSpace] = useState(0); //The maximal space available on the shelf
-	const { placedAmount, setPlacedAmount, batchAmount } = usePlacedAmountContext();
+	const { placedAmount, setPlacedAmount, batchAmount } =
+		usePlacedAmountContext();
 	const { nestedMap: autolocateMap } = useAutolocateContext();
-	const { batchPositionMapSet, batchPositionMapDelete, batchPositionMapHas} = useBatchPositionContext();
+	const { batchPositionMapSet, batchPositionMapDelete, batchPositionMapHas } =
+		useBatchPositionContext();
 
 	useEffect(() => {
 		let autoLocateAmount = 0;
-		const rackIdMap = autolocateMap.get(rackId);
-		if (rackIdMap !== undefined) {
-			const amount = rackIdMap.get(position + 1);
-			autoLocateAmount = typeof amount === "number" ? amount : 0;
+		const amount = autolocateMap.get(shelfId);
+		if (amount) {
+			autoLocateAmount = amount;
 		}
 
-		if (autoLocateAmount !== 0) {
-		}
 		updateCurrentValue(autoLocateAmount);
 	}, [autolocateMap, position, rackId]);
 
@@ -63,38 +62,53 @@ const ShelfBox: React.FC<ShelfData> = ({ position, rackId, id: shelfId }) => {
 	const updateCurrentValue = (value: number) => {
 		setCurrentValue(value);
 
-		if (value !== 0) {
-			console.log(`Shelf with id ${shelfId} settings its value to ${value}`);
+		if (value > 0) {
+			console.log(
+				`Shelf with id ${shelfId} and position ${position} settings its value to ${value}`,
+			);
+			console.log("Rack", rackId, "With shelf", shelfId, " Has ", value);
 			batchPositionMapSet(shelfId, value);
 		} else if (batchPositionMapHas(shelfId)) {
-			console.log(`Shelf with id ${shelfId} deleting its value`);
+			console.log(
+				`Shelf with id ${shelfId} and position ${position} deleting its value`,
+			);
 			batchPositionMapDelete(shelfId);
 		}
 	};
 
 	const validateAndSetInput = (input: number) => {
-		const max = getMax(input);
-		if (input < 0) {
-			//Input may not be negative
+		// Ensure we receive an actual number which is not less than 0
+		if (Number.isNaN(input) || input < 0) {
 			input = 0;
-		} else if (input > max) {
-			//Input may not be more than max
+		} // If we did receive a number, ensure it is an integer
+		else if (!Number.isInteger(input)) {
+			input = Math.round(input);
+		}
+
+		// Ensure the number is not more than the maximum allowed.
+		const max = getMax(input);
+		if (input > max) {
 			input = max;
 		}
 
-		//console.log("Set input to: " + input + ", max is: " + max);
-		//event.target.value = input.toString();
+		// Calculate difference between input and current (previous value)
 		const valueDifference = input - currentValue;
+
+		// Calculate the total placed amount across all input fields
 		const newPlacedAmount = placedAmount + valueDifference;
+
+		//Update total placed amount and the current value
 		setPlacedAmount(newPlacedAmount);
-		//console.log("Placed amount was before: " + placedAmount + " and is now: " + newPlacedAmount);
 		updateCurrentValue(input);
 	};
 
 	return (
 		// Shelf container
-		<div className="flex-1 flex items-center justify-center rounded-lg bg-zinc-200">
-			{availableSpace > 0 && (
+		<div
+			className="flex-1 flex items-center justify-center rounded-lg bg-zinc-200"
+			onClick={() => console.log(rackId, shelfId)}
+		>
+			{availableSpace >= 0 && (
 				<div className="flex items-center">
 					<input
 						type="number"

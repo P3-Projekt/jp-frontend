@@ -80,25 +80,21 @@ export function usePlacedAmountContext() {
 }
 
 interface NestedMapProps {
-	nestedMap: Map<number, Map<number, number>>;
-	setNestedMap: React.Dispatch<
-		React.SetStateAction<Map<number, Map<number, number>>>
-	>;
+	nestedMap: Map<number, number>;
+	setNestedMap: React.Dispatch<React.SetStateAction<Map<number, number>>>;
 }
 
-const AutolocateContext = createContext<NestedMapProps | undefined>(
-	undefined,
-);
+const AutolocateContext = createContext<NestedMapProps | undefined>(undefined);
 
 export const AutolocateProvider: React.FC<{ children: ReactNode }> = ({
 	children,
 }) => {
-	const [autolocateMap, setAutolocateMap] = useState(
-		new Map<number, Map<number, number>>(),
-	);
+	const [autolocateMap, setAutolocateMap] = useState(new Map<number, number>());
 
 	return (
-		<AutolocateContext.Provider value={{ nestedMap: autolocateMap, setNestedMap: setAutolocateMap }}>
+		<AutolocateContext.Provider
+			value={{ nestedMap: autolocateMap, setNestedMap: setAutolocateMap }}
+		>
 			{children}
 		</AutolocateContext.Provider>
 	);
@@ -130,7 +126,9 @@ const BatchPositionContext = createContext<batchPositionProps | undefined>(
 export const BatchPositionProvider: React.FC<{ children: ReactNode }> = ({
 	children,
 }) => {
-	const [batchPositionMap, setBatchPositionMap] = useState(new Map<number, number>);
+	const [batchPositionMap, setBatchPositionMap] = useState(
+		new Map<number, number>(),
+	);
 
 	const batchPositionMapSet = (key: number, value: number) => {
 		setBatchPositionMap((prev) => {
@@ -138,22 +136,29 @@ export const BatchPositionProvider: React.FC<{ children: ReactNode }> = ({
 			newMap.set(key, value);
 			return newMap;
 		});
-	}
+	};
 
 	const batchPositionMapHas = (key: number) => {
 		return batchPositionMap.has(key);
-	}
+	};
 
 	const batchPositionMapDelete = (key: number) => {
 		setBatchPositionMap((prev) => {
 			const newMap = new Map(prev);
 			newMap.delete(key);
 			return newMap;
-		})
-	}
+		});
+	};
 
 	return (
-		<BatchPositionContext.Provider value={{batchPositionMap, batchPositionMapSet, batchPositionMapDelete, batchPositionMapHas }}>
+		<BatchPositionContext.Provider
+			value={{
+				batchPositionMap,
+				batchPositionMapSet,
+				batchPositionMapDelete,
+				batchPositionMapHas,
+			}}
+		>
 			{children}
 		</BatchPositionContext.Provider>
 	);
