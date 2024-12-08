@@ -1,6 +1,6 @@
-import { Grid2X2, House, Leaf, SquarePen, Shrub } from "lucide-react";
+import { Grid2X2, House, Leaf, SquarePen, Shrub, Calendar } from "lucide-react";
 
-export const endpoint = process.env.NEXT_PUBLIC_API_URL;
+export const endpoint = "http://localhost:8080";
 
 interface SidebarItem {
 	title: string;
@@ -34,8 +34,13 @@ const sidebarConfig: SidebarItem[] = [
 		],
 	},
 	{
+		title: "Kalender",
+		path: "/kalender",
+		icon: Calendar,
+	},
+	{
 		title: "Marker",
-		path: "/settings",
+		path: "/marker",
 		icon: Grid2X2,
 	},
 	{

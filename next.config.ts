@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { endpoint } from "@/config/config";
 
 const nextConfig: NextConfig = {
 	basePath: "",
@@ -9,7 +10,7 @@ const nextConfig: NextConfig = {
 				headers: [
 					{
 						key: "Access-Control-Allow-Origin",
-						value: "http://localhost:8080",
+						value: endpoint,
 					},
 				],
 			},

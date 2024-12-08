@@ -23,7 +23,7 @@ export const Shelf: React.FC<ShelfArguments> = ({
 		<div className="flex-1 flex items-center justify-center rounded-lg bg-zinc-100">
 			<div className="flex items-center">
 				{displayMode !== DisplayMode.input
-					? batches.map((batch, index) => (
+					? batches.map((batch: BatchData, index: number) => (
 							<Batch
 								key={index}
 								{...batch}

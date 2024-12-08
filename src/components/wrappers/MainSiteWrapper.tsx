@@ -15,7 +15,6 @@ const MainSiteWrapper = ({
 	const path = usePathname();
 
 	useEffect(() => {
-		console.log("path", path);
 		const authToken = localStorage.getItem("authToken");
 		if (!authToken && path !== "/login") {
 			router.push("/login");

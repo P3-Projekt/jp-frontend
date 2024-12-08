@@ -1,0 +1,20 @@
+.highlighted {
+	outline: 3px solid red;
+}
+
+.blink {
+	animation: blink-border 1s steps(5, start) infinite;
+	-webkit-animation: blink-border 1s steps(5, start) infinite;
+}
+
+@keyframes blink-border {
+	50% {
+		outline-color: transparent;
+	}
+}
+
+@-webkit-keyframes blink-border {
+	50% {
+		outline-color: transparent;
+	}
+}

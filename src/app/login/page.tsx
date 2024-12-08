@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { endpoint } from "@/config/config";
 
 /**
  * Login form component.
@@ -19,7 +20,7 @@ function LoginForm() {
 
 		// Send the login request to the server
 		try {
-			const response = await fetch("http://localhost:8080/api/auth/login", {
+			const response = await fetch(endpoint + "/api/auth/login", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -29,8 +30,6 @@ function LoginForm() {
 
 			if (response.ok) {
 				const data = await response.text();
-				console.log("Login successful");
-				console.log(data);
 				localStorage.setItem("authToken", data);
 				router.push("/");
 			} else {
