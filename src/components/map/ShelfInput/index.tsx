@@ -1,53 +1,20 @@
 import {
-	usePlacedAmountContext,
-	useShelfContext,
-	useAutolocateContext,
-	useBatchPositionContext,
+	usePregerminationContext,
+	getPlacedAmount,
 } from "@/app/pregermination/context";
-import React, { useEffect, useState } from "react";
 import { ToastMessage } from "@/functions/ToastMessage/ToastMessage";
 import { ShelfData } from "@/app/pregermination/page";
 
 const ShelfBox: React.FC<ShelfData> = ({ position, rackId, id: shelfId }) => {
-	const { shelfMap } = useShelfContext(); //Get the shelfMap which tells this shelf how much available space it has
-	const [currentValue, setCurrentValue] = useState(0); //The current input value which becomes the previous when the next input is entered
-	const [availableSpace, setAvailableSpace] = useState(0); //The maximal space available on the shelf
-	const { placedAmount, setPlacedAmount, batchAmount } =
-		usePlacedAmountContext();
-	const { nestedMap: autolocateMap } = useAutolocateContext();
-	const { batchPositionMapSet, batchPositionMapDelete, batchPositionMapHas } =
-		useBatchPositionContext();
-
-	useEffect(() => {
-		let autoLocateAmount = 0;
-		const amount = autolocateMap.get(shelfId);
-		if (amount) {
-			autoLocateAmount = amount;
-		}
-		updateCurrentValue(autoLocateAmount);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [autolocateMap, position, rackId, shelfId]);
-
-	useEffect((): void => {
-		setCurrentValue(0);
-		if (shelfMap === undefined) {
-			ToastMessage({
-				title: "Noget gik galt!",
-				message: "Hylderne er ikke defineret. Prøv at genindlæse siden.",
-				type: "error",
-			});
-			throw new TypeError("shelfMap from useShelfContext is undefined");
-		}
-		const shelfArray = shelfMap.shelves.get(rackId);
-		if (shelfArray !== undefined) {
-			const space = shelfArray.at(position);
-			if (space) {
-				setAvailableSpace(space);
-			}
-		} else {
-			setAvailableSpace(0);
-		}
-	}, [shelfMap, rackId, position]);
+	const {
+		availableSpace,
+		activeBatchId,
+		batchAmount,
+		batchPosition,
+		batchPositionSet,
+		batchPositionDelete,
+		batchPositionExists,
+	} = usePregerminationContext();
 
 	const getMax = (currentlyPlaced: number): number => {
 		if (batchAmount === null) {
@@ -60,20 +27,28 @@ const ShelfBox: React.FC<ShelfData> = ({ position, rackId, id: shelfId }) => {
 				"Expected a non-null value for batchAmount, getMax should only be called when a batch is selected and then batchAmount should not be null",
 			);
 		}
-		const valueDifference: number = currentlyPlaced - currentValue; // Get the difference from the new input and the previous input
+		// Get the difference from the new input and the previous input
+		const valueDifference: number =
+			currentlyPlaced - batchPosition[shelfId] || 0;
+		// Calculate the amount left to be placed
 		const leftToBePlaced: number =
-			batchAmount - placedAmount + currentlyPlaced - valueDifference; // Calculate the amount left to be placed
-		return leftToBePlaced < availableSpace ? leftToBePlaced : availableSpace; // Return the smaller of leftToBePlaced and availableSpace
+			batchAmount -
+			getPlacedAmount(batchPosition) +
+			currentlyPlaced -
+			valueDifference;
+		// Return the smaller of leftToBePlaced and availableSpace
+		const availableSpaceAtPosition = availableSpace[rackId]?.at(position) ?? 0;
+		return leftToBePlaced < availableSpaceAtPosition
+			? leftToBePlaced
+			: availableSpaceAtPosition;
 	};
 
 	// Update the current value and store the value in the batchPositionContext
 	const updateCurrentValue = (value: number) => {
-		setCurrentValue(value);
-
 		if (value > 0) {
-			batchPositionMapSet(shelfId, value);
-		} else if (batchPositionMapHas(shelfId)) {
-			batchPositionMapDelete(shelfId);
+			batchPositionSet(shelfId, value);
+		} else if (batchPositionExists(shelfId)) {
+			batchPositionDelete(shelfId);
 		}
 	};
 
@@ -83,6 +58,7 @@ const ShelfBox: React.FC<ShelfData> = ({ position, rackId, id: shelfId }) => {
 			input = 0;
 		} // If we did receive a number, ensure it is an integer
 		else if (!Number.isInteger(input)) {
+			console.log("Input was not an integer, rounding to nearest integer");
 			input = Math.round(input);
 		}
 
@@ -97,33 +73,28 @@ const ShelfBox: React.FC<ShelfData> = ({ position, rackId, id: shelfId }) => {
 			});
 		}
 
-		// Calculate difference between input and current (previous value)
-		const valueDifference = input - currentValue;
-
-		// Calculate the total placed amount across all input fields
-		const newPlacedAmount = placedAmount + valueDifference;
-
-		//Update total placed amount and the current value
-		setPlacedAmount(newPlacedAmount);
+		// Update total placed amount and the current value
 		updateCurrentValue(input);
 	};
 
 	return (
 		// Shelf container
 		<div className="flex-1 flex items-center justify-center rounded-lg bg-zinc-200">
-			{availableSpace >= 0 && (
+			{activeBatchId !== null && (
 				<div className="flex items-center">
 					<input
 						type="number"
 						min={0}
-						value={currentValue}
+						value={batchPosition[shelfId] || 0}
 						onChange={(e) => {
-							validateAndSetInput(e.target.valueAsNumber);
+							const newValue = e.target.valueAsNumber; // This is NaN if the field is empty
+							//validateAndSetInput(Number.isNaN(newValue) ? 0 : newValue);
+							validateAndSetInput(newValue);
 						}}
 						className="w-12 h-4 bg-sidebarcolor rounded border border-colorprimary text-black text-center text-sm"
 					/>
 					<div className="text-black text-center ml-1 text-sm ">
-						/ {availableSpace}
+						/ {availableSpace[rackId]?.at(position) || 0}
 					</div>
 				</div>
 			)}

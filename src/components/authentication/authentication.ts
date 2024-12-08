@@ -31,6 +31,8 @@ export function getUser() {
 	const token = getToken();
 	if (token) {
 		return jwtDecode<JwtPayload>(token).sub;
+	} else {
+		throw new Error("Can't find user as token is missing");
 	}
 }
 

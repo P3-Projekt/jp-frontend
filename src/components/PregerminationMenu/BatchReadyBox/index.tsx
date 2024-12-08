@@ -11,12 +11,13 @@ import {
 import { Button, buttonVariants } from "@/components/ui/button";
 
 import {
-	useShelfContext,
-	usePlacedAmountContext,
-	useAutolocateContext,
-	useBatchPositionContext,
+	usePregerminationContext,
+	getPlacedAmount,
 } from "@/app/pregermination/context";
-import { fetchWithAuth } from "@/components/authentication/authentication";
+import {
+	fetchWithAuth,
+	getUser,
+} from "@/components/authentication/authentication";
 import { ToastMessage } from "@/functions/ToastMessage/ToastMessage";
 import { endpoint } from "@/config/config";
 
@@ -24,32 +25,36 @@ interface BatchReadyProps {
 	batchId: number;
 	plantType: string;
 	amount: number;
+	onPlace: () => void;
 }
 
 const BatchReadyBox: React.FC<BatchReadyProps> = ({
 	batchId,
 	plantType,
 	amount,
+	onPlace,
 }) => {
-	const { setShelfMap, activeBatchId, setActiveBatchId } = useShelfContext();
-	const { placedAmount, setBatchAmount, setPlacedAmount } =
-		usePlacedAmountContext();
-	const { setNestedMap: setAutolocateMap } = useAutolocateContext();
-	const { batchPositionMap } = useBatchPositionContext();
+	const {
+		activeBatchId,
+		setActiveBatchId,
+		setAvailableSpace,
+		setBatchAmount,
+		setBatchPosition,
+		batchPosition,
+	} = usePregerminationContext();
+
 	const [openDialog, setOpenDialog] = useState(false);
 
 	const handleClick = async () => {
 		if (activeBatchId === batchId) {
-			updateShelfMap(new Object());
-			setPlacedAmount(0);
 			setActiveBatchId(null);
 			setBatchAmount(null);
 		} else {
-			setPlacedAmount(0);
 			setActiveBatchId(batchId);
 			setBatchAmount(amount);
 			await fetchMaxBatchesOnShelves(batchId);
 		}
+		setBatchPosition({});
 	};
 
 	const fetchMaxBatchesOnShelves = async (batchId: number) => {
@@ -59,17 +64,15 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
 			);
 
 			if (!response.ok) {
-				ToastMessage({
-					title: "Uventet fejl",
-					message: "Kunne ikke hente maksimal mængde på hylder",
-					type: "error",
-				});
-				throw new Error("Fetching max batches on shelves failed");
+				const errorMesssage = await response.text();
+				throw new Error(
+					"Fetching max amount on shelves failed: " + errorMesssage,
+				);
 			}
 
 			const result = await response.json();
 
-			updateShelfMap(result);
+			setAvailableSpace(result);
 		} catch (err) {
 			ToastMessage({
 				title: "Uventet fejl",
@@ -80,8 +83,10 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
 		}
 	};
 
-	const fetchBatchPosition = async (data: unknown) => {
+	const handleConfirmPlaceClick = async () => {
+		setOpenDialog(false);
 		try {
+			console.log(getUser());
 			const response = await fetchWithAuth(
 				`${endpoint}/Batch/${batchId}/Position`,
 				{
@@ -90,48 +95,29 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
 						"Content-Type": "application/json",
 					},
 					body: JSON.stringify({
-						locations: data,
-						username: "demo",
+						locations: batchPosition,
+						username: getUser(),
 					}),
 				},
 			);
 
 			if (!response.ok) {
-				throw new Error("Updating batch position failed");
+				const errorMesssage = await response.text();
+				throw new Error("Placing batch failed: " + errorMesssage);
 			}
-		} catch (error) {
-			alert(error);
+
+			onPlace();
+			setActiveBatchId(null);
+			setBatchAmount(null);
+			setBatchPosition({});
+		} catch (err) {
+			ToastMessage({
+				title: "Uventet fejl",
+				message: "Kunne ikke placere batch",
+				type: "error",
+			});
+			console.error("Kunne ikke placere batch: " + err);
 		}
-	};
-
-	const handleConfirmPlaceClick = async () => {
-		setOpenDialog(false);
-		const obj = mapToObject(batchPositionMap);
-		await fetchBatchPosition(obj);
-	};
-
-	// Function to convert a Map to a plain JavaScript object
-	const mapToObject = (
-		map: Map<string | number, unknown>,
-	): Record<string, unknown> => {
-		// Initialize an empty object to hold the converted Map data
-		const obj: Record<string, unknown> = {};
-		// Iterate over each key-value pair in the Map
-		for (const [key, value] of map.entries()) {
-			// Convert the key to a string (object keys in JSON must be strings)
-			// If the value is another Map, call mapToObject recursively to handle it
-			// Otherwise, directly assign the value to the object
-			obj[String(key)] = value instanceof Map ? mapToObject(value) : value;
-		}
-		// Return the resulting plain object
-		return obj;
-	};
-
-	const updateShelfMap = (data: object) => {
-		const newShelfMap = new Map<number, number[]>(
-			Object.entries(data).map(([key, value]) => [Number(key), value]),
-		);
-		setShelfMap({ shelves: newShelfMap });
 	};
 
 	const handlePlaceClick = () => {
@@ -150,13 +136,7 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
 
 			const result = await response.json();
 
-			const autolocateMap = new Map();
-
-			createNestedNumberMap(result, autolocateMap);
-
-			setPlacedAmount(sumNestedNumberMap(autolocateMap));
-
-			setAutolocateMap(autolocateMap);
+			setBatchPosition(result);
 		} catch (error) {
 			if (error instanceof TypeError) {
 				alert(
@@ -167,58 +147,6 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
 				alert(error);
 			}
 		}
-	};
-
-	// Create a nested number map from an object consisting of objects and numbers, and save result to outputMap
-	const createNestedNumberMap = (
-		sourceObject: object,
-		outputMap: Map<number, unknown>,
-	) => {
-		for (const [key, value] of Object.entries(sourceObject)) {
-			const numericKey = Number(key);
-			const numericValue = Number(value);
-			if (Number.isNaN(numericKey) || !Number.isInteger(numericKey)) {
-				throw new TypeError(
-					"Found key '" + key + "'which couldn't be parsed as an integer",
-				);
-			}
-			if (value instanceof Object) {
-				const nestedMap = new Map<number, unknown>();
-				outputMap.set(numericKey, nestedMap);
-				createNestedNumberMap(value, nestedMap);
-			} else if (
-				!Number.isNaN(numericValue) ||
-				!Number.isInteger(numericValue)
-			) {
-				outputMap.set(numericKey, numericValue);
-			} else {
-				throw new TypeError(
-					"Found value with type '" +
-						typeof value +
-						"', the object must consist only of objects and strings which can be parsed as an integer.",
-				);
-			}
-		}
-	};
-
-	// Calculate the sum of a nested number map
-	const sumNestedNumberMap = (nestedMap: Map<unknown, unknown>) => {
-		let accumulator = 0;
-		for (const value of nestedMap.values()) {
-			if (value instanceof Map) {
-				accumulator += sumNestedNumberMap(value);
-			} else if (typeof value === "number") {
-				accumulator += value;
-			} else {
-				throw new TypeError(
-					"The nested map contains a type that is '" +
-						typeof value +
-						"' which is neither a number or a map",
-				);
-			}
-		}
-
-		return accumulator;
 	};
 
 	return (
@@ -250,7 +178,7 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
 						</div>
 
 						{/* "Lokaliseret" background */}
-						{placedAmount === amount ? (
+						{getPlacedAmount(batchPosition) === amount ? (
 							// If all plants are placed
 							<>
 								<div
@@ -315,7 +243,7 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
 							// If not all plants are placed
 							<div className="bg-sidebarcolor text-black p-2 shadow-md rounded-lg transition-all duration-300">
 								<div className="text-black text-lg font-bold text-center">
-									Lokaliseret: {placedAmount}/{amount}
+									Lokaliseret: {getPlacedAmount(batchPosition)}/{amount}
 								</div>
 							</div>
 						)}
