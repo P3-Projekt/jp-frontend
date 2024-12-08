@@ -32,7 +32,7 @@ const BakkerPage = () => {
 	const [error, setError] = useState<string | null>(null);
 
 	// Funktion til at hente bakke typer fra backend
-	const fetchTrayTypes = useCallback(async () => {
+	const fetchTrayTypes = async () => {
 		setIsLoading(true);
 		setError(null);
 		try {
@@ -64,12 +64,12 @@ const BakkerPage = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	}, []);
+	};
 
 	// Henter bakke typer når siden indlæses
 	useEffect(() => {
 		fetchTrayTypes();
-	}, [fetchTrayTypes]);
+	}, []);
 
 	// Håndterer ændringer i formular-felter
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
