@@ -17,6 +17,7 @@ const ShelfBox: React.FC<ShelfData> = ({ position, rackId, id: shelfId }) => {
 	const { nestedMap: autolocateMap } = useAutolocateContext();
 	const { batchPositionMapSet, batchPositionMapDelete, batchPositionMapHas } =
 		useBatchPositionContext();
+	const { activeBatchId } = useShelfContext();
 
 	useEffect(() => {
 		let autoLocateAmount = 0;
@@ -111,7 +112,7 @@ const ShelfBox: React.FC<ShelfData> = ({ position, rackId, id: shelfId }) => {
 	return (
 		// Shelf container
 		<div className="flex-1 flex items-center justify-center rounded-lg bg-zinc-200">
-			{availableSpace >= 0 && (
+			{ (activeBatchId !== null) && (
 				<div className="flex items-center">
 					<input
 						type="number"
