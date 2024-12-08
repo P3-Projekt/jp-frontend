@@ -27,7 +27,9 @@ interface PregerminationContext {
 	 * Update the available space object
 	 * @param newAvailableSpaceMap The new object
 	 */
-	setAvailableSpace: (newAvailableSpaceMap: { [key: number]: number[] }) => void;
+	setAvailableSpace: (newAvailableSpaceMap: {
+		[key: number]: number[];
+	}) => void;
 	/**
 	 * An object where each key corresponds to a shelf ID and the corresponding value describes the amount which is currently entered in the corresponding shelfInput
 	 */
@@ -60,15 +62,17 @@ interface PregerminationContext {
 	batchPositionExists: (key: number) => boolean;
 }
 
-const PregerminationContext = createContext<PregerminationContext | undefined>(undefined);
+const PregerminationContext = createContext<PregerminationContext | undefined>(
+	undefined,
+);
 
 /**
  * PregerminationProvider component that provides context values for pregermination process.
- * 
+ *
  * @param children - The child components that will have access to the context values.
- * 
+ *
  * @returns The PregerminationContext.Provider component with the provided context values.
- * 
+ *
  * @context
  * - activeBatchId: The ID of the currently active batch.
  * - setActiveBatchId: Function to set the active batch ID.
@@ -82,70 +86,80 @@ const PregerminationContext = createContext<PregerminationContext | undefined>(u
  * - batchPositionDelete: Function to delete a specific batch position.
  * - batchPositionExists: Function to check if a specific batch position exists.
  */
-export const PregerminationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [availableSpace, setAvailableSpace] = useState<{ [key: number]: number[] }>({});
-    const [activeBatchId, setActiveBatchId] = useState<number | null>(null);
-    const [batchAmount, setBatchAmount] = useState<number | null>(null);
-    const [batchPosition, setBatchPosition] = useState<{ [key: number]: number }>({});
+export const PregerminationProvider: React.FC<{ children: ReactNode }> = ({
+	children,
+}) => {
+	const [availableSpace, setAvailableSpace] = useState<{
+		[key: number]: number[];
+	}>({});
+	const [activeBatchId, setActiveBatchId] = useState<number | null>(null);
+	const [batchAmount, setBatchAmount] = useState<number | null>(null);
+	const [batchPosition, setBatchPosition] = useState<{ [key: number]: number }>(
+		{},
+	);
 
 	/**
 	 * Deletes a key from the batchPosition object
 	 * @param key The key to be deleted
-	 * @param value 
+	 * @param value
 	 */
-    const batchPositionSet = (key: number, value: number) => {
-        setBatchPosition((prev) => ({
-            ...prev,
-            [key]: value,
-        }));
-    };
+	const batchPositionSet = (key: number, value: number) => {
+		setBatchPosition((prev) => ({
+			...prev,
+			[key]: value,
+		}));
+	};
 
-    const batchPositionDelete = (key: number) => {
-        setBatchPosition((prev) => {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { [key]: _, ...newMap } = prev;
-            return newMap;
-        });
-    };
+	const batchPositionDelete = (key: number) => {
+		setBatchPosition((prev) => {
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			const { [key]: _, ...newMap } = prev;
+			return newMap;
+		});
+	};
 
-    const batchPositionExists = (key: number) => {
-        return key in batchPosition;
-    };
+	const batchPositionExists = (key: number) => {
+		return key in batchPosition;
+	};
 
-    return (
-        <PregerminationContext.Provider
-            value={{
-                activeBatchId,
-                setActiveBatchId,
-                batchAmount,
-                setBatchAmount,
-                availableSpace,
-                setAvailableSpace,
-                batchPosition,
-                setBatchPosition,
-                batchPositionSet,
-                batchPositionDelete,
-                batchPositionExists,
-            }}
-        >
-            {children}
-        </PregerminationContext.Provider>
-    );
+	return (
+		<PregerminationContext.Provider
+			value={{
+				activeBatchId,
+				setActiveBatchId,
+				batchAmount,
+				setBatchAmount,
+				availableSpace,
+				setAvailableSpace,
+				batchPosition,
+				setBatchPosition,
+				batchPositionSet,
+				batchPositionDelete,
+				batchPositionExists,
+			}}
+		>
+			{children}
+		</PregerminationContext.Provider>
+	);
 };
 
 export function usePregerminationContext() {
-    const pregerminationContext = useContext(PregerminationContext);
-    
-    if (pregerminationContext === undefined) {
-        throw new Error("usePregerminationContext must be used within a PregerminationContextProvider");
-    }
-    return pregerminationContext;
+	const pregerminationContext = useContext(PregerminationContext);
+
+	if (pregerminationContext === undefined) {
+		throw new Error(
+			"usePregerminationContext must be used within a PregerminationContextProvider",
+		);
+	}
+	return pregerminationContext;
 }
 
-export function getPlacedAmount(batchPositionMap: { [key: number]: number }): number {
-    let total = 0;
-    for (const value of Object.values(batchPositionMap)) {
-        total += value;
-    }
-    return total;
+export function getPlacedAmount(batchPositionMap: {
+	[key: number]: number;
+}): number {
+	let total = 0;
+	for (const value of Object.values(batchPositionMap)) {
+		total += value;
+	}
+	return total;
 }

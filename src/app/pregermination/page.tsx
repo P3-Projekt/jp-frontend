@@ -2,9 +2,7 @@
 import React, { useEffect, useState } from "react";
 import GerminationBox from "@/components/PregerminationMenu/GerminationBox/index";
 import BatchReadyBox from "@/components/PregerminationMenu/BatchReadyBox/index";
-import {
-	PregerminationProvider,
-} from "./context";
+import { PregerminationProvider } from "./context";
 import { fetchWithAuth } from "@/components/authentication/authentication";
 import CanvasComponent, { DisplayMode } from "@/components/map/CanvasComponent";
 import { endpoint } from "@/config/config";
@@ -35,7 +33,9 @@ export interface RackData {
 }
 
 const PreGerminationPage: React.FC = () => {
-	const [pregerminatingBatches, setPregerminatingBatches] = useState<Batch[]>([]); // Store batches still pregerminating in this
+	const [pregerminatingBatches, setPregerminatingBatches] = useState<Batch[]>(
+		[],
+	); // Store batches still pregerminating in this
 	const [canBePlacedBatches, setCanBePlacedBatches] = useState<Batch[]>([]); // Store batches ready to be placed in this
 
 	useEffect(() => {
@@ -90,65 +90,65 @@ const PreGerminationPage: React.FC = () => {
 			(batch: Batch) => batch.batchId !== batchId,
 		);
 		setCanBePlacedBatches(newCanBePlacedBatches);
-	}
+	};
 
 	return (
 		<PregerminationProvider>
-						<div className="flex h-full">
-							{/* Grey "Forspiring" background */}
-							<div className="w-[250px] fixed h-full bg-lightgrey flex flex-col">
-								<div className="bg-colorprimary mb-2">
-									<h1 className="text-white font-bold text-2xl text-center mt-2 mb-2">
-										Forspiring
-									</h1>
-								</div>
+			<div className="flex h-full">
+				{/* Grey "Forspiring" background */}
+				<div className="w-[250px] fixed h-full bg-lightgrey flex flex-col">
+					<div className="bg-colorprimary mb-2">
+						<h1 className="text-white font-bold text-2xl text-center mt-2 mb-2">
+							Forspiring
+						</h1>
+					</div>
 
-								{/* Centered "Klar" box with border */}
-								<div className="flex justify-center items-center">
-									<div className="bg-sidebarcolor w-full p-2 text-center text-colorprimary font-bold text-xl border-b-4 border-t-4 border-colorprimary">
-										Klar
-									</div>
-								</div>
-
-								{/* "Klar" box content */}
-								<div className="bg-lightgrey p-2 space-y-2 flex-1 overflow-y-auto">
-									{canBePlacedBatches.map((batch: Batch, index: number) => (
-										<BatchReadyBox
-											batchId={batch.batchId}
-											plantType={batch.plantName}
-											amount={batch.amount}
-											key={index}
-											onPlace={() => handleRemovePlacedBatch(batch.batchId)}
-										/>
-									))}
-								</div>
-
-								{/* Centered "Spirer" box with border */}
-								<div className="flex justify-center items-center">
-									<div className="bg-sidebarcolor w-full p-2 text-center text-colorprimary font-bold text-xl border-b-4 border-t-4 border-colorprimary">
-										Spirer
-									</div>
-								</div>
-
-								{/* "Spire" box content */}
-								<div className="bg-lightgrey p-2 mb-2 flex-1 overflow-y-auto">
-									{pregerminatingBatches.map((batch: Batch, index: number) => (
-										<GerminationBox
-											plantType={batch.plantName}
-											amount={batch.amount}
-											daysUntilReady={batch.daysUntilReady}
-											key={index}
-										/>
-									))}
-								</div>
-							</div>
-
-							{/* Display racks */}
-							<div className="ml-[250px] flex-1">
-								<CanvasComponent displayMode={DisplayMode.input} />
-							</div>
+					{/* Centered "Klar" box with border */}
+					<div className="flex justify-center items-center">
+						<div className="bg-sidebarcolor w-full p-2 text-center text-colorprimary font-bold text-xl border-b-4 border-t-4 border-colorprimary">
+							Klar
 						</div>
-						</PregerminationProvider>
+					</div>
+
+					{/* "Klar" box content */}
+					<div className="bg-lightgrey p-2 space-y-2 flex-1 overflow-y-auto">
+						{canBePlacedBatches.map((batch: Batch, index: number) => (
+							<BatchReadyBox
+								batchId={batch.batchId}
+								plantType={batch.plantName}
+								amount={batch.amount}
+								key={index}
+								onPlace={() => handleRemovePlacedBatch(batch.batchId)}
+							/>
+						))}
+					</div>
+
+					{/* Centered "Spirer" box with border */}
+					<div className="flex justify-center items-center">
+						<div className="bg-sidebarcolor w-full p-2 text-center text-colorprimary font-bold text-xl border-b-4 border-t-4 border-colorprimary">
+							Spirer
+						</div>
+					</div>
+
+					{/* "Spire" box content */}
+					<div className="bg-lightgrey p-2 mb-2 flex-1 overflow-y-auto">
+						{pregerminatingBatches.map((batch: Batch, index: number) => (
+							<GerminationBox
+								plantType={batch.plantName}
+								amount={batch.amount}
+								daysUntilReady={batch.daysUntilReady}
+								key={index}
+							/>
+						))}
+					</div>
+				</div>
+
+				{/* Display racks */}
+				<div className="ml-[250px] flex-1">
+					<CanvasComponent displayMode={DisplayMode.input} />
+				</div>
+			</div>
+		</PregerminationProvider>
 	);
 };
 
