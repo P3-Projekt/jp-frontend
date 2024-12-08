@@ -171,7 +171,7 @@ const PlanterPage = () => {
 	
 		try {
 			const response = await fetchWithAuth(`${endpoint}/PlantType/${name}`, {
-				method: "DELETE",
+				method: "PUT",
 				headers: {
 					"Content-Type": "application/json",
 				},

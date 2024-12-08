@@ -161,7 +161,7 @@ const BrugereSide = () => {
 		try {
 			// Send anmodning (med token) for at inaktivere bruger
 			const response = await fetchWithAuth(`${endpoint}/Users/${name}`, {
-				method: "DELETE",
+				method: "PUT",
 				headers: {
 					"Content-Type": "application/json",
 				},
