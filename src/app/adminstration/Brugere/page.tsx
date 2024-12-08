@@ -161,7 +161,7 @@ const BrugereSide = () => {
 		try {
 			// Send anmodning (med token) for at inaktivere bruger
 			const response = await fetchWithAuth(`${endpoint}/Users/${name}`, {
-				method: "DELETE",
+				method: "PUT",
 				headers: {
 					"Content-Type": "application/json",
 				},
@@ -183,7 +183,7 @@ const BrugereSide = () => {
 	};
 
 	return (
-		<div className="p-8">
+		<div className="p-8 h-screen overflow-y-auto">
 			<h1 className="text-3xl font-bold mb-6 text-center">BRUGERE OG ROLLER</h1>
 
 			{/* Fejlbesked boks */}

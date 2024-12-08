@@ -100,7 +100,10 @@ const BatchesPage = () => {
 
 			// Opdater plantetyper state med navne fra modtaget data
 			const data = await response.json();
-			setPlantTypes(data.map((pt: { name: string }) => pt.name));
+			const activePlantTypes = data.filter(
+				(pt: { name: string; active: boolean }) => pt.active,
+			);
+			setPlantTypes(activePlantTypes.map((pt: { name: string }) => pt.name));
 		} catch (err) {
 			console.error("Kunne ikke hente plantetyper:", err);
 		}
@@ -123,7 +126,10 @@ const BatchesPage = () => {
 
 			// Opdater bakketyper state med navne fra modtaget data
 			const data = await response.json();
-			setTrayTypes(data.map((tt: { name: string }) => tt.name));
+			const activeTrays = data.filter(
+				(tt: { name: string; active: boolean }) => tt.active,
+			);
+			setTrayTypes(activeTrays.map((tt: { name: string }) => tt.name));
 		} catch (err) {
 			console.error("Kunne ikke hente bakketyper:", err);
 		}
@@ -187,7 +193,7 @@ const BatchesPage = () => {
 	};
 
 	return (
-		<div className="p-8">
+		<div className="p-8 h-screen overflow-y-auto">
 			<h1 className="text-3xl font-bold mb-6 text-center">MARKER</h1>
 
 			{/* Fejlmeddelsesboks */}
