@@ -183,7 +183,7 @@ const BrugereSide = () => {
 	};
 
 	return (
-		<div className="p-8">
+		<div className="p-8 h-screen overflow-y-auto">
 			<h1 className="text-3xl font-bold mb-6 text-center">BRUGERE OG ROLLER</h1>
 
 			{/* Fejlbesked boks */}

@@ -175,7 +175,7 @@ const BakkerPage = () => {
 	};
 
 	return (
-		<div className="p-8">
+		<div className="p-8 h-screen overflow-y-auto">
 			<h1 className="text-3xl font-bold mb-6 text-center">BAKKE TYPER</h1>
 
 			{/* Fejlmeddelelse vises, hvis der er en */}

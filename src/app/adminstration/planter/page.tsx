@@ -128,7 +128,7 @@ const PlanterPage = () => {
 
 		try {
 			// Send anmodning (med token) til backend for at oprette ny plantetype
-			const response = await fetchWithAuth(`${endpoint}/PlantType/${name}/activate`, {
+			const response = await fetchWithAuth(`${endpoint}/PlantType`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -222,7 +222,7 @@ const PlanterPage = () => {
 	};
 
 	return (
-		<div className="p-8">
+		<div className="p-8 h-screen overflow-y-auto">
 			<h1 className="text-3xl font-bold mb-6 text-center">PLANTE SORTER</h1>
 
 			{/* Område til visning af fejlmeddelelser */}
