@@ -3,10 +3,7 @@ import React, { useEffect, useState } from "react";
 import GerminationBox from "@/components/PregerminationMenu/GerminationBox/index";
 import BatchReadyBox from "@/components/PregerminationMenu/BatchReadyBox/index";
 import {
-	ShelfProvider,
-	PlacedAmountProvider,
-	AutolocateProvider,
-	BatchPositionProvider,
+	PregerminationProvider,
 } from "./context";
 import { fetchWithAuth } from "@/components/authentication/authentication";
 import CanvasComponent, { DisplayMode } from "@/components/map/CanvasComponent";
@@ -90,10 +87,7 @@ const PreGerminationPage: React.FC = () => {
 	}, []);
 
 	return (
-		<ShelfProvider>
-			<PlacedAmountProvider>
-				<AutolocateProvider>
-					<BatchPositionProvider>
+		<PregerminationProvider>
 						<div className="flex h-full">
 							{/* Grey "Forspiring" background */}
 							<div className="w-[250px] fixed h-full bg-lightgrey flex flex-col">
@@ -147,10 +141,7 @@ const PreGerminationPage: React.FC = () => {
 								<CanvasComponent displayMode={DisplayMode.input} />
 							</div>
 						</div>
-					</BatchPositionProvider>
-				</AutolocateProvider>
-			</PlacedAmountProvider>
-		</ShelfProvider>
+						</PregerminationProvider>
 	);
 };
 
