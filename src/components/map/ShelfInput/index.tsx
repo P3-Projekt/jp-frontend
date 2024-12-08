@@ -9,7 +9,7 @@ import { ToastMessage } from "@/functions/ToastMessage/ToastMessage";
 import { ShelfData } from "@/app/pregermination/page";
 
 const ShelfBox: React.FC<ShelfData> = ({ position, rackId, id: shelfId }) => {
-	const { shelfMap } = useShelfContext(); //Get the shelfMap which tells this shelf how much available space it has
+	const { shelfMap, activeBatchId } = useShelfContext(); //Get the shelfMap which tells this shelf how much available space it has
 	const [currentValue, setCurrentValue] = useState(0); //The current input value which becomes the previous when the next input is entered
 	const [availableSpace, setAvailableSpace] = useState(0); //The maximal space available on the shelf
 	const { placedAmount, setPlacedAmount, batchAmount } =
@@ -17,7 +17,6 @@ const ShelfBox: React.FC<ShelfData> = ({ position, rackId, id: shelfId }) => {
 	const { nestedMap: autolocateMap } = useAutolocateContext();
 	const { batchPositionMapSet, batchPositionMapDelete, batchPositionMapHas } =
 		useBatchPositionContext();
-	const { activeBatchId } = useShelfContext();
 
 	useEffect(() => {
 		let autoLocateAmount = 0;
