@@ -76,7 +76,9 @@ const KalenderPage: React.FC = () => {
 				<Task
 					taskId={task.taskId}
 					batchId={task.batchId}
-					category={task.category.toLowerCase() as "harvest" | "water" | "plant"}
+					category={
+						task.category.toLowerCase() as "harvest" | "water" | "plant"
+					}
 					plantType={task.plantType}
 					fields={task.fields}
 					dueDate={task.dueDate}

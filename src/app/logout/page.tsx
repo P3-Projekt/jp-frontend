@@ -1,16 +1,16 @@
 "use client";
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 const LogoutPage = () => {
-    const router = useRouter();
+	const router = useRouter();
 
-    useEffect(() => {
-        localStorage.removeItem('authToken');
-        router.push('/');
-    }, [router]);
+	useEffect(() => {
+		localStorage.removeItem("authToken");
+		router.push("/");
+	}, [router]);
 
-    return null;
+	return null;
 };
 
 export default LogoutPage;
