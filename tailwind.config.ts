@@ -16,6 +16,7 @@ const config: Config = {
 				colorsecondary: "#D2CFC9",
 				textcolor: "#3A3C47",
 				sidebarcolor: "#F4F3F0",
+				sidebarcolordark: "#e9e7e1",
 				subbordercolor: "#E6E3DC",
 				lightgrey: "#D9D9D9",
 				darkgrey: "#A5A5A5",

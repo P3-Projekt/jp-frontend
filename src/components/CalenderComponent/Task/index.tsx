@@ -18,7 +18,7 @@ export interface TaskProps {
 	taskId: number;
 	fields: number;
 	plantType: number;
-	category: "harvest" | "water" | "move";
+	category: "harvest" | "water" | "plant";
 	batchId: number;
 	dueDate: Date;
 }
@@ -36,7 +36,7 @@ const categoryDetails = {
 		dialogTaskIcon: <Droplets className="size-12" />,
 		backgroundColor: "bg-blue-500",
 	},
-	move: {
+	plant: {
 		type: "flyt",
 		taskIcon: <MoveRight className="size-7 mt-0.5" />,
 		dialogTaskIcon: <MoveRight className="size-12 pt-1" />,

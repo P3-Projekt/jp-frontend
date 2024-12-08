@@ -76,7 +76,7 @@ const KalenderPage: React.FC = () => {
 				<Task
 					taskId={task.taskId}
 					batchId={task.batchId}
-					category={task.category.toLowerCase() as "harvest" | "water" | "move"}
+					category={task.category.toLowerCase() as "harvest" | "water" | "plant"}
 					plantType={task.plantType}
 					fields={task.fields}
 					dueDate={task.dueDate}
@@ -164,12 +164,12 @@ const KalenderPage: React.FC = () => {
 					/>
 				</div>
 				{/* DAGE */}
-				<div className="mt-3 flex flex-row justify-center gap-x-2 cursor-default">
+				<div className="mt-3 flex flex-row justify-center gap-x-2 cursor-default mr-12">
 					<WeekDay currentDay={currentDay} days={daysInWeek} />
 				</div>
 
 				{/* OPGAVER */}
-				<div className="mt-3 flex flex-row justify-center gap-x-2 h-full">
+				<div className="mt-3 flex flex-row justify-center gap-x-2 h-full mr-12">
 					{daysInWeek.map((day, index) => (
 						<div
 							key={index}
@@ -179,7 +179,7 @@ const KalenderPage: React.FC = () => {
 									: defaultColumnStyle
 							}
 						>
-							<ul className="grid grid-rows-12 w-100 h-full divide-y divide-black text-center m-2">
+							<ul className="grid grid-rows-12 w-100 h-full gap-y-2 text-center m-2">
 								{selectedDayTask(day)}
 							</ul>
 						</div>
