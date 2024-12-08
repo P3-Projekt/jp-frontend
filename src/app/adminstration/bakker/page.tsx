@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { fetchWithAuth } from "@/components/authentication/authentication";
 import { endpoint } from "@/config/config";
@@ -125,12 +125,15 @@ const BakkerPage = () => {
 		setError(null);
 
 		try {
-			const response = await fetchWithAuth(`${endpoint}/TrayType/${name}/activate`, {
-				 method: "PUT",
-				 headers: {
-					 "Content-Type": "application/json" 
-					} 
-				});
+			const response = await fetchWithAuth(
+				`${endpoint}/TrayType/${name}/activate`,
+				{
+					method: "PUT",
+					headers: {
+						"Content-Type": "application/json",
+					},
+				},
+			);
 
 			if (!response.ok) {
 				const errorText = await response.text();
@@ -146,19 +149,21 @@ const BakkerPage = () => {
 		}
 	};
 
-
 	// Funktion til at slette (inaktivere) en bakke type
 	const handleDelete = async (name: string) => {
 		setIsLoading(true);
 		setError(null);
 
 		try {
-			const response = await fetchWithAuth(`${endpoint}/TrayType/${name}/inactivate`, {
-				method: "PUT",
-				headers: { 
-					"Content-Type": "application/json" 
-				}
-			});
+			const response = await fetchWithAuth(
+				`${endpoint}/TrayType/${name}/inactivate`,
+				{
+					method: "PUT",
+					headers: {
+						"Content-Type": "application/json",
+					},
+				},
+			);
 
 			if (!response.ok) {
 				const errorText = await response.text();
@@ -258,7 +263,9 @@ const BakkerPage = () => {
 
 			{/* Tabel over aktive bakke typer */}
 			<div className="bg-sidebarcolor p-6 rounded-lg shadow-xl border mb-8">
-				<h2 className="text-lg font-semibold mb-6">AKTIV BAKKE TYPE OVERSIGT</h2>
+				<h2 className="text-lg font-semibold mb-6">
+					AKTIV BAKKE TYPE OVERSIGT
+				</h2>
 				<table className="w-full table-auto border-collapse">
 					<thead>
 						<tr className="bg-colorprimary text-white">
@@ -307,7 +314,9 @@ const BakkerPage = () => {
 
 			{/* Tabel over inaktive bakke typer */}
 			<div className="bg-sidebarcolor p-6 rounded-lg shadow-xl border">
-				<h2 className="text-xl font-semibold mb-6">INAKTIV BAKKE TYPE OVERSIGT</h2>
+				<h2 className="text-xl font-semibold mb-6">
+					INAKTIV BAKKE TYPE OVERSIGT
+				</h2>
 				<table className="w-full table-auto border-collapse">
 					<thead>
 						<tr className="bg-red-900 text-white">

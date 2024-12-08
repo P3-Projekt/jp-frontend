@@ -100,7 +100,9 @@ const BatchesPage = () => {
 
 			// Opdater plantetyper state med navne fra modtaget data
 			const data = await response.json();
-			const activePlantTypes = data.filter((pt: { name: string; active: boolean }) => pt.active);
+			const activePlantTypes = data.filter(
+				(pt: { name: string; active: boolean }) => pt.active,
+			);
 			setPlantTypes(activePlantTypes.map((pt: { name: string }) => pt.name));
 		} catch (err) {
 			console.error("Kunne ikke hente plantetyper:", err);
@@ -124,7 +126,9 @@ const BatchesPage = () => {
 
 			// Opdater bakketyper state med navne fra modtaget data
 			const data = await response.json();
-			const activeTrays = data.filter((tt: { name: string; active: boolean }) => tt.active);
+			const activeTrays = data.filter(
+				(tt: { name: string; active: boolean }) => tt.active,
+			);
 			setTrayTypes(activeTrays.map((tt: { name: string }) => tt.name));
 		} catch (err) {
 			console.error("Kunne ikke hente bakketyper:", err);

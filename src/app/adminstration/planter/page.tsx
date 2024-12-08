@@ -68,13 +68,16 @@ const PlanterPage = () => {
 			// Opdater state med de hentede plantetyper
 			const data = await response.json();
 
-            // Separate active and inactive plant types
-            const activePlantTypes = data.filter((plante: PlantType) => plante.active);
-            const inactivePlantTypes = data.filter((plante: PlantType) => !plante.active);
-            
-            setPlantTypes(activePlantTypes);
-            setInactivePlantTypes(inactivePlantTypes);
+			// Separate active and inactive plant types
+			const activePlantTypes = data.filter(
+				(plante: PlantType) => plante.active,
+			);
+			const inactivePlantTypes = data.filter(
+				(plante: PlantType) => !plante.active,
+			);
 
+			setPlantTypes(activePlantTypes);
+			setInactivePlantTypes(inactivePlantTypes);
 		} catch (error) {
 			setError("Kunne ikke hente plante typer fra database");
 			console.error("Kunne ikke hente plante typer fra database:", error);
@@ -164,11 +167,11 @@ const PlanterPage = () => {
 		}
 	};
 
-    //Send anmodning (med token) til backend for at inaktivere plantetype
+	//Send anmodning (med token) til backend for at inaktivere plantetype
 	const handleDeactivate = async (name: string) => {
 		setIsLoading(true);
 		setError(null);
-	
+
 		try {
 			const response = await fetchWithAuth(`${endpoint}/PlantType/${name}`, {
 				method: "PUT",
@@ -176,13 +179,13 @@ const PlanterPage = () => {
 					"Content-Type": "application/json",
 				},
 			});
-	
+
 			if (!response.ok) {
 				const errorText = await response.text();
 				throw new Error(errorText || "Kunne ikke inaktivere plantetype");
 			}
-	
-			await fetchPlantTypes(); 
+
+			await fetchPlantTypes();
 		} catch (err) {
 			setError("Kunne ikke inaktivere plantetype");
 			console.error("Kunne ikke inaktivere plantetype:", err);
@@ -191,11 +194,11 @@ const PlanterPage = () => {
 		}
 	};
 
-    // Send anmodning (med token) til backend for at aktivere plantetype
+	// Send anmodning (med token) til backend for at aktivere plantetype
 	const handleReactivate = async (name: string) => {
 		setIsLoading(true);
 		setError(null);
-	
+
 		try {
 			const response = await fetchWithAuth(
 				`${endpoint}/PlantType/${name}/activate`,
@@ -204,14 +207,14 @@ const PlanterPage = () => {
 					headers: {
 						"Content-Type": "application/json",
 					},
-				}
+				},
 			);
-	
+
 			if (!response.ok) {
 				const errorText = await response.text();
 				throw new Error(errorText || "Kunne ikke reaktivere plantetype");
 			}
-	
+
 			await fetchPlantTypes();
 		} catch (err) {
 			setError("Kunne ikke reaktivere plantetype");
@@ -344,128 +347,128 @@ const PlanterPage = () => {
 			</form>
 
 			{/* Tabel til visning af eksisterende plantetyper */}
-            <div className="bg-sidebarcolor p-6 rounded-lg shadow-xl mb-8">
-                <h2 className="text-lg font-semibold mb-6">AKTIVE PLANTE TYPER</h2>
-                <table className="w-full table-auto border-collapse">
-                    <thead>
-                        <tr className="bg-colorprimary text-white">
-                            <th className="p-2 border text-center" style={{ width: "60px" }}>
-                                Inaktiver
-                            </th>
-                            <th className="p-2 border w-1/5">Sort navn</th>
-                            <th className="p-2 border w-1/5">Spiring [dage]</th>
-                            <th className="p-2 border w-1/5">Gro tid [dage]</th>
-                            <th className="p-2 border w-1/5">Vandings tider [dage]</th>
-                            <th className="p-2 border w-1/5">Position</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {isLoading ? (
-                            <tr>
-                                <td colSpan={6} className="p-4 text-center">
-                                    Indlæser plante typer...
-                                </td>
-                            </tr>
-                        ) : (
-                            plantTypes.map((plante) => (
-                                <tr key={plante.name} className="odd:bg-white even:bg-gray-200">
-                                    <td className="p-2 border text-center">
-                                        <button
-                                            onClick={() => handleDeactivate(plante.name)}
-                                            className="flex items-center justify-center w-full h-full"
-                                            aria-label={`Inaktiver ${plante.name}`}
-                                            disabled={isLoading}
-                                        >
-                                            <Image
-                                                src="/x.png"
-                                                alt="Inaktiver Icon"
-                                                width={24}
-                                                height={24}
-                                            />
-                                        </button>
-                                    </td>
-                                    <td className="p-2 border text-center">{plante.name}</td>
-                                    <td className="p-2 border text-center">
-                                        {plante.preGerminationDays}
-                                    </td>
-                                    <td className="p-2 border text-center">
-                                        {plante.growthTimeDays}
-                                    </td>
-                                    <td className="p-2 border text-center">
-                                        {plante.wateringSchedule.join(", ")}
-                                    </td>
-                                    <td className="p-2 border text-center">
-                                        {positionDisplayMap[plante.preferredPosition]}
-                                    </td>
-                                </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
-            </div>
+			<div className="bg-sidebarcolor p-6 rounded-lg shadow-xl mb-8">
+				<h2 className="text-lg font-semibold mb-6">AKTIVE PLANTE TYPER</h2>
+				<table className="w-full table-auto border-collapse">
+					<thead>
+						<tr className="bg-colorprimary text-white">
+							<th className="p-2 border text-center" style={{ width: "60px" }}>
+								Inaktiver
+							</th>
+							<th className="p-2 border w-1/5">Sort navn</th>
+							<th className="p-2 border w-1/5">Spiring [dage]</th>
+							<th className="p-2 border w-1/5">Gro tid [dage]</th>
+							<th className="p-2 border w-1/5">Vandings tider [dage]</th>
+							<th className="p-2 border w-1/5">Position</th>
+						</tr>
+					</thead>
+					<tbody>
+						{isLoading ? (
+							<tr>
+								<td colSpan={6} className="p-4 text-center">
+									Indlæser plante typer...
+								</td>
+							</tr>
+						) : (
+							plantTypes.map((plante) => (
+								<tr key={plante.name} className="odd:bg-white even:bg-gray-200">
+									<td className="p-2 border text-center">
+										<button
+											onClick={() => handleDeactivate(plante.name)}
+											className="flex items-center justify-center w-full h-full"
+											aria-label={`Inaktiver ${plante.name}`}
+											disabled={isLoading}
+										>
+											<Image
+												src="/x.png"
+												alt="Inaktiver Icon"
+												width={24}
+												height={24}
+											/>
+										</button>
+									</td>
+									<td className="p-2 border text-center">{plante.name}</td>
+									<td className="p-2 border text-center">
+										{plante.preGerminationDays}
+									</td>
+									<td className="p-2 border text-center">
+										{plante.growthTimeDays}
+									</td>
+									<td className="p-2 border text-center">
+										{plante.wateringSchedule.join(", ")}
+									</td>
+									<td className="p-2 border text-center">
+										{positionDisplayMap[plante.preferredPosition]}
+									</td>
+								</tr>
+							))
+						)}
+					</tbody>
+				</table>
+			</div>
 
-            {/* Inactive Plant Types Table */}
-            <div className="bg-sidebarcolor p-6 rounded-lg shadow-xl">
-                <h2 className="text-lg font-semibold mb-6">INAKTIVE PLANTE TYPER</h2>
-                <table className="w-full table-auto border-collapse">
-                    <thead>
-                        <tr className="bg-red-900 text-white">
-                            <th className="p-2 border text-center" style={{ width: "60px" }}>
-                                Aktiver
-                            </th>
-                            <th className="p-2 border w-1/5">Sort navn</th>
-                            <th className="p-2 border w-1/5">Spiring [dage]</th>
-                            <th className="p-2 border w-1/5">Gro tid [dage]</th>
-                            <th className="p-2 border w-1/5">Vandings tider [dage]</th>
-                            <th className="p-2 border w-1/5">Position</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {isLoading ? (
-                            <tr>
-                                <td colSpan={6} className="p-4 text-center">
-                                    Indlæser plante typer...
-                                </td>
-                            </tr>
-                        ) : (
-                            inactivePlantTypes.map((plante) => (
-                                <tr key={plante.name} className="odd:bg-white even:bg-gray-200">
-                                    <td className="p-2 border text-center">
-                                        <button
-                                            onClick={() => handleReactivate(plante.name)}
-                                            className="flex items-center justify-center w-full h-full"
-                                            aria-label={`Aktiver ${plante.name}`}
-                                            disabled={isLoading}
-                                        >
-                                            <Image
-                                                src="/check.png"
-                                                alt="Aktiver Icon"
-                                                width={24}
-                                                height={24}
-                                            />
-                                        </button>
-                                    </td>
-                                    <td className="p-2 border text-center">{plante.name}</td>
-                                    <td className="p-2 border text-center">
-                                        {plante.preGerminationDays}
-                                    </td>
-                                    <td className="p-2 border text-center">
-                                        {plante.growthTimeDays}
-                                    </td>
-                                    <td className="p-2 border text-center">
-                                        {plante.wateringSchedule.join(", ")}
-                                    </td>
-                                    <td className="p-2 border text-center">
-                                        {positionDisplayMap[plante.preferredPosition]}
-                                    </td>
-                                </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    );
+			{/* Inactive Plant Types Table */}
+			<div className="bg-sidebarcolor p-6 rounded-lg shadow-xl">
+				<h2 className="text-lg font-semibold mb-6">INAKTIVE PLANTE TYPER</h2>
+				<table className="w-full table-auto border-collapse">
+					<thead>
+						<tr className="bg-red-900 text-white">
+							<th className="p-2 border text-center" style={{ width: "60px" }}>
+								Aktiver
+							</th>
+							<th className="p-2 border w-1/5">Sort navn</th>
+							<th className="p-2 border w-1/5">Spiring [dage]</th>
+							<th className="p-2 border w-1/5">Gro tid [dage]</th>
+							<th className="p-2 border w-1/5">Vandings tider [dage]</th>
+							<th className="p-2 border w-1/5">Position</th>
+						</tr>
+					</thead>
+					<tbody>
+						{isLoading ? (
+							<tr>
+								<td colSpan={6} className="p-4 text-center">
+									Indlæser plante typer...
+								</td>
+							</tr>
+						) : (
+							inactivePlantTypes.map((plante) => (
+								<tr key={plante.name} className="odd:bg-white even:bg-gray-200">
+									<td className="p-2 border text-center">
+										<button
+											onClick={() => handleReactivate(plante.name)}
+											className="flex items-center justify-center w-full h-full"
+											aria-label={`Aktiver ${plante.name}`}
+											disabled={isLoading}
+										>
+											<Image
+												src="/check.png"
+												alt="Aktiver Icon"
+												width={24}
+												height={24}
+											/>
+										</button>
+									</td>
+									<td className="p-2 border text-center">{plante.name}</td>
+									<td className="p-2 border text-center">
+										{plante.preGerminationDays}
+									</td>
+									<td className="p-2 border text-center">
+										{plante.growthTimeDays}
+									</td>
+									<td className="p-2 border text-center">
+										{plante.wateringSchedule.join(", ")}
+									</td>
+									<td className="p-2 border text-center">
+										{positionDisplayMap[plante.preferredPosition]}
+									</td>
+								</tr>
+							))
+						)}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	);
 };
 
 export default PlanterPage;
