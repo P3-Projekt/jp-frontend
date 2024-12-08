@@ -35,9 +35,7 @@ export interface RackData {
 }
 
 const PreGerminationPage: React.FC = () => {
-	const [pregerminatingBatches, setPregerminatingBatches] = useState<Batch[]>(
-		[],
-	); // Store batches still pregerminating in this
+	const [pregerminatingBatches, setPregerminatingBatches] = useState<Batch[]>([]); // Store batches still pregerminating in this
 	const [canBePlacedBatches, setCanBePlacedBatches] = useState<Batch[]>([]); // Store batches ready to be placed in this
 
 	useEffect(() => {
@@ -86,6 +84,14 @@ const PreGerminationPage: React.FC = () => {
 		fetchBatchData();
 	}, []);
 
+	const handleRemovePlacedBatch = (batchId: number) => {
+		// Remove batch from canBePlacedBatches
+		const newCanBePlacedBatches = canBePlacedBatches.filter(
+			(batch: Batch) => batch.batchId !== batchId,
+		);
+		setCanBePlacedBatches(newCanBePlacedBatches);
+	}
+
 	return (
 		<PregerminationProvider>
 						<div className="flex h-full">
@@ -112,6 +118,7 @@ const PreGerminationPage: React.FC = () => {
 											plantType={batch.plantName}
 											amount={batch.amount}
 											key={index}
+											onPlace={() => handleRemovePlacedBatch(batch.batchId)}
 										/>
 									))}
 								</div>

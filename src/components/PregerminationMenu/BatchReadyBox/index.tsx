@@ -14,7 +14,7 @@ import {
     usePregerminationContext,
     getPlacedAmount
 } from "@/app/pregermination/context";
-import { fetchWithAuth } from "@/components/authentication/authentication";
+import { fetchWithAuth, getUser } from "@/components/authentication/authentication";
 import { ToastMessage } from "@/functions/ToastMessage/ToastMessage";
 import { endpoint } from "@/config/config";
 
@@ -22,12 +22,14 @@ interface BatchReadyProps {
     batchId: number;
     plantType: string;
     amount: number;
+    onPlace: () => void;
 }
 
 const BatchReadyBox: React.FC<BatchReadyProps> = ({
     batchId,
     plantType,
     amount,
+    onPlace,
 }) => {
     const { activeBatchId, setActiveBatchId, setAvailableSpace, setBatchAmount, setBatchPosition, batchPosition } = usePregerminationContext();
 
@@ -52,12 +54,8 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
             );
 
             if (!response.ok) {
-                ToastMessage({
-                    title: "Uventet fejl",
-                    message: "Kunne ikke hente maksimal mængde på hylder",
-                    type: "error",
-                });
-                throw new Error("Fetching max batches on shelves failed");
+                const errorMesssage = await response.text();
+                throw new Error("Fetching max amount on shelves failed: " + errorMesssage);
             }
 
             const result = await response.json();
@@ -73,13 +71,10 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
         }
     };
 
-    const fetchBatchPosition = async (data: unknown) => {
+    const handleConfirmPlaceClick = async () => {
+        setOpenDialog(false);
         try {
-            const fetchObj = {
-                locations: data,
-                username: "Jens",
-            };
-            console.log(fetchObj);
+            console.log(getUser());
             const response = await fetchWithAuth(
                 `${endpoint}/Batch/${batchId}/Position`,
                 {
@@ -87,22 +82,30 @@ const BatchReadyBox: React.FC<BatchReadyProps> = ({
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify(fetchObj),
+                    body: JSON.stringify({
+                        locations: batchPosition,
+                        username: getUser(),
+                    }),
                 },
             );
 
             if (!response.ok) {
-                throw new Error("Updating batch position failed");
+                const errorMesssage = await response.text();
+                throw new Error("Placing batch failed: " + errorMesssage);
             }
-        } catch (error) {
-            alert(error);
-        }
-    };
 
-    const handleConfirmPlaceClick = async () => {
-        setOpenDialog(false);
-        console.log(batchPosition);
-        await fetchBatchPosition(batchPosition);
+            onPlace();
+            setActiveBatchId(null);
+            setBatchAmount(null);
+            setBatchPosition({});
+        } catch (err) {
+            ToastMessage({
+                title: "Uventet fejl",
+                message: "Kunne ikke placere batch",
+                type: "error",
+            });
+            console.error("Kunne ikke placere batch: " + err);
+        }
     };
 
     const handlePlaceClick = () => {
