@@ -21,6 +21,9 @@ export interface TaskProps {
 	category: "harvest" | "water" | "plant";
 	batchId: number;
 	dueDate: Date;
+	isPlaced: boolean;
+	completedAt: string | null;
+	completedBy: string | null;
 }
 
 const categoryDetails = {
@@ -44,11 +47,19 @@ const categoryDetails = {
 	},
 };
 
-const Task = ({ fields, plantType, category, batchId }: TaskProps) => {
+const Task = ({ fields, plantType, category, batchId, completedAt, completedBy, isPlaced }: TaskProps) => {
 	const [openDialog, setOpenDialog] = useState(false);
 
 	const { type, taskIcon, dialogTaskIcon, backgroundColor } =
 		categoryDetails[category] || {};
+
+	function getStatus(completedAt: string | null, completedBy: string | null) {
+		if (completedAt && completedBy) {
+			return `Gennemført af ${completedBy} @ ${new Date(completedAt).toLocaleString()}`;
+		} else {
+			return "Ikke færdig";
+		}
+	}
 
 	return (
 		<>
@@ -98,22 +109,30 @@ const Task = ({ fields, plantType, category, batchId }: TaskProps) => {
 								{fields}
 							</span>
 							<br />
+							Status:{" "}
+							<span className="font-bold text-colorprimary cursor-text">
+								{getStatus(completedAt, completedBy)}
+							</span>
+							<br />
+							
 						</DialogDescription>
 						<DialogFooter>
+							{isPlaced ? 
 							<div className="w-full flex flex-row justify-between gap-y-4 mt-2">
-								<Link
-									href={`/?id=${batchId}`}
-									className={buttonVariants({
-										variant: "black",
-									})}
-									onClick={() => {
-										// Send til kort
-										setOpenDialog(false);
-									}}
-								>
-									<p className="uppercase font-bold">vis lokation</p>
-								</Link>
-							</div>
+							<Link
+								href={`/?batchId=${batchId}`}
+								className={buttonVariants({
+									variant: "black",
+								})}
+								onClick={() => {
+									// Send til kort
+									setOpenDialog(false);
+								}}
+							>
+								<p className="uppercase font-bold">vis lokation</p>
+							</Link>
+						</div>
+							: null}
 						</DialogFooter>
 					</DialogHeader>
 				</DialogContent>

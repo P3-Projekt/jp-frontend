@@ -10,7 +10,7 @@ import { endpoint } from "@/config/config";
 
 const KalenderPage: React.FC = () => {
 	// Get current week number
-	const currentWeekNumber: number = getCurrentWeekNumber(new Date());
+	const currentWeekNumber: number = getCurrentWeekNumber();
 	const currentYear: number = new Date().getFullYear();
 
 	// State for week number
@@ -26,18 +26,6 @@ const KalenderPage: React.FC = () => {
 		"grid w-full bg-sidebarcolor text-black rounded";
 	const currentDayColumnStyle: string =
 		"grid w-full bg-colorprimary text-white rounded";
-
-	// Get week number from local storage
-	useEffect(() => {
-		const savedWeekNumber = localStorage.getItem("weekNumber");
-		const savedYear = localStorage.getItem("year");
-		if (savedWeekNumber) {
-			setWeekNumber(parseInt(savedWeekNumber, 10));
-		}
-		if (savedYear) {
-			setYear(parseInt(savedYear, 10));
-		}
-	}, []);
 
 	useEffect(() => {
 		const fetchTasks = async () => {
@@ -82,16 +70,13 @@ const KalenderPage: React.FC = () => {
 					plantType={task.plantType}
 					fields={task.fields}
 					dueDate={task.dueDate}
+					isPlaced={task.isPlaced}
+					completedAt={task.completedAt}
+					completedBy={task.completedBy}
 				/>
 			</div>
 		));
 	};
-
-	// Save week number to local storage
-	useEffect(() => {
-		localStorage.setItem("weekNumber", weekNumber.toString());
-		localStorage.setItem("year", year.toString());
-	}, [weekNumber, year]);
 
 	// Functionality to change week number with arrow keys
 	useEffect(() => {

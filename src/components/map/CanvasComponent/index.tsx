@@ -90,25 +90,32 @@ const CanvasComponent = forwardRef<
 	const [loadingRacks, setLoadingRacks] = useState<Map<number, RackData>>(
 		new Map(),
 	);
-	const [highlightedRackId, setHighlightedRackId] = useState<string | null>(
-		null,
-	);
+	const [highlightedRacks, setHighlightedRacks] = useState<number[]>([]);
 
 	// Get search params
 	const searchParams = useSearchParams();
-	const highlightedId = searchParams.get("id");
+	const highlightedId = searchParams.get("batchId");
 
 	useEffect(() => {
-		if (highlightedId) {
-			setHighlightedRackId(highlightedId);
+
+		if(highlightedId){
+
+			const highlightedRackIds = racks.filter(
+				(rack) => rack.shelves.some(
+					(shelf) => shelf.batches.some(
+						(batch) => batch.id === Number(highlightedId)
+					))).map((rack) => rack.id);
+			console.log(highlightedRackIds)
+
+			setHighlightedRacks(highlightedRackIds);
 
 			const timer = setTimeout(() => {
-				setHighlightedRackId(null);
+				setHighlightedRacks([]);
 			}, 3000);
 
 			return () => clearTimeout(timer);
 		}
-	}, [highlightedId]);
+	}, [highlightedId, racks]);
 
 	// Fetch racks from the backend
 	useEffect((): void => {
@@ -413,7 +420,7 @@ const CanvasComponent = forwardRef<
 							rackMouseDownHandler(index);
 						}}
 						className={
-							Number(highlightedRackId) === box.id ? "highlighted blink" : ""
+							highlightedRacks.includes(Number(box.id)) ? "highlighted blink" : ""
 						}
 						removeRack={() => {
 							removeRack(index);

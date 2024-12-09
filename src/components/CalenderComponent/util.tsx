@@ -3,24 +3,12 @@
  * @param date
  * @returns current week number
  */
-export function getCurrentWeekNumber(date: Date): number {
-	const msPerDay = 86400000;
-
-	const firstThursday: Date = new Date(date.getFullYear(), 0, 1);
-
-	while (firstThursday.getDay() !== 4) {
-		firstThursday.setDate(firstThursday.getDate() + 1);
-	}
-
-	const currentThursday: Date = new Date(date);
-
-	while (currentThursday.getDay() !== 4) {
-		currentThursday.setDate(currentThursday.getDate() - 1);
-	}
-
-	return Math.ceil(
-		((currentThursday.getTime() - firstThursday.getTime()) / msPerDay + 1) / 7,
-	);
+export function getCurrentWeekNumber() : number {
+	const date = new Date();
+	const startOfYear = new Date(date.getFullYear(), 0, 1);
+	const days = Math.floor((date.getTime() - startOfYear.getTime()) / (24 * 60 * 60 * 1000));
+	const weekNumber = Math.ceil((days + 1) / 7);
+	return weekNumber;
 }
 
 /**
