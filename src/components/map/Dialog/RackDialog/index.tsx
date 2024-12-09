@@ -103,7 +103,7 @@ const RackDialog: React.FC<RackDialogProps> = ({
 						<DialogDescription>
 							<div className="min-h-full gap-x-5 flex flex-row justify-between content-center">
 								{/* rack information */}
-								<div className="h-[320px] self-center items-start basis-2/5 flex flex-col bg-blue-200 text-xl text-black rounded border-2 border-black pl-2 pr-2">
+								<div className="h-[340px] self-center items-start basis-2/5 flex flex-col bg-blue-200 text-xl text-black rounded border-2 border-black pl-2 pr-2">
 									<div>
 										Næste opgave:{" "}
 										<span className="font-semibold font-">
