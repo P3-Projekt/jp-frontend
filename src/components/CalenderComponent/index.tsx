@@ -19,13 +19,13 @@ const KalenderPage: React.FC = () => {
 	const daysInWeek = getDatesInWeek(weekNumber, year);
 	const currentDay = formatDate(new Date());
 
-	// Hvis dag er den samme som den nuværende dag, så skal farven være primary, ellers skal den være sidebarcolor
+	// If current day is the same as the day in the loop, set the column style to be primary color
 	const columnStyle = (day: string) =>
 		day === currentDay
 			? "grid w-full bg-colorprimary text-white rounded"
 			: "grid w-full bg-sidebarcolor text-black rounded";
 
-	// Hent opgaver fra API
+	// Get tasks for the selected week
 	const fetchTasks = useCallback(async () => {
 		try {
 			const response = await fetchWithAuth(
@@ -33,17 +33,17 @@ const KalenderPage: React.FC = () => {
 			);
 			if (!response.ok) throw new Error("Failed to fetch tasks");
 			const tasks = await response.json();
-			setTasks(tasks); // Sætter tasks til at være de hentede opgaver
+			setTasks(tasks); // Set tasks
 		} catch (error) {
 			console.error(error);
 		}
 	}, [weekNumber]);
 
 	useEffect(() => {
-		fetchTasks(); // Hent opgaver
+		fetchTasks();
 	}, [fetchTasks]);
 
-	// Vis opgaver for den valgte dag
+	// Show tasks for the selected day
 	const selectedDayTask = (selectedDay: Date) => {
 		const dayTasks = tasks.filter(
 			(task) => formatDate(new Date(task.dueDate)) === formatDate(selectedDay),
@@ -52,17 +52,17 @@ const KalenderPage: React.FC = () => {
 		return dayTasks.map((task) => <Task key={task.taskId} {...task} />);
 	};
 
-	// Skift uge
+	// Change week number
 	const changeWeek = (increment: number) => {
 		setWeekNumber((prev) => {
 			const newWeek = prev + increment;
 			if (newWeek < 1) {
-				// Hvis ugen er mindre end 1, så skal året trækkes fra 1
+				// If the week is less than 1, subtract 1 from the year
 				setYear((prevYear) => prevYear - 1);
 				return 52;
 			}
 			if (newWeek > 52) {
-				// Hvis ugen er større end 52, så skal året tilføjes 1
+				// If the week is greater than 52, add 1 to the year
 				setYear((prevYear) => prevYear + 1);
 				return 1;
 			}
@@ -70,7 +70,7 @@ const KalenderPage: React.FC = () => {
 		});
 	};
 
-	// Lyt efter tastatur input for at skifte uge
+	// Listen for arrow key presses to change week
 	useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
 			if (event.key === "ArrowLeft") changeWeek(-1);
@@ -108,7 +108,7 @@ const KalenderPage: React.FC = () => {
 			<div className="mt-3 flex flex-row justify-center gap-x-2">
 				<WeekDay currentDay={currentDay} days={daysInWeek} />
 			</div>
-			{/* Opgaver */}
+			{/* Tasks */}
 			<div className="mt-3 flex flex-row justify-center gap-x-2 h-full">
 				{daysInWeek.map((day, index) => (
 					<div key={index} className={columnStyle(formatDate(day))}>
