@@ -105,7 +105,6 @@ const CanvasComponent = forwardRef<
 					(shelf) => shelf.batches.some(
 						(batch) => batch.id === Number(highlightedId)
 					))).map((rack) => rack.id);
-			console.log(highlightedRackIds)
 
 			setHighlightedRacks(highlightedRackIds);
 
