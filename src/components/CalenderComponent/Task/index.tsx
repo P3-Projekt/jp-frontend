@@ -47,7 +47,15 @@ const categoryDetails = {
 	},
 };
 
-const Task = ({ fields, plantType, category, batchId, completedAt, completedBy, isPlaced }: TaskProps) => {
+const Task = ({
+	fields,
+	plantType,
+	category,
+	batchId,
+	completedAt,
+	completedBy,
+	isPlaced,
+}: TaskProps) => {
 	const [openDialog, setOpenDialog] = useState(false);
 
 	const { type, taskIcon, dialogTaskIcon, backgroundColor } =
@@ -114,25 +122,24 @@ const Task = ({ fields, plantType, category, batchId, completedAt, completedBy, 
 								{getStatus(completedAt, completedBy)}
 							</span>
 							<br />
-							
 						</DialogDescription>
 						<DialogFooter>
-							{isPlaced ? 
-							<div className="w-full flex flex-row justify-between gap-y-4 mt-2">
-							<Link
-								href={`/?batchId=${batchId}`}
-								className={buttonVariants({
-									variant: "black",
-								})}
-								onClick={() => {
-									// Send til kort
-									setOpenDialog(false);
-								}}
-							>
-								<p className="uppercase font-bold">vis lokation</p>
-							</Link>
-						</div>
-							: null}
+							{isPlaced ? (
+								<div className="w-full flex flex-row justify-between gap-y-4 mt-2">
+									<Link
+										href={`/?batchId=${batchId}`}
+										className={buttonVariants({
+											variant: "black",
+										})}
+										onClick={() => {
+											// Send til kort
+											setOpenDialog(false);
+										}}
+									>
+										<p className="uppercase font-bold">vis lokation</p>
+									</Link>
+								</div>
+							) : null}
 						</DialogFooter>
 					</DialogHeader>
 				</DialogContent>

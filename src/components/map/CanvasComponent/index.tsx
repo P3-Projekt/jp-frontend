@@ -97,14 +97,14 @@ const CanvasComponent = forwardRef<
 	const highlightedId = searchParams.get("batchId");
 
 	useEffect(() => {
-
-		if(highlightedId){
-
-			const highlightedRackIds = racks.filter(
-				(rack) => rack.shelves.some(
-					(shelf) => shelf.batches.some(
-						(batch) => batch.id === Number(highlightedId)
-					))).map((rack) => rack.id);
+		if (highlightedId) {
+			const highlightedRackIds = racks
+				.filter((rack) =>
+					rack.shelves.some((shelf) =>
+						shelf.batches.some((batch) => batch.id === Number(highlightedId)),
+					),
+				)
+				.map((rack) => rack.id);
 
 			setHighlightedRacks(highlightedRackIds);
 
@@ -134,16 +134,19 @@ const CanvasComponent = forwardRef<
 
 			// Set the boxes state to the racks
 			.then((racks): void => {
-				const isATaskOverdue = racks.some((rack: RackData) => 
-					rack.shelves.some((shelf) => 
-						shelf.batches.some((batch) => 
-							daysUntilDate(new Date(batch.nextTask.dueDate)) < 0
-				)));
+				const isATaskOverdue = racks.some((rack: RackData) =>
+					rack.shelves.some((shelf) =>
+						shelf.batches.some(
+							(batch) => daysUntilDate(new Date(batch.nextTask.dueDate)) < 0,
+						),
+					),
+				);
 
 				if (isATaskOverdue) {
 					ToastMessage({
 						title: "Tjek opgaver!",
-						message: "Du har opgaver, der skulle have været afsluttet tidligere, men som stadig ikke er færdige.",
+						message:
+							"Du har opgaver, der skulle have været afsluttet tidligere, men som stadig ikke er færdige.",
 						type: "default",
 					});
 				}
@@ -419,7 +422,9 @@ const CanvasComponent = forwardRef<
 							rackMouseDownHandler(index);
 						}}
 						className={
-							highlightedRacks.includes(Number(box.id)) ? "highlighted blink" : ""
+							highlightedRacks.includes(Number(box.id))
+								? "highlighted blink"
+								: ""
 						}
 						removeRack={() => {
 							removeRack(index);

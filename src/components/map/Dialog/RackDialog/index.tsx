@@ -66,17 +66,21 @@ const RackDialog: React.FC<RackDialogProps> = ({
 
 	const rackToDisplay = rackToDisplayUnSynced;
 
-	function nextTaskToString(nextTask? : {category: string, dueDate: string}): string | null {
-		if(nextTask == null){
+	function nextTaskToString(nextTask?: {
+		category: string;
+		dueDate: string;
+	}): string | null {
+		if (nextTask == null) {
 			return null;
 		}
 		const dueDateObject = new Date(nextTask.dueDate);
 		const daysUntil = daysUntilDate(dueDateObject);
-		const pluralSuffix = (daysUntil : number) => Math.abs(daysUntil) === 1 ? "" : "e";
+		const pluralSuffix = (daysUntil: number) =>
+			Math.abs(daysUntil) === 1 ? "" : "e";
 		const categoryTranslated = taskTranslate[nextTask.category];
-		if(daysUntil < 0){
+		if (daysUntil < 0) {
 			return `${categoryTranslated} for ${-daysUntil} dag${pluralSuffix(daysUntil)} siden`;
-		} else if (daysUntil == 0){
+		} else if (daysUntil == 0) {
 			return `${categoryTranslated} i dag`;
 		} else {
 			return `${categoryTranslated} om ${daysUntil} dag${pluralSuffix(daysUntil)}`;
@@ -219,7 +223,7 @@ const RackDialog: React.FC<RackDialogProps> = ({
 																		className={`text-blue-600 border-black size-5 self-center`}
 																	/>
 																) : batch?.nextTask.category === "Harvest" &&
-																isTaskDue(batch.nextTask.dueDate) ? (
+																  isTaskDue(batch.nextTask.dueDate) ? (
 																	<Scissors className={`text-red-600 size-5`} />
 																) : batch.nextTask.progress >= 0 ||
 																  batch.nextTask.progress != null ? (
