@@ -1,6 +1,6 @@
 "use client";
-
 import React, { useEffect, useState } from "react";
+import { fetchWithAuth } from "@/components/authentication/authentication";
 
 import {
 	Dialog,
@@ -24,37 +24,38 @@ import { RackData } from "@/components/map/Rack";
 import { Droplets, Loader2, Scissors, X } from "lucide-react";
 import { CircularProgressbar } from "react-circular-progressbar";
 import { BatchData } from "../../Batch";
-import { toast } from "@/hooks/use-toast";
+import { getUser } from "@/components/authentication/authentication";
+import { endpoint } from "@/config/config";
+
+import { ToastMessage } from "@/functions/ToastMessage/ToastMessage";
+import { daysUntilDate, isTaskDue } from "@/utils/tasks";
 
 let rackToDisplayUnSynced: RackData | null = null;
 
-export function setRackToBeDisplayed(rack: RackData) {
+export function setRackToBeDisplayed(rack: RackData): void {
 	rackToDisplayUnSynced = rack;
 }
 
 interface RackDialogProps {
 	showDialog: boolean;
 	setShowDialog: (show: boolean) => void;
+	getLocations: (batchId: number) => string[];
 }
 
 const RackDialog: React.FC<RackDialogProps> = ({
 	showDialog,
 	setShowDialog,
+	getLocations,
 }) => {
 	const [selectedBatch, setSelectedBatch] = useState<BatchData | null>(null);
 	const [taskCompleting, setTaskCompleting] = useState<boolean>(false);
 	const [completeConfirm, setCompleteConfirm] = useState<boolean>(false);
-
-	const user = "Victor";
 
 	const taskTranslate: { [key: string]: string } = {
 		Water: "Vanding",
 		Harvest: "Høst",
 		Plant: "Plantning",
 	};
-	const nextTaskTranslated = selectedBatch?.nextTask.category
-		? taskTranslate[selectedBatch.nextTask.category]
-		: null;
 
 	// Set selectedBatch to null if the showDialog changes to false
 	useEffect(() => {
@@ -65,16 +66,36 @@ const RackDialog: React.FC<RackDialogProps> = ({
 
 	const rackToDisplay = rackToDisplayUnSynced;
 
-	const currentDate = new Date().toISOString().split("T")[0]; // Get current date in YYYY-MM-DD format
-
-	function taskIsDue(batch: BatchData) {
-		return new Date(currentDate) >= new Date(batch.nextTask.dueDate);
+	function nextTaskToString(nextTask?: {
+		category: string;
+		dueDate: string;
+	}): string | null {
+		if (nextTask == null) {
+			return null;
+		}
+		const dueDateObject = new Date(nextTask.dueDate);
+		const daysUntil = daysUntilDate(dueDateObject);
+		const pluralSuffix = (daysUntil: number) =>
+			Math.abs(daysUntil) === 1 ? "" : "e";
+		const categoryTranslated = taskTranslate[nextTask.category];
+		if (daysUntil < 0) {
+			return `${categoryTranslated} for ${-daysUntil} dag${pluralSuffix(daysUntil)} siden`;
+		} else if (daysUntil == 0) {
+			return `${categoryTranslated} i dag`;
+		} else {
+			return `${categoryTranslated} om ${daysUntil} dag${pluralSuffix(daysUntil)}`;
+		}
 	}
 
+	//Avoid mouse event bubbling down to elements below
+	const propagateMouseEvent = function (e: React.MouseEvent<HTMLDivElement>) {
+		e.stopPropagation();
+	};
+
 	return (
-		<>
+		<div onMouseDown={propagateMouseEvent}>
 			<Dialog open={showDialog} onOpenChange={setShowDialog}>
-				<DialogContent className="bg-white opacity-100 min-w-[700px] min-h-[500px] [&>button]:hidden">
+				<DialogContent className="bg-white opacity-100 min-w-[900px] min-h-[500px] [&>button]:hidden">
 					<DialogHeader>
 						<DialogTitle>
 							<div className="flex flex-row justify-start items-center">
@@ -84,6 +105,7 @@ const RackDialog: React.FC<RackDialogProps> = ({
 								<div className="ml-auto -mr-3">
 									<X
 										className="size-14 text-black cursor-pointer"
+										aria-label={"Luk reol vindue"}
 										onClick={() => {
 											setShowDialog(false);
 										}}
@@ -92,14 +114,13 @@ const RackDialog: React.FC<RackDialogProps> = ({
 							</div>
 						</DialogTitle>
 						<DialogDescription>
-							<div className="min-h-full gap-x-4 flex flex-row justify-between content-center">
+							<div className="min-h-full gap-x-5 flex flex-row justify-between content-center">
 								{/* rack information */}
-								{/* skal kunne laves om alt efter hvilken batch der klikkes på */}
-								<div className="h-[290px] self-center items-start basis-1/2 flex flex-col bg-blue-200 text-xl text-black rounded border-2 border-black pl-2 pr-2">
+								<div className="h-[340px] self-center items-start basis-2/5 flex flex-col bg-blue-200 text-xl text-black rounded border-2 border-black pl-2 pr-2">
 									<div>
 										Næste opgave:{" "}
 										<span className="font-semibold font-">
-											{nextTaskTranslated}
+											{nextTaskToString(selectedBatch?.nextTask)}
 										</span>
 									</div>
 									<div>
@@ -109,7 +130,7 @@ const RackDialog: React.FC<RackDialogProps> = ({
 										</span>
 									</div>
 									<div>
-										Antal:
+										Antal:{" "}
 										<span className="font-semibold">
 											{selectedBatch?.amount}
 										</span>
@@ -122,23 +143,31 @@ const RackDialog: React.FC<RackDialogProps> = ({
 										Batch id:{" "}
 										<span className="font-semibold">{selectedBatch?.id}</span>
 									</div>
-									<div className="mt-3">
+									<div>
+										Lokationer:{" "}
+										<span className="font-semibold">
+											{selectedBatch != null &&
+												getLocations(selectedBatch.id).join(", ")}
+										</span>
+									</div>
+									<div>
 										Oprettet af:{" "}
 										<span className="font-semibold">
 											{selectedBatch?.createdBy}
 										</span>
 									</div>
-									<div className="">
+									<div>
 										Høstdato:{" "}
 										<span className="font-semibold text-lg">
 											{selectedBatch?.harvestDate}
 										</span>
 									</div>
 									<div
-										className={`mt-4 self-center uppercase font-bold ${selectedBatch !== null && taskIsDue(selectedBatch) ? "" : "hidden"}`}
+										className={`mt-4 self-center uppercase font-bold ${selectedBatch !== null && isTaskDue(selectedBatch.nextTask.dueDate) ? "" : "hidden"}`}
 									>
 										<Button
 											disabled={taskCompleting}
+											aria-label={"Udfør opgave"}
 											className={
 												`hover:cursor-pointer font-bold` +
 												buttonVariants({
@@ -149,7 +178,7 @@ const RackDialog: React.FC<RackDialogProps> = ({
 												setCompleteConfirm(true);
 											}}
 										>
-											{taskCompleting == false ? (
+											{!taskCompleting ? (
 												"Udfør opgave"
 											) : (
 												<Loader2 className="animate-spin" />
@@ -159,7 +188,7 @@ const RackDialog: React.FC<RackDialogProps> = ({
 								</div>
 								{/* Batch information */}
 								<div
-									className={`h-[400px] pl-2 basis-1/2 grid grid-cols-1 grid-rows-7 gap-y-5 justify-evenly content-center`}
+									className={`h-[400px] pl-2 basis-3/5 grid grid-cols-1 grid-rows-7 gap-y-5 justify-evenly content-center`}
 								>
 									{/* Skal oprettes dynamisk alt efter hvor mange hylder der er */}
 									{rackToDisplay?.shelves.map((shelf, index) => (
@@ -172,13 +201,13 @@ const RackDialog: React.FC<RackDialogProps> = ({
 													{index + 1}
 												</div>
 												<div className="h-full w-full overflow-x-scroll ml-2 bg-gray-200 justify-between content-center pl-2 pr-2 self-center border-black border-2">
-													<div className="h-4/5 w-full flex flex-row items-center gap-x-4">
+													<div className="h-4/5 w-full flex flex-row items-center gap-x-1">
 														{/* Dynamiclly adding batches */}
-														{shelf.batches.map((batch) => (
+														{shelf.batches.map((batch: BatchData) => (
 															<div
 																key={batch.id}
 																className={`flex flex-row h-full content-center items-center self-center pl-1 pr-1 text-black border-black border rounded  font-semibold hover:cursor-pointer ${selectedBatch === batch ? "bg-blue-200" : ""}`}
-																onClick={() => {
+																onClick={(): void => {
 																	// Her vælges den specifikke batch:
 																	if (selectedBatch === batch) {
 																		setSelectedBatch(null);
@@ -187,26 +216,25 @@ const RackDialog: React.FC<RackDialogProps> = ({
 																	}
 																}}
 															>
-																{batch.plant}
+																<p className="text-xl">{batch.plant}</p>
 																{batch?.nextTask.category === "Water" &&
-																taskIsDue(batch) ? (
+																isTaskDue(batch.nextTask.dueDate) ? (
 																	<Droplets
-																		className={`text-blue-600 border-black size-6 self-center`}
+																		className={`text-blue-600 border-black size-5 self-center`}
 																	/>
 																) : batch?.nextTask.category === "Harvest" &&
-																  taskIsDue(batch) ? (
-																	<Scissors
-																		className={`text-green-600 size-6`}
-																	/>
-																) : (
+																  isTaskDue(batch.nextTask.dueDate) ? (
+																	<Scissors className={`text-red-600 size-5`} />
+																) : batch.nextTask.progress >= 0 ||
+																  batch.nextTask.progress != null ? (
 																	<CircularProgressbar
-																		value={batch?.nextTask.progress}
+																		value={batch.nextTask.progress}
 																		className={`size-5 w-fit ml-1`}
 																		strokeWidth={25}
 																		minValue={0}
 																		maxValue={100}
 																	/>
-																)}
+																) : null}
 															</div>
 														))}
 													</div>
@@ -232,8 +260,9 @@ const RackDialog: React.FC<RackDialogProps> = ({
 					</AlertDialogHeader>
 					<AlertDialogFooter>
 						<Button
-							className={`` + buttonVariants({ variant: "cancel" })}
-							onClick={() => {
+							aria-label={"Annuller udførelse"}
+							className={buttonVariants({ variant: "cancel" })}
+							onClick={(): void => {
 								// Cancel completion
 								setCompleteConfirm(false);
 							}}
@@ -241,53 +270,58 @@ const RackDialog: React.FC<RackDialogProps> = ({
 							Annuller
 						</Button>
 						<Button
+							aria-label={"Bekræft udførelse"}
 							disabled={taskCompleting}
-							className={`` + buttonVariants({ variant: "green" })}
-							onClick={() => {
+							className={buttonVariants({ variant: "green" })}
+							onClick={(): void => {
 								setTaskCompleting(true);
 								// Udfør opgaven
 								try {
-									fetch(
-										`http://localhost:8080/Task/${selectedBatch?.nextTask.id}/Complete`,
+									fetchWithAuth(
+										`${endpoint}/Task/${selectedBatch?.nextTask.id}/Complete`,
 										{
 											method: "PUT",
 											headers: {
 												"Content-Type": "application/json",
 											},
-											body: JSON.stringify({ username: user }),
+											body: JSON.stringify({ username: getUser() }),
 										},
 									)
-										.then((response) => {
+										.then((response: Response): void => {
 											// Check if the response is ok
 											if (!response.ok) {
-												toast({
-													variant: "destructive",
-													title: "Noget gik galt",
-													description:
-														"Opgaven kunne ikke gennemføres - prøv igen.",
+												ToastMessage({
+													title: "Uventet fejl!",
+													message:
+														"Vi stødte på et problem, vent og prøv igen.",
+													type: "error",
 												});
 												throw new Error("Network response was not ok");
 											} else {
+												ToastMessage({
+													title: "Opgave udført",
+													message: "Opgaven er blevet udført",
+													type: "success",
+												});
 												window.location.reload();
 											}
 										})
 										// Error handling
-										.catch((err) => {
-											toast({
-												variant: "destructive",
-												title: "Noget gik galt",
-												description:
-													"Opgaven kunne ikke gennemføres - prøv igen.",
+										.catch((err): void => {
+											ToastMessage({
+												title: "Noget gik galt!",
+												message: "Opgaven kunne ikke udføres, prøv igen.",
+												type: "error",
 											});
 											console.error("Error deleting shelf: " + err);
 											setTaskCompleting(false);
 											setCompleteConfirm(false);
 										});
 								} catch (err) {
-									toast({
-										variant: "destructive",
-										title: "Noget gik galt",
-										description: "Opgaven kunne ikke gennemføres - prøv igen.",
+									ToastMessage({
+										title: "Noget gik galt!",
+										message: "Opgaven kunne ikke udføres, prøv igen.",
+										type: "error",
 									});
 									console.error("Fejl under udføring af opgave: " + err);
 									setTaskCompleting(false);
@@ -298,7 +332,7 @@ const RackDialog: React.FC<RackDialogProps> = ({
 								setShowDialog(false);
 							}}
 						>
-							{taskCompleting == false ? (
+							{!taskCompleting ? (
 								"Bekræft"
 							) : (
 								<Loader2 className="animate-spin" />
@@ -307,7 +341,7 @@ const RackDialog: React.FC<RackDialogProps> = ({
 					</AlertDialogFooter>
 				</AlertDialogContent>
 			</AlertDialog>
-		</>
+		</div>
 	);
 };
 

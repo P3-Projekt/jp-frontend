@@ -14,7 +14,8 @@ const GerminationBox: React.FC<GerminationProps> = ({
 	return (
 		<div className="p-2 mb-2 bg-sidebarcolor shadow-md rounded-lg">
 			<p className="text-center text-black">
-				{plantType}: {amount}, {daysUntilReady} dage tilbage
+				{plantType}: {amount}, {daysUntilReady}{" "}
+				{daysUntilReady > 1 ? "dage" : "dag"} tilbage
 			</p>
 		</div>
 	);

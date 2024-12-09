@@ -1,9 +1,38 @@
-export function getToken() {
+import { JwtPayload, jwtDecode } from "jwt-decode";
+
+export const isTokenExpired = (token: string): boolean => {
+	try {
+		const decoded = jwtDecode<JwtPayload>(token);
+		if (!decoded.exp) {
+			console.warn("Token does not have an expiration time.");
+			return true; // Consider invalid tokens as expired
+		}
+		const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
+		return decoded.exp < currentTime;
+	} catch (error) {
+		console.error("Error decoding token:", error);
+		return true; // Treat invalid tokens as expired
+	}
+};
+
+function getToken() {
 	const token = localStorage.getItem("authToken");
 	if (!token) {
 		window.location.href = "/login";
+	} else if (isTokenExpired(token)) {
+		localStorage.removeItem("authToken");
+		window.location.href = "/login";
 	} else {
 		return token;
+	}
+}
+
+export function getUser() {
+	const token = getToken();
+	if (token) {
+		return jwtDecode<JwtPayload>(token).sub;
+	} else {
+		throw new Error("Can't find user as token is missing");
 	}
 }
 
@@ -18,7 +47,7 @@ export function fetchWithAuth(
 		...options.headers, // Merge any additional headers passed in options
 	};
 
-	// Perform the fetch call with the provided URL and options
+	// Perform the fetchWithAuth call with the provided URL and options
 	return fetch(url, {
 		...options, // Spread the passed options (method, body, etc.)
 		headers, // Override headers with our Bearer token

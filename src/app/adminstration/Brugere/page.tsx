@@ -2,7 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import { fetchWithAuth } from "@/components/authentication/authentication";
+import { endpoint } from "@/config/config";
 
+// interface som definerer bruger objekt struktur
 interface User {
 	name: string;
 	role: "Gardener" | "Administrator" | "Manager";
@@ -10,39 +13,47 @@ interface User {
 }
 
 const BrugereSide = () => {
+	// Tilstandsvariabler til at styre sidens data og UI
 	const [users, setUsers] = useState<User[]>([]);
 	const [inactiveUsers, setInactiveUsers] = useState<User[]>([]);
+
+	// Formular data til oprettelse af ny bruger
 	const [formData, setFormData] = useState({
 		name: "",
+		password: "",
 		role: "Gardener",
 	});
+
+	// Indlæsnings- og fejlhåndteringstilstande
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
-	// Hent brugere til at starte med
+	// Hent brugere når siden indlæses
 	useEffect(() => {
 		fetchUsers();
 	}, []);
 
-	// funktion til at hente brugere fra backend
+	// Funktion til at hente brugere fra backend
 	const fetchUsers = async () => {
 		setIsLoading(true);
 		setError(null);
 		try {
-			const response = await fetch("http://localhost:8080/Users", {
+			// Send anmodning (med token) for at hente brugere
+			const response = await fetchWithAuth(endpoint + "/Users", {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
 				},
 			});
 
+			// Håndter fejl ved hentning af brugere
 			if (!response.ok) {
 				const errorText = await response.text();
 				throw new Error(errorText || "Kunne ikke hente brugere fra databasen");
 			}
 			const data = await response.json();
 
-			// Separer aktive og inaktive brugere
+			// Opdel brugere i aktive og inaktive
 			const activeUsers = data.filter((user: User) => user.active);
 			const notActiveUsers = data.filter((user: User) => !user.active);
 			setUsers(activeUsers);
@@ -55,7 +66,7 @@ const BrugereSide = () => {
 		}
 	};
 
-	// Håndtere bruger input ændringer
+	// Håndter ændringer i formularfelter
 	const handleChange = (
 		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
 	) => {
@@ -66,56 +77,58 @@ const BrugereSide = () => {
 		}));
 	};
 
-	// håndtere sendingen af formen så en bruger skabes i backend
+	// Håndter indsendelse af formular for at oprette en ny bruger
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setIsLoading(true);
 		setError(null);
 
 		try {
-			const response = await fetch("http://localhost:8080/User", {
+			// Send anmodning (med token) til backend for at oprette bruger
+			const response = await fetchWithAuth(endpoint + "/User", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({
 					name: formData.name,
+					password: formData.password,
 					role: formData.role,
 				}),
 			});
 
+			// Håndter fejl ved oprettelse af bruger
 			if (!response.ok) {
 				const errorData = await response.text();
 				throw new Error(errorData || "Kunne ikke skabe brugeren");
 			}
 
-			// Genopfrist listen af brugere
+			// Genopfrisk brugerlisten
 			await fetchUsers();
 
-			// nulstil formen
-			setFormData({ name: "", role: "Gardener" });
+			// Nulstil formularen
+			setFormData({ name: "", password: "", role: "Gardener" });
 		} catch (err) {
-			if (err instanceof Error) {
-				if (err.message.includes("already exists")) {
-					setError("Brugeren eksistere allerede");
-				} else {
-					setError("Kunne ikke skabe brugeren");
-				}
-				console.error("Kunne ikke skabe brugeren:", err);
+			if (err instanceof Error && err.message.includes("already exists")) {
+				setError("Brugeren eksistere allerede");
+			} else {
+				setError("Kunne ikke skabe brugeren");
 			}
+			console.error("Kunne ikke skabe brugeren:", err);
 		} finally {
 			setIsLoading(false);
 		}
 	};
 
-	//funktion til reaktivering af brugere
+	// Funktion til reaktivering af en inaktiv bruger
 	const handleReactivate = async (name: string) => {
 		setIsLoading(true);
 		setError(null);
 
 		try {
-			const response = await fetch(
-				`http://localhost:8080/Users/${name}/activate`,
+			// Send anmodning (med token) for at reaktivere bruger
+			const response = await fetchWithAuth(
+				`${endpoint}/Users/${name}/activate`,
 				{
 					method: "PUT",
 					headers: {
@@ -124,12 +137,13 @@ const BrugereSide = () => {
 				},
 			);
 
+			// Håndter fejl ved reaktivering af bruger
 			if (!response.ok) {
 				const errorText = await response.text();
 				throw new Error(errorText || "Kunne ikke reaktivere brugeren");
 			}
 
-			//Genopfrist brugertabel
+			// Genopfrisk brugerlisten
 			await fetchUsers();
 		} catch (err) {
 			setError("Kunne ikke reaktivere brugeren");
@@ -139,24 +153,26 @@ const BrugereSide = () => {
 		}
 	};
 
-	//funktion til inaktivering af brugere
+	// Funktion til inaktivering af en aktiv bruger
 	const handleDelete = async (name: string) => {
 		setIsLoading(true);
 		setError(null);
 
 		try {
-			const response = await fetch(`http://localhost:8080/Users/${name}`, {
-				method: "DELETE",
+			// Send anmodning (med token) for at inaktivere bruger
+			const response = await fetchWithAuth(`${endpoint}/Users/${name}`, {
+				method: "PUT",
 				headers: {
 					"Content-Type": "application/json",
 				},
 			});
 
+			// Håndter fejl ved inaktivering
 			if (!response.ok) {
 				throw new Error("Kunne ikke inaktivere brugeren");
 			}
 
-			//Genopfrist brugertabel
+			// Genopfrisk brugerlisten
 			await fetchUsers();
 		} catch (err) {
 			setError("Kunne ikke inaktivere brugeren");
@@ -167,10 +183,10 @@ const BrugereSide = () => {
 	};
 
 	return (
-		<div className="p-8">
+		<div className="p-8 h-screen overflow-y-auto">
 			<h1 className="text-3xl font-bold mb-6 text-center">BRUGERE OG ROLLER</h1>
 
-			{/* box til fejlbeskeder i toppen*/}
+			{/* Fejlbesked boks */}
 			{error && (
 				<div
 					className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
@@ -180,14 +196,14 @@ const BrugereSide = () => {
 				</div>
 			)}
 
-			{/*Form til at lave nye brugere */}
+			{/* Formular til oprettelse af nye brugere */}
 			<form
 				className="bg-sidebarcolor p-6 rounded-lg mb-8 shadow-xl border"
 				onSubmit={handleSubmit}
 			>
 				<h2 className="text-lg font-semibold mb-6">OPRET EN BRUGER</h2>
-				<div className="grid grid-cols-2 gap-6">
-					{/*Navne felt*/}
+				<div className="grid grid-cols-3 gap-6">
+					{/* Navne felt */}
 					<div>
 						<label className="font-semibold">Navn:</label>
 						<input
@@ -202,7 +218,22 @@ const BrugereSide = () => {
 						/>
 					</div>
 
-					{/*Rolle felt*/}
+					{/* Password felt */}
+					<div>
+						<label className="font-semibold">Password:</label>
+						<input
+							type="password"
+							name="password"
+							value={formData.password}
+							onChange={handleChange}
+							required
+							placeholder="Indsæt password"
+							className="w-full border border-gray-300 rounded p-2"
+							disabled={isLoading}
+						/>
+					</div>
+
+					{/* Rolle felt */}
 					<div>
 						<label className="font-semibold">Role:</label>
 						<select
@@ -220,24 +251,22 @@ const BrugereSide = () => {
 					</div>
 				</div>
 
-				{/*Opret knap*/}
+				{/* Opret bruger knap */}
 				<button
 					type="submit"
-					className="transition w-full bg-green-700 font-semibold hover:bg-green-800 text-white py-2 mt-4 rounded-2xl"
+					className="transition w-full bg-colorprimary font-semibold hover:bg-green-700 text-white py-2 mt-4 rounded-2xl"
 					disabled={isLoading}
 				>
-					{isLoading ? "HENTER DATA FRA BACKEND" : "OPRET"}
+					{isLoading ? "HENTER DATA FRA DATABASEN" : "OPRET BRUGER"}
 				</button>
 			</form>
 
-			{/*Tabel til at vise aktive brugere*/}
+			{/* Tabel over aktive brugere */}
 			<div className="bg-sidebarcolor p-6 rounded-lg shadow-xl border mb-8">
-				<h2 className="text-xl font-semibold mb-6">
-					OVERSIGT OVER AKTIVE BRUGERE
-				</h2>
+				<h2 className="text-xl font-semibold mb-6">AKTIV BRUGER OVERSIGT</h2>
 				<table className="w-full table-auto border-collapse">
 					<thead>
-						<tr className="bg-green-700 text-white">
+						<tr className="bg-colorprimary text-white">
 							<th className="p-2 border text-center" style={{ width: "60px" }}>
 								Inaktiver
 							</th>
@@ -280,14 +309,12 @@ const BrugereSide = () => {
 				</table>
 			</div>
 
-			{/*Tabel til at vise inaktive brugere*/}
+			{/* Tabel over inaktive brugere */}
 			<div className="bg-sidebarcolor p-6 rounded-lg shadow-xl border">
-				<h2 className="text-xl font-semibold mb-6">
-					OVERSIGT OVER INAKTIVE BRUGERE
-				</h2>
+				<h2 className="text-xl font-semibold mb-6">INAKTIV BRUGER OVERSIGT</h2>
 				<table className="w-full table-auto border-collapse">
 					<thead>
-						<tr className="bg-red-700 text-white">
+						<tr className="bg-red-900 text-white">
 							<th className="p-2 border text-center" style={{ width: "60px" }}>
 								Aktiver
 							</th>

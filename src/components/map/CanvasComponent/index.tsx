@@ -1,11 +1,4 @@
 "use client";
-/*
-TODO:
-	- (måske) gem i localstorage, alle racks hentet fra databasen, og kun tjek om der er sket ændringre siden sidste gang. Slipper muligvis for at skulle hente alle racks hver gang.
-	- Error handling - tjek om racksene er oven i hindanden, og giv en fejlbesked.
-
-*/
-
 import React, {
 	useState,
 	useCallback,
@@ -13,30 +6,33 @@ import React, {
 	forwardRef,
 	useImperativeHandle,
 } from "react";
-import DraggableBox, {
-	RackData,
-	rackHeight,
-	rackWidth,
-} from "@/components/map/Rack";
+import Rack, { RackData, rackHeight, rackWidth } from "@/components/map/Rack";
 import { fetchWithAuth } from "@/components/authentication/authentication";
+import { ToastMessage } from "@/functions/ToastMessage/ToastMessage";
+import { useSearchParams } from "next/navigation";
+import { endpoint } from "@/config/config";
+import "./style.css";
+import { daysUntilDate } from "@/utils/tasks";
 
 export enum DisplayMode {
 	view,
 	edit,
+	editPrototype,
 	input,
+	loading,
 }
 
 // Grid size for snapping
-const GRID_SIZE = 50;
+const GRID_SIZE: number = 50;
 
 // Helper function to snap moving rack coordinates to grid
 export const snapToGrid = (value: number) =>
-	Math.abs(Math.round(value / GRID_SIZE) * GRID_SIZE);
+	Math.round(value / GRID_SIZE) * GRID_SIZE;
 
-async function updateRackPosition(rackData: RackData) {
+async function updateRackPosition(rackData: RackData): Promise<void> {
 	try {
-		const response = await fetch(
-			"http://localhost:8080/Rack/" + rackData.id + "/Position",
+		const response: Response = await fetchWithAuth(
+			endpoint + "/Rack/" + rackData.id + "/Position",
 			{
 				method: "PUT",
 				headers: {
@@ -50,9 +46,19 @@ async function updateRackPosition(rackData: RackData) {
 		);
 
 		if (!response.ok) {
+			ToastMessage({
+				title: "Uventet fejl!",
+				message: "Vi stødte på et problem, vent og prøv igen.",
+				type: "error",
+			});
 			throw new Error("Bad response code");
 		}
 	} catch (e) {
+		ToastMessage({
+			title: "Noget gik galt!",
+			message: "Kunne opdatere reol placeringen",
+			type: "error",
+		});
 		console.error("Error updating rack position: " + e);
 	}
 }
@@ -63,6 +69,8 @@ interface CanvasComponentProps {
 
 export interface CanvasComponentMethods {
 	newRack: (x: number, y: number) => void;
+	getOffset: () => { x: number; y: number };
+	isPositionOverlapping: (position: { x: number; y: number }) => boolean;
 }
 
 // CanvasComponent component
@@ -74,96 +82,173 @@ const CanvasComponent = forwardRef<
 	const [selectedRackIndex, setSelectedRackIndex] = useState<number | null>(
 		null,
 	);
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 	const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
+	const [panStart, setPanStart] = useState({ x: 0, y: 0 });
+	const [isPanning, setIsPanning] = useState(false);
 	const [hasBeenMoved, setHasBeenMoved] = useState(false);
-	const [loadingRackIndexes, setLoadingRackIndexes] = useState<number[]>([]);
+	const [loadingRacks, setLoadingRacks] = useState<Map<number, RackData>>(
+		new Map(),
+	);
+	const [highlightedRacks, setHighlightedRacks] = useState<number[]>([]);
+
+	// Get search params
+	const searchParams = useSearchParams();
+	const highlightedId = searchParams.get("batchId");
+
+	useEffect(() => {
+		if (highlightedId) {
+			const highlightedRackIds = racks
+				.filter((rack) =>
+					rack.shelves.some((shelf) =>
+						shelf.batches.some((batch) => batch.id === Number(highlightedId)),
+					),
+				)
+				.map((rack) => rack.id);
+
+			setHighlightedRacks(highlightedRackIds);
+
+			const timer = setTimeout(() => {
+				setHighlightedRacks([]);
+			}, 3000);
+
+			return () => clearTimeout(timer);
+		}
+	}, [highlightedId, racks]);
 
 	// Fetch racks from the backend
-	useEffect(() => {
-		fetchWithAuth("http://localhost:8080/Racks", {})
-			.then((response) => {
+	useEffect((): void => {
+		fetchWithAuth(endpoint + "/Racks", {})
+			.then((response: Response) => {
 				// Check if the response is ok
 				if (!response.ok) {
+					ToastMessage({
+						title: "Uventet fejl!",
+						message: "Vi stødte på et problem, vent og prøv igen.",
+						type: "error",
+					});
 					throw new Error("Network response was not ok");
 				}
 				return response.json();
 			})
 
 			// Set the boxes state to the racks
-			.then((racks) => {
+			.then((racks): void => {
+				const isATaskOverdue = racks.some((rack: RackData) =>
+					rack.shelves.some((shelf) =>
+						shelf.batches.some(
+							(batch) => daysUntilDate(new Date(batch.nextTask.dueDate)) < 0,
+						),
+					),
+				);
+
+				if (isATaskOverdue) {
+					ToastMessage({
+						title: "Tjek opgaver!",
+						message:
+							"Du har opgaver, der skulle have været afsluttet tidligere, men som stadig ikke er færdige.",
+						type: "default",
+					});
+				}
+
 				setRacks(racks);
 			})
+
 			// Error handling
-			.catch((err) => {
+			.catch((err): void => {
+				ToastMessage({
+					title: "Noget gik galt!",
+					message: "Vi kunne ikke hente reolerne, prøv at genindlæse siden.",
+					type: "error",
+				});
 				console.error("Error getting racks: " + err);
 			});
 	}, []);
 
 	const addNewRackFetch = useCallback(
-		async (xCoordinate: number, yCoordinate: number, index: number) => {
+		async (tempId: number, data: RackData) => {
 			try {
-				setLoadingRackIndexes([...loadingRackIndexes, index]);
-				const response = await fetch("http://localhost:8080/Rack", {
+				const response = await fetchWithAuth(endpoint + "/Rack", {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
 					},
 					body: JSON.stringify({
-						xCoordinate: xCoordinate,
-						yCoordinate: yCoordinate,
+						xCoordinate: data.position.x,
+						yCoordinate: data.position.y,
 					}),
 				});
 
 				if (!response.ok) {
-					throw new Error("Bad response code");
+					ToastMessage({
+						title: "Uventet fejl!",
+						message: "Vi stødte på et problem, vent og prøv igen.",
+						type: "error",
+					});
+					throw new Error("Bad response code" + response);
 				}
 
 				const newRack: RackData = await response.json();
-				console.log("New rack", newRack);
-				console.log(racks.length);
-				const newRacks: RackData[] = racks.map((box, i) =>
-					i === index ? newRack : box,
-				);
+				//Remove from loading
+				const newLoadingRacks = new Map(loadingRacks);
+				newLoadingRacks.delete(tempId);
+				setLoadingRacks(newLoadingRacks);
+				//Add to racks
+				const newRacks = [...racks, newRack];
 				setRacks(newRacks);
-				setLoadingRackIndexes(loadingRackIndexes.filter((i) => i !== index));
 			} catch (e) {
 				console.error("Error adding new rack: " + e);
 			}
 		},
-		[racks, loadingRackIndexes],
+		[racks, loadingRacks],
+	);
+
+	const isPositionOverlapping = useCallback(
+		function (position: { x: number; y: number }) {
+			return racks.some((box) => {
+				const xDelta = Math.abs(box.position.x - position.x);
+				const yDelta = Math.abs(box.position.y - position.y);
+				return xDelta < rackWidth && yDelta < rackHeight;
+			});
+		},
+		[racks],
 	);
 
 	const newRack = useCallback(
 		(xPosition: number, yPosition: number) => {
-			const newRackIndex = racks.length;
-			const newRacks = [
-				...racks,
-				{
-					id: -1,
-					position: { x: xPosition, y: yPosition },
-					shelves: [],
-				},
-			];
-			setRacks(newRacks);
-			addNewRackFetch(xPosition, yPosition, newRackIndex);
-		},
-		[addNewRackFetch, racks],
-	);
+			if (isPositionOverlapping({ x: xPosition, y: yPosition })) {
+				return;
+			}
 
-	useEffect(() => {
-		console.log("ref", ref);
-	}, [ref]);
+			const tempId =
+				Math.max(...racks.map((rack) => rack.id), ...loadingRacks.keys()) + 1;
+
+			const newRack = {
+				id: tempId,
+				position: { x: xPosition, y: yPosition },
+				shelves: [],
+			};
+
+			const newLoadingRacks = new Map(loadingRacks);
+			newLoadingRacks.set(tempId, newRack);
+			setLoadingRacks(newLoadingRacks);
+
+			addNewRackFetch(tempId, newRack);
+		},
+		[addNewRackFetch, racks, isPositionOverlapping, loadingRacks],
+	);
 
 	useImperativeHandle(ref, () => {
 		return {
 			newRack: newRack,
+			getOffset: () => panOffset,
+			isPositionOverlapping: isPositionOverlapping,
 		};
-	});
+	}, [panOffset, newRack, isPositionOverlapping]);
 
 	const updateRack = useCallback(
-		(rack: RackData, index: number) => {
-			const newRacks = racks.map((box, i) =>
+		(rack: RackData, index: number): void => {
+			const newRacks = racks.map((box: RackData, i: number) =>
 				i === index ? { ...box, ...rack } : box,
 			);
 			setRacks(newRacks);
@@ -171,31 +256,60 @@ const CanvasComponent = forwardRef<
 		[racks],
 	);
 
+	const handlePanMove = useCallback(
+		(e: React.MouseEvent<HTMLDivElement>) => {
+			if (!isPanning) {
+				return;
+			}
+
+			const panDeltaX = e.clientX - panStart.x;
+			const panDeltaY = e.clientY - panStart.y;
+
+			const newOffsetX = panOffset.x + panDeltaX;
+			const newOffsetY = panOffset.y + panDeltaY;
+
+			setPanOffset({ x: newOffsetX, y: newOffsetY });
+			setPanStart({ x: e.clientX, y: e.clientY });
+		},
+		[isPanning, panStart, panOffset],
+	);
+
 	const handleMouseMove = useCallback(
 		function (event: React.MouseEvent<HTMLDivElement>) {
-			if (selectedRackIndex === null || displayMode !== DisplayMode.edit)
-				return;
+			if (isPanning) {
+				handlePanMove(event);
+			}
 
-			const rect = (
+			if (selectedRackIndex === null || displayMode !== DisplayMode.edit) {
+				return;
+			}
+
+			const rect: DOMRect = (
 				event.currentTarget as HTMLDivElement
 			).getBoundingClientRect();
-			const mouseX = event.clientX - rect.left;
-			const mouseY = event.clientY - rect.top;
+			const mouseX: number = event.clientX - rect.left;
+			const mouseY: number = event.clientY - rect.top;
 
 			// Convert client position to absolute position by removing pan offset and centering the boxes
-			const xCoordinate = snapToGrid(mouseX - panOffset.x - rackWidth / 2);
-			const yCoordinate = snapToGrid(mouseY - panOffset.y - rackHeight / 2);
+			const xCoordinate: number = snapToGrid(
+				mouseX - panOffset.x - rackWidth / 2,
+			);
+			const yCoordinate: number = snapToGrid(
+				mouseY - panOffset.y - rackHeight / 2,
+			);
 
 			// Check for overlap and snap to grid if not overlapping
-			const isOverlapping = racks.some((box, index) => {
-				if (index === selectedRackIndex) return false;
-				const xDelta = Math.abs(box.position.x - xCoordinate);
-				const yDelta = Math.abs(box.position.y - yCoordinate);
-				return xDelta < rackWidth && yDelta < rackHeight;
-			});
+			const isOverlapping: boolean = racks.some(
+				(box: RackData, index: number): boolean => {
+					if (index === selectedRackIndex) return false;
+					const xDelta: number = Math.abs(box.position.x - xCoordinate);
+					const yDelta: number = Math.abs(box.position.y - yCoordinate);
+					return xDelta < rackWidth && yDelta < rackHeight;
+				},
+			);
 
 			// Determind if a rack has been moved
-			const hasRackBeenMoved =
+			const hasRackBeenMoved: boolean =
 				xCoordinate !== racks[selectedRackIndex].position.x ||
 				yCoordinate !== racks[selectedRackIndex].position.y;
 
@@ -218,15 +332,16 @@ const CanvasComponent = forwardRef<
 			panOffset.y,
 			racks,
 			updateRack,
+			isPanning,
+			handlePanMove,
 		],
 	);
 
 	const handleMouseUp = useCallback(
 		function () {
+			setIsPanning(false);
 			if (selectedRackIndex !== null && hasBeenMoved) {
 				updateRackPosition(racks[selectedRackIndex]);
-
-				console.log("Update position", racks[selectedRackIndex].position);
 			}
 			setSelectedRackIndex(null);
 		},
@@ -234,42 +349,54 @@ const CanvasComponent = forwardRef<
 	);
 
 	const rackMouseDownHandler = function (index: number) {
-		setSelectedRackIndex(index);
+		if (displayMode === DisplayMode.edit) {
+			setSelectedRackIndex(index);
+		}
 	};
+
+	const removeRack = useCallback(
+		function (indexToRemove: number) {
+			const newRacks = racks.filter((box, i) => i !== indexToRemove);
+			setRacks(newRacks);
+		},
+		[racks],
+	);
+
+	const getLocationsByBatch = useCallback(
+		function (batchId: number) {
+			const locations: string[] = [];
+
+			for (const rack of racks) {
+				for (const [index, shelf] of rack.shelves.entries()) {
+					if (shelf.batches.some((batch) => batch.id === batchId)) {
+						locations.push(`${rack.id}.${index + 1}`);
+					}
+				}
+			}
+			return locations;
+		},
+		[racks],
+	);
 
 	useEffect(() => {
 		document.addEventListener("mouseup", handleMouseUp);
 
-		return () => {
+		return (): void => {
 			document.removeEventListener("mouseup", handleMouseUp);
 		};
 	}, [hasBeenMoved, selectedRackIndex, racks, handleMouseUp]);
 
-	/*
-  // Add event listeners for panning
-  useEffect(() => {
-    
-    // Unselect
-    if (isPanning) {
-      document.addEventListener('mousemove', handlePanMove);
-      document.addEventListener('mouseup', handlePanEnd);
-    } else {
-      document.removeEventListener('mousemove', handlePanMove);
-      document.removeEventListener('mouseup', handlePanEnd);
-    }
-
-    return () => {
-      document.removeEventListener('mousemove', handlePanMove);
-      document.removeEventListener('mouseup', handlePanEnd);
-    };
-  }, [isPanning, panStart, panOffset, handlePanMove, handlePanEnd]);
-  */
+	const startPanning = function (event: React.MouseEvent<HTMLDivElement>) {
+		setIsPanning(true);
+		setPanStart({ x: event.clientX, y: event.clientY });
+	};
 
 	// Grid lines
 	return (
 		<div
-			className="relative w-full h-full overflow-hidden z-1"
+			className="relative w-full h-full overflow-hidden z-1 cursor-grab active:cursor-grabbing"
 			onMouseMove={handleMouseMove}
+			onMouseDown={startPanning}
 		>
 			<div
 				className="absolute w-full h-full inset-0 pointer-events-none opacity-40"
@@ -285,16 +412,33 @@ const CanvasComponent = forwardRef<
 				}}
 				className="absolute inset-0"
 			>
-				{racks.map((box, index) => (
-					<DraggableBox
+				{racks.map((box: RackData, index: number) => (
+					<Rack
 						key={box.id}
 						displayMode={displayMode}
 						rackData={box}
 						isSelected={selectedRackIndex === index}
-						isLoading={loadingRackIndexes.some((i) => i === index)}
 						mouseDownHandler={() => {
 							rackMouseDownHandler(index);
 						}}
+						className={
+							highlightedRacks.includes(Number(box.id))
+								? "highlighted blink"
+								: ""
+						}
+						removeRack={() => {
+							removeRack(index);
+						}}
+						getLocations={getLocationsByBatch}
+					/>
+				))}
+				{Array.from(loadingRacks.values()).map((box) => (
+					<Rack
+						key={box.id}
+						displayMode={DisplayMode.loading}
+						rackData={box}
+						isSelected={false}
+						mouseDownHandler={() => {}}
 					/>
 				))}
 			</div>
