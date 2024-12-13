@@ -12,6 +12,7 @@ import { ToastMessage } from "@/functions/ToastMessage/ToastMessage";
 import { useSearchParams } from "next/navigation";
 import { endpoint } from "@/config/config";
 import "./style.css";
+import { daysUntilDate } from "@/utils/tasks";
 
 export enum DisplayMode {
 	view,
@@ -127,6 +128,20 @@ const CanvasComponent = forwardRef<
 
 			// Set the boxes state to the racks
 			.then((racks): void => {
+				const isATaskOverdue = racks.some((rack: RackData) => 
+					rack.shelves.some((shelf) => 
+						shelf.batches.some((batch) => 
+							daysUntilDate(new Date(batch.nextTask.dueDate)) < 0
+				)));
+
+				if (isATaskOverdue) {
+					ToastMessage({
+						title: "Tjek opgaver!",
+						message: "Du har opgaver, der skulle have været afsluttet tidligere, men som stadig ikke er færdige.",
+						type: "default",
+					});
+				}
+
 				setRacks(racks);
 			})
 
