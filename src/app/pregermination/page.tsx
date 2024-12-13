@@ -7,7 +7,7 @@ import { fetchWithAuth } from "@/components/authentication/authentication";
 import CanvasComponent, { DisplayMode } from "@/components/map/CanvasComponent";
 import { endpoint } from "@/config/config";
 
-interface Batch {
+interface BatchData {
 	batchId: number;
 	amount: number;
 	plantName: string;
@@ -15,28 +15,11 @@ interface Batch {
 	daysUntilReady: number;
 }
 
-export interface ShelfData {
-	id: number;
-	rackId: number;
-	position: number;
-}
-
-interface Vector2 {
-	x: number;
-	y: number;
-}
-
-export interface RackData {
-	id: number;
-	position: Vector2;
-	shelves: ShelfData[];
-}
-
 const PreGerminationPage: React.FC = () => {
-	const [pregerminatingBatches, setPregerminatingBatches] = useState<Batch[]>(
+	const [pregerminatingBatches, setPregerminatingBatches] = useState<BatchData[]>(
 		[],
 	); // Store batches still pregerminating in this
-	const [canBePlacedBatches, setCanBePlacedBatches] = useState<Batch[]>([]); // Store batches ready to be placed in this
+	const [canBePlacedBatches, setCanBePlacedBatches] = useState<BatchData[]>([]); // Store batches ready to be placed in this
 
 	useEffect(() => {
 		const fetchBatchData = async () => {
@@ -62,14 +45,14 @@ const PreGerminationPage: React.FC = () => {
 
 				// Create array for the batches still pregerminating and calculate daysUntilReady from dueDate
 				const preGerminationBatches = result.needsMorePreGermination.map(
-					(item: Batch) => ({
+					(item: BatchData) => ({
 						...item,
 						daysUntilReady: getDaysUntilReady(item.dueDate),
 					}),
 				);
 
 				// Create array for the batches still canBePlacedBatches and calculate daysUntilReady from dueDate
-				const canBePlacedBatches = result.canBePlaced.map((item: Batch) => ({
+				const canBePlacedBatches = result.canBePlaced.map((item: BatchData) => ({
 					...item,
 					daysUntilReady: getDaysUntilReady(item.dueDate),
 				}));
@@ -87,7 +70,7 @@ const PreGerminationPage: React.FC = () => {
 	const handleRemovePlacedBatch = (batchId: number) => {
 		// Remove batch from canBePlacedBatches
 		const newCanBePlacedBatches = canBePlacedBatches.filter(
-			(batch: Batch) => batch.batchId !== batchId,
+			(batch: BatchData) => batch.batchId !== batchId,
 		);
 		setCanBePlacedBatches(newCanBePlacedBatches);
 	};
@@ -112,7 +95,7 @@ const PreGerminationPage: React.FC = () => {
 
 					{/* "Klar" box content */}
 					<div className="bg-lightgrey p-2 space-y-2 flex-1 overflow-y-auto">
-						{canBePlacedBatches.map((batch: Batch, index: number) => (
+						{canBePlacedBatches.map((batch: BatchData, index: number) => (
 							<BatchReadyBox
 								batchId={batch.batchId}
 								plantType={batch.plantName}
@@ -132,7 +115,7 @@ const PreGerminationPage: React.FC = () => {
 
 					{/* "Spire" box content */}
 					<div className="bg-lightgrey p-2 mb-2 flex-1 overflow-y-auto">
-						{pregerminatingBatches.map((batch: Batch, index: number) => (
+						{pregerminatingBatches.map((batch: BatchData, index: number) => (
 							<GerminationBox
 								plantType={batch.plantName}
 								amount={batch.amount}
