@@ -1,9 +1,16 @@
-const currentDate = new Date().toISOString().split("T")[0]; // Get current date in YYYY-MM-DD format
-
-export function taskIsDue(dueDate: string): boolean {
-    return new Date(currentDate) >= new Date(dueDate);
+function calculateDaysBetween(date1: Date, date2: Date): number {
+    const end = date1.getTime();
+    const start = date2.getTime();
+    
+    const msPerDay = 24 * 60 * 60 * 1000; // milliseconds in a day
+    return Math.floor((end - start) / msPerDay);
 }
 
-export function daysUntilDate(date: Date){
-    return (date.getTime() - new Date(currentDate).getTime()) / (1000 * 60 * 60 * 24);
+
+export function daysUntilDate(date: Date): number {
+    return calculateDaysBetween(date, new Date());
+}
+
+export function isTaskDue(dueDate: string): boolean {
+    return daysUntilDate(new Date(dueDate)) <= 0;
 }

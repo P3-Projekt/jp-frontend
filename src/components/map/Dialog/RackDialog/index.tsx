@@ -28,7 +28,7 @@ import { getUser } from "@/components/authentication/authentication";
 import { endpoint } from "@/config/config";
 
 import { ToastMessage } from "@/functions/ToastMessage/ToastMessage";
-import { daysUntilDate, taskIsDue } from "@/utils/tasks";
+import { daysUntilDate, isTaskDue } from "@/utils/tasks";
 
 let rackToDisplayUnSynced: RackData | null = null;
 
@@ -159,7 +159,7 @@ const RackDialog: React.FC<RackDialogProps> = ({
 										</span>
 									</div>
 									<div
-										className={`mt-4 self-center uppercase font-bold ${selectedBatch !== null && taskIsDue(selectedBatch.nextTask.dueDate) ? "" : "hidden"}`}
+										className={`mt-4 self-center uppercase font-bold ${selectedBatch !== null && isTaskDue(selectedBatch.nextTask.dueDate) ? "" : "hidden"}`}
 									>
 										<Button
 											disabled={taskCompleting}
@@ -214,12 +214,12 @@ const RackDialog: React.FC<RackDialogProps> = ({
 															>
 																<p className="text-xl">{batch.plant}</p>
 																{batch?.nextTask.category === "Water" &&
-																taskIsDue(batch.nextTask.dueDate) ? (
+																isTaskDue(batch.nextTask.dueDate) ? (
 																	<Droplets
 																		className={`text-blue-600 border-black size-5 self-center`}
 																	/>
 																) : batch?.nextTask.category === "Harvest" &&
-																taskIsDue(batch.nextTask.dueDate) ? (
+																isTaskDue(batch.nextTask.dueDate) ? (
 																	<Scissors className={`text-red-600 size-5`} />
 																) : batch.nextTask.progress >= 0 ||
 																  batch.nextTask.progress != null ? (

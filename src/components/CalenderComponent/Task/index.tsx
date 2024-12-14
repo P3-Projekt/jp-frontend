@@ -98,11 +98,6 @@ const Task = ({ fields, plantType, category, batchId }: TaskProps) => {
 								{fields}
 							</span>
 							<br />
-							Reoler:{" "}
-							<span className="font-bold text-colorprimary cursor-text">
-								{/*{batchIdShelf}*/}
-							</span>
-							<br />
 						</DialogDescription>
 						<DialogFooter>
 							<div className="w-full flex flex-row justify-between gap-y-4 mt-2">
