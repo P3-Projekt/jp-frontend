@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight, Undo2 } from "lucide-react";
 import Task from "@/components/CalenderComponent/Task";
 import WeekDay from "@/components/CalenderComponent/WeekDay";
@@ -9,171 +9,116 @@ import { formatDate, getCurrentWeekNumber, getDatesInWeek } from "./util";
 import { endpoint } from "@/config/config";
 
 const KalenderPage: React.FC = () => {
-	// Get current week number
-	const currentWeekNumber: number = getCurrentWeekNumber();
-	const currentYear: number = new Date().getFullYear();
+	const currentWeekNumber = getCurrentWeekNumber();
+	const currentYear = new Date().getFullYear();
 
-	// State for week number
 	const [weekNumber, setWeekNumber] = useState(currentWeekNumber);
 	const [year, setYear] = useState(currentYear);
 	const [tasks, setTasks] = useState<TaskProps[]>([]);
 
-	const currentDay: string = formatDate(new Date());
-	const daysInWeek: Date[] = getDatesInWeek(weekNumber, year);
+	const daysInWeek = getDatesInWeek(weekNumber, year);
+	const currentDay = formatDate(new Date());
 
-	// Styles for task columns
-	const defaultColumnStyle: string =
-		"grid w-full bg-sidebarcolor text-black rounded";
-	const currentDayColumnStyle: string =
-		"grid w-full bg-colorprimary text-white rounded";
+	// If current day is the same as the day in the loop, set the column style to be primary color
+	const columnStyle = (day: string) =>
+		day === currentDay
+			? "grid w-full bg-colorprimary text-white rounded"
+			: "grid w-full bg-sidebarcolor text-black rounded";
 
-	useEffect(() => {
-		const fetchTasks = async () => {
-			try {
-				const response = await fetchWithAuth(
-					`${endpoint}/Tasks?weekNumber=${weekNumber}`,
-				);
-				if (!response.ok) {
-					throw new Error("Failed to fetch tasks");
-				}
-				const tasks = await response.json();
-				setTasks(tasks);
-			} catch (error) {
-				console.error(error);
-			}
-		};
-
-		fetchTasks();
+	// Get tasks for the selected week
+	const fetchTasks = useCallback(async () => {
+		try {
+			const response = await fetchWithAuth(
+				`${endpoint}/Tasks?weekNumber=${weekNumber}`,
+			);
+			if (!response.ok) throw new Error("Failed to fetch tasks");
+			const tasks = await response.json();
+			setTasks(tasks); // Set tasks
+		} catch (error) {
+			console.error(error);
+		}
 	}, [weekNumber]);
 
-	// Function to get tasks for selected day
-	const selectedDayTask = (selectedDay: Date): React.ReactNode => {
-		const normalizedSelectedDay = new Date(selectedDay.setHours(0, 0, 0, 0));
+	useEffect(() => {
+		fetchTasks();
+	}, [fetchTasks]);
 
-		const filteredTasks = tasks.filter((task) => {
-			const taskDueDate = new Date(task.dueDate);
-			const normalizedTaskDate = new Date(taskDueDate.setHours(0, 0, 0, 0));
+	// Show tasks for the selected day
+	const selectedDayTask = (selectedDay: Date) => {
+		const dayTasks = tasks.filter(
+			(task) => formatDate(new Date(task.dueDate)) === formatDate(selectedDay),
+		);
 
-			return normalizedTaskDate.getTime() === normalizedSelectedDay.getTime();
-		});
-
-		if (filteredTasks.length === 0) return null;
-
-		return filteredTasks.map((task) => (
-			<div className="content-center" key={task.taskId}>
-				<Task
-					taskId={task.taskId}
-					batchId={task.batchId}
-					category={
-						task.category.toLowerCase() as "harvest" | "water" | "plant"
-					}
-					plantType={task.plantType}
-					fields={task.fields}
-					dueDate={task.dueDate}
-					isPlaced={task.isPlaced}
-					completedAt={task.completedAt}
-					completedBy={task.completedBy}
-				/>
-			</div>
-		));
+		return dayTasks.map((task) => <Task key={task.taskId} {...task} />);
 	};
 
-	// Functionality to change week number with arrow keys
+	// Change week number
+	const changeWeek = (increment: number) => {
+		setWeekNumber((prev) => {
+			const newWeek = prev + increment;
+			if (newWeek < 1) {
+				// If the week is less than 1, subtract 1 from the year
+				setYear((prevYear) => prevYear - 1);
+				return 52;
+			}
+			if (newWeek > 52) {
+				// If the week is greater than 52, add 1 to the year
+				setYear((prevYear) => prevYear + 1);
+				return 1;
+			}
+			return newWeek;
+		});
+	};
+
+	// Listen for arrow key presses to change week
 	useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
-			if (event.key === "ArrowLeft") {
-				if (weekNumber > 1) {
-					setWeekNumber(weekNumber - 1);
-				} else {
-					setWeekNumber(52);
-					setYear(year - 1);
-				}
-			} else if (event.key === "ArrowRight") {
-				if (weekNumber < 52) {
-					setWeekNumber(weekNumber + 1);
-				} else {
-					setWeekNumber(1);
-					setYear(year + 1);
-				}
-			}
+			if (event.key === "ArrowLeft") changeWeek(-1);
+			if (event.key === "ArrowRight") changeWeek(1);
 		};
 		window.addEventListener("keydown", handleKeyDown);
-		return () => {
-			window.removeEventListener("keydown", handleKeyDown);
-		};
-	}, [weekNumber, year]);
+		return () => window.removeEventListener("keydown", handleKeyDown);
+	}, []);
 
 	return (
-		<>
-			{/* UGER */}
-			<div className="w-full h-full flex flex-col justify-center select-none overflow-hidden m-8">
-				<div className="flex flex-row justify-center">
-					<ChevronLeft
-						aria-label="Forige uge"
-						className="size-10 cursor-pointer hover:scale-110"
-						onClick={() => {
-							if (weekNumber > 1) {
-								setWeekNumber(weekNumber - 1);
-							} else {
-								// start from 1 in the past year
-								setWeekNumber(52);
-								setYear(year - 1);
-							}
-						}}
-					/>
-					<h1
-						aria-label="Ugenummer"
-						className="text-colorprimary text-4xl cursor-default font-extrabold"
-					>
-						UGE{" "}
-						<span className="underline underline-offset-3">{weekNumber}</span>
-					</h1>
-					<ChevronRight
-						aria-label="Næste uge"
-						className="size-10 hover:cursor-pointer hover:scale-110"
-						onClick={() => {
-							if (weekNumber < 52) {
-								setWeekNumber(weekNumber + 1);
-							} else {
-								// start from 1 in the new year
-								setWeekNumber(1);
-								setYear(year + 1);
-							}
-						}}
-					/>
-					<Undo2
-						aria-label="Gå til nuværende uge"
-						className="size-9 mt-0.5 hover:cursor-pointer hover:scale-110"
-						onClick={() => {
-							setWeekNumber(currentWeekNumber);
-							setYear(currentYear);
-						}}
-					/>
-				</div>
-				{/* DAGE */}
-				<div className="mt-3 flex flex-row justify-center gap-x-2 cursor-default mr-12">
-					<WeekDay currentDay={currentDay} days={daysInWeek} />
-				</div>
-
-				{/* OPGAVER */}
-				<div className="mt-3 flex flex-row justify-center gap-x-2 h-full mr-12">
-					{daysInWeek.map((day, index) => (
-						<div
-							key={index}
-							className={
-								currentDay === formatDate(day)
-									? currentDayColumnStyle
-									: defaultColumnStyle
-							}
-						>
-							<ul className="grid grid-rows-12 w-100 h-full gap-y-2 text-center m-2">
-								{selectedDayTask(day)}
-							</ul>
-						</div>
-					))}
-				</div>
+		<div className="w-full h-full flex flex-col justify-center select-none p-8 ">
+			<div className="flex flex-row justify-center items-center gap-4">
+				<ChevronLeft
+					aria-label="Forrige uge"
+					className="cursor-pointer hover:scale-110"
+					onClick={() => changeWeek(-1)}
+				/>
+				<h1 className="text-colorprimary text-4xl font-extrabold">
+					UGE <span className="underline underline-offset-3">{weekNumber}</span>
+				</h1>
+				<ChevronRight
+					aria-label="Næste uge"
+					className="cursor-pointer hover:scale-110"
+					onClick={() => changeWeek(1)}
+				/>
+				<Undo2
+					aria-label="Gå til nuværende uge"
+					className="cursor-pointer hover:scale-110"
+					onClick={() => {
+						setWeekNumber(currentWeekNumber);
+						setYear(currentYear);
+					}}
+				/>
 			</div>
-		</>
+			<div className="mt-3 flex flex-row justify-center gap-x-2">
+				<WeekDay currentDay={currentDay} days={daysInWeek} />
+			</div>
+			{/* Tasks */}
+			<div className="mt-3 flex flex-row justify-center gap-x-2 h-full">
+				{daysInWeek.map((day, index) => (
+					<div key={index} className={columnStyle(formatDate(day))}>
+						<ul className="grid grid-rows-12 gap-y-2 p-2">
+							{selectedDayTask(day)}
+						</ul>
+					</div>
+				))}
+			</div>
+		</div>
 	);
 };
 

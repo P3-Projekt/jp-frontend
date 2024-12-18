@@ -1,6 +1,7 @@
-import type { Metadata } from "next";
+"use client";
 import "./globals.css";
 import React from "react";
+import { usePathname } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import MainSiteWrapper from "@/components/wrappers/MainSiteWrapper";
 import { cn } from "@/app/lib/utils";
@@ -13,12 +14,12 @@ interface LayoutProps {
 	children: React.ReactNode;
 }
 
-// Metadata
-export const metadata: Metadata = {
-	title: "JP-Grønt - Microgrønt",
-	description: "Site for JP-Grønt, a microgreen producer in Denmark",
-};
 const Layout: React.FC<LayoutProps> = ({ children }) => {
+	const pathname = usePathname(); // Get the current route
+
+	// Determine if the sidebar should be shown
+	const showSidebar = pathname !== "/login";
+
 	return (
 		<html lang="en">
 			<body
@@ -28,7 +29,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 				)}
 			>
 				<div className="min-h-screen flex">
-					<Sidebar />
+					{/* Conditionally render Sidebar */}
+					{showSidebar && <Sidebar />}
 					<MainSiteWrapper>{children}</MainSiteWrapper>
 					<Toaster />
 				</div>
@@ -36,4 +38,5 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 		</html>
 	);
 };
+
 export default Layout;
