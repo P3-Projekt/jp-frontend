@@ -25,7 +25,6 @@ A micro-green managment system made for JP-Grønt ApS. This is the UI Server mad
 
 The backend system can be found here [jp-backend](https://github.com/P3-Projekt/jp-backend)
 
-
 ## Run Locally
 
 Clone the project

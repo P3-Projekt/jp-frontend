@@ -116,7 +116,7 @@ const CanvasComponent = forwardRef<
 		}
 	}, [highlightedId, racks]);
 
-	// Fetch racks from the backend
+	// Fetch racks from the data server
 	useEffect((): void => {
 		fetchWithAuth(endpoint + "/Racks", {})
 			.then((response: Response) => {
