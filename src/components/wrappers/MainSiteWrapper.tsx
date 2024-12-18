@@ -9,7 +9,6 @@ const MainSiteWrapper = ({
 	className?: string;
 	children: ReactNode;
 }) => {
-
 	return (
 		<div
 			className={cn(

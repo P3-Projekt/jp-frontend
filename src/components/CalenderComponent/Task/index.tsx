@@ -18,7 +18,7 @@ export interface TaskProps {
 	taskId: number;
 	fields: number;
 	plantType: number;
-	category: "harvest" | "water" | "plant";
+	category: "Harvest" | "Water" | "Plant";
 	batchId: number;
 	dueDate: Date;
 	isPlaced: boolean;
@@ -28,19 +28,19 @@ export interface TaskProps {
 
 const categoryDetails = {
 	Harvest: {
-		type: "Harvest",
+		type: "Høst",
 		taskIcon: <Scissors className="size-7 mt-0.5" />,
 		dialogTaskIcon: <Scissors className="size-12" />,
 		backgroundColor: "bg-green-500",
 	},
 	Water: {
-		type: "Water",
+		type: "Vanding",
 		taskIcon: <Droplets className="size-7 -mt-0.5" />,
 		dialogTaskIcon: <Droplets className="size-12" />,
 		backgroundColor: "bg-blue-500",
 	},
 	Plant: {
-		type: "Plant",
+		type: "Plantning",
 		taskIcon: <MoveRight className="size-7 mt-0.5" />,
 		dialogTaskIcon: <MoveRight className="size-12 pt-1" />,
 		backgroundColor: "bg-orange-500",

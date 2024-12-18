@@ -14,7 +14,6 @@ interface LayoutProps {
 	children: React.ReactNode;
 }
 
-
 const Layout: React.FC<LayoutProps> = ({ children }) => {
 	const pathname = usePathname(); // Get the current route
 
