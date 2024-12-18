@@ -1,8 +1,6 @@
-
 # Micro-green Management System
 
 A micro-green managment system made for JP-Grønt ApS. This is the UI Server made in NextJS
-
 
 ## Authors
 
@@ -13,13 +11,13 @@ A micro-green managment system made for JP-Grønt ApS. This is the UI Server mad
 - [Nicolai Dybro](https://www.github.com/NicolaiDybro)
 - [Victor Hjelmberg Feddersen](https://www.github.com/victorhjelmberg)
 - [Jeppe Mortensen](https://www.github.com/Yamammao23)
+
 ## Features
 
 - Calendar to display tasks
 - 2D overview of all racks
 - User system
 - Plant type, task type and batch creation
-
 
 ## Backend
 
@@ -61,10 +59,8 @@ Start the server
 
 In `src/config/config.tsx` you can change the `endpoint` to your preffered URL.
 
-
 ## Used By
 
 This project is used by the following companies:
 
 - JP-Grønt ApS
-

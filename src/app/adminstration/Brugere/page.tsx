@@ -38,7 +38,6 @@ const BrugereSide = () => {
 		setIsLoading(true);
 		setError(null);
 		try {
-
 			// Send request (with token) to get users
 			const response = await fetchWithAuth(endpoint + "/Users", {
 				method: "GET",

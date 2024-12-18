@@ -52,7 +52,7 @@ const BakkerPage = () => {
 
 			const data = await response.json();
 
-			// Split tray types into active and inactive 
+			// Split tray types into active and inactive
 			const activeTrayTypes = data.filter((tray: BakkeType) => tray.active);
 			const inactiveTrayTypes = data.filter((tray: BakkeType) => !tray.active);
 
