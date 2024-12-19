@@ -16,9 +16,9 @@ interface BatchData {
 }
 
 const PreGerminationPage: React.FC = () => {
-	const [pregerminatingBatches, setPregerminatingBatches] = useState<BatchData[]>(
-		[],
-	); // Store batches still pregerminating in this
+	const [pregerminatingBatches, setPregerminatingBatches] = useState<
+		BatchData[]
+	>([]); // Store batches still pregerminating in this
 	const [canBePlacedBatches, setCanBePlacedBatches] = useState<BatchData[]>([]); // Store batches ready to be placed in this
 
 	useEffect(() => {
@@ -52,10 +52,12 @@ const PreGerminationPage: React.FC = () => {
 				);
 
 				// Create array for the batches still canBePlacedBatches and calculate daysUntilReady from dueDate
-				const canBePlacedBatches = result.canBePlaced.map((item: BatchData) => ({
-					...item,
-					daysUntilReady: getDaysUntilReady(item.dueDate),
-				}));
+				const canBePlacedBatches = result.canBePlaced.map(
+					(item: BatchData) => ({
+						...item,
+						daysUntilReady: getDaysUntilReady(item.dueDate),
+					}),
+				);
 
 				setPregerminatingBatches(preGerminationBatches);
 				setCanBePlacedBatches(canBePlacedBatches);
