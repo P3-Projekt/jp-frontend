@@ -6,14 +6,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { buttonVariants } from "../ui/button";
 import { LogOut, User } from "lucide-react";
+import { getUser } from "../authentication/authentication";
 
 const Sidebar: React.FC = () => {
 	// Decode authToken to get user information
-	const authToken =
-		typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
-	const decodedToken = authToken
-		? JSON.parse(atob(authToken.split(".")[1]))
-		: null;
+	const user = getUser();
 
 	return (
 		<div className="flex flex-col justify-start w-[350px] z-10 fixed h-screen">
@@ -35,7 +32,7 @@ const Sidebar: React.FC = () => {
 			<div className="flex flex-col justify-end bg-sidebarcolordark">
 				<div className="flex flex-row justify-evenly my-4 items-center">
 					<div className="flex flex-row items-center justify-between gap-x-2 select-none">
-						<User /> <p className="text-lg">{decodedToken?.sub || ""}</p>
+						<User /> <p className="text-lg">{user || ""}</p>
 					</div>
 					<div>
 						<Link href="/logout" className={buttonVariants({ variant: "red" })}>

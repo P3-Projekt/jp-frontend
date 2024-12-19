@@ -46,7 +46,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
 
 	return (
 		<div
-			className={`flex flex-col ${isChild ? "border-l-4 border-subbordercolor" : "mt-8"}`}
+			className={`flex flex-col ${isChild ? "border-l-4 border-subbordercolor" : "mt-5"}`}
 		>
 			<div
 				className={`p-2.5 rounded ${isActive || isParentActive ? ` ${isChild ? "bg-subbordercolor hover:bg-colorsecondary" : "bg-colorprimary text-white"} ` : "hover:bg-colorsecondary"} cursor-pointer flex justify-between items-center text-textcolor transition-all duration-300 ease-in-out`}

@@ -28,6 +28,7 @@ import { getUser } from "@/components/authentication/authentication";
 import { endpoint } from "@/config/config";
 
 import { ToastMessage } from "@/functions/ToastMessage/ToastMessage";
+import { daysUntilDate, isTaskDue } from "@/utils/tasks";
 
 let rackToDisplayUnSynced: RackData | null = null;
 
@@ -55,9 +56,6 @@ const RackDialog: React.FC<RackDialogProps> = ({
 		Harvest: "Høst",
 		Plant: "Plantning",
 	};
-	const nextTaskTranslated = selectedBatch?.nextTask.category
-		? taskTranslate[selectedBatch.nextTask.category]
-		: null;
 
 	// Set selectedBatch to null if the showDialog changes to false
 	useEffect(() => {
@@ -68,10 +66,25 @@ const RackDialog: React.FC<RackDialogProps> = ({
 
 	const rackToDisplay = rackToDisplayUnSynced;
 
-	const currentDate = new Date().toISOString().split("T")[0]; // Get current date in YYYY-MM-DD format
-
-	function taskIsDue(batch: BatchData): boolean {
-		return new Date(currentDate) >= new Date(batch.nextTask.dueDate);
+	function nextTaskToString(nextTask?: {
+		category: string;
+		dueDate: string;
+	}): string | null {
+		if (nextTask == null) {
+			return null;
+		}
+		const dueDateObject = new Date(nextTask.dueDate);
+		const daysUntil = daysUntilDate(dueDateObject);
+		const pluralSuffix = (daysUntil: number) =>
+			Math.abs(daysUntil) === 1 ? "" : "e";
+		const categoryTranslated = taskTranslate[nextTask.category];
+		if (daysUntil < 0) {
+			return `${categoryTranslated} for ${-daysUntil} dag${pluralSuffix(daysUntil)} siden`;
+		} else if (daysUntil == 0) {
+			return `${categoryTranslated} i dag`;
+		} else {
+			return `${categoryTranslated} om ${daysUntil} dag${pluralSuffix(daysUntil)}`;
+		}
 	}
 
 	//Avoid mouse event bubbling down to elements below
@@ -103,11 +116,11 @@ const RackDialog: React.FC<RackDialogProps> = ({
 						<DialogDescription>
 							<div className="min-h-full gap-x-5 flex flex-row justify-between content-center">
 								{/* rack information */}
-								<div className="h-[320px] self-center items-start basis-2/5 flex flex-col bg-blue-200 text-xl text-black rounded border-2 border-black pl-2 pr-2">
+								<div className="h-[340px] self-center items-start basis-2/5 flex flex-col bg-blue-200 text-xl text-black rounded border-2 border-black pl-2 pr-2">
 									<div>
 										Næste opgave:{" "}
 										<span className="font-semibold font-">
-											{nextTaskTranslated}
+											{nextTaskToString(selectedBatch?.nextTask)}
 										</span>
 									</div>
 									<div>
@@ -137,20 +150,20 @@ const RackDialog: React.FC<RackDialogProps> = ({
 												getLocations(selectedBatch.id).join(", ")}
 										</span>
 									</div>
-									<div className="mt-3">
+									<div>
 										Oprettet af:{" "}
 										<span className="font-semibold">
 											{selectedBatch?.createdBy}
 										</span>
 									</div>
-									<div className="">
+									<div>
 										Høstdato:{" "}
 										<span className="font-semibold text-lg">
 											{selectedBatch?.harvestDate}
 										</span>
 									</div>
 									<div
-										className={`mt-4 self-center uppercase font-bold ${selectedBatch !== null && taskIsDue(selectedBatch) ? "" : "hidden"}`}
+										className={`mt-4 self-center uppercase font-bold ${selectedBatch !== null && isTaskDue(selectedBatch.nextTask.dueDate) ? "" : "hidden"}`}
 									>
 										<Button
 											disabled={taskCompleting}
@@ -205,12 +218,12 @@ const RackDialog: React.FC<RackDialogProps> = ({
 															>
 																<p className="text-xl">{batch.plant}</p>
 																{batch?.nextTask.category === "Water" &&
-																taskIsDue(batch) ? (
+																isTaskDue(batch.nextTask.dueDate) ? (
 																	<Droplets
 																		className={`text-blue-600 border-black size-5 self-center`}
 																	/>
 																) : batch?.nextTask.category === "Harvest" &&
-																  taskIsDue(batch) ? (
+																  isTaskDue(batch.nextTask.dueDate) ? (
 																	<Scissors className={`text-red-600 size-5`} />
 																) : batch.nextTask.progress >= 0 ||
 																  batch.nextTask.progress != null ? (

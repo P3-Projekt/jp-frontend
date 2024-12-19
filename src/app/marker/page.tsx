@@ -7,7 +7,7 @@ import {
 } from "@/components/authentication/authentication";
 import { endpoint } from "@/config/config";
 
-// Interface til at definere batch-typen med dens egenskaber
+// Interface to define the batch type with its properties
 type BatchType = {
 	batchId: number;
 	plantName: string;
@@ -18,7 +18,7 @@ type BatchType = {
 	harvestDate: string;
 };
 
-// Interface til at definere strukturen for en ny batch-anmodning
+// Interface to define the structure of a new batch request
 type CreateBatchRequest = {
 	plantTypeId: string;
 	trayTypeId: string;
@@ -27,7 +27,7 @@ type CreateBatchRequest = {
 };
 
 const BatchesPage = () => {
-	// State variabler til at styre komponentens data og tilstand
+	// State variables to manage the component's data and state
 	const [batches, setBatches] = useState<BatchType[]>([]);
 	const [plantTypes, setPlantTypes] = useState<string[]>([]);
 	const [trayTypes, setTrayTypes] = useState<string[]>([]);
@@ -41,25 +41,25 @@ const BatchesPage = () => {
 	const [error, setError] = useState<string | null>(null);
 	const [currentUser, setCurrentUser] = useState<string>("");
 
-	// Hent indledende data når siden indlæses
+	// Retrieve initial data when the page loads
 	useEffect(() => {
-		// Hent brugerens token og brugernavn
+		// Get the user's token and username
 		const username = getUser();
 		if (username) {
 			setCurrentUser(username);
 		}
-		// Hent batches, plantetyper og bakketyper
+		// Retrieve batches, plant types, and tray types
 		fetchBatches();
 		fetchPlantTypes();
 		fetchTrayTypes();
 	}, []);
 
-	// Hent batches fra backend
+	// Fetch batches from the backend
 	const fetchBatches = async () => {
 		setIsLoading(true);
 		setError(null);
 		try {
-			// Send anmodning (med token) til backend
+			// Send request (with token) to get batches
 			const response = await fetchWithAuth(endpoint + "/Batches", {
 				method: "GET",
 				headers: {
@@ -72,7 +72,7 @@ const BatchesPage = () => {
 				throw new Error(errorText || "Kunne ikke hente batches fra databasen");
 			}
 
-			// Opdater batches state med modtaget data
+			// Update batches state with data from the response
 			const data = await response.json();
 			setBatches(data);
 		} catch (err) {
@@ -83,10 +83,10 @@ const BatchesPage = () => {
 		}
 	};
 
-	// Hent plantetyper fra backend
+	// Fetch plant types from the backend
 	const fetchPlantTypes = async () => {
 		try {
-			// Send anmodning (med token) for at hente plantetyper
+			// Send request (with token) to get plant types
 			const response = await fetchWithAuth(endpoint + "/PlantTypes", {
 				method: "GET",
 				headers: {
@@ -98,18 +98,21 @@ const BatchesPage = () => {
 				throw new Error("Kunne ikke hente plantetyper");
 			}
 
-			// Opdater plantetyper state med navne fra modtaget data
+			// Update plant types state with names from the received data
 			const data = await response.json();
-			setPlantTypes(data.map((pt: { name: string }) => pt.name));
+			const activePlantTypes = data.filter(
+				(pt: { name: string; active: boolean }) => pt.active,
+			);
+			setPlantTypes(activePlantTypes.map((pt: { name: string }) => pt.name));
 		} catch (err) {
 			console.error("Kunne ikke hente plantetyper:", err);
 		}
 	};
 
-	// Hent bakketyper fra backend
+	// Fetch tray types from the backend
 	const fetchTrayTypes = async () => {
 		try {
-			// Send anmodning (med token) for at hente bakketyper
+			// Send request (with token) to get tray types
 			const response = await fetchWithAuth(endpoint + "/TrayTypes", {
 				method: "GET",
 				headers: {
@@ -121,34 +124,37 @@ const BatchesPage = () => {
 				throw new Error("Kunne ikke hente bakketyper");
 			}
 
-			// Opdater bakketyper state med navne fra modtaget data
+			// Update tray types state with names from the received data
 			const data = await response.json();
-			setTrayTypes(data.map((tt: { name: string }) => tt.name));
+			const activeTrays = data.filter(
+				(tt: { name: string; active: boolean }) => tt.active,
+			);
+			setTrayTypes(activeTrays.map((tt: { name: string }) => tt.name));
 		} catch (err) {
 			console.error("Kunne ikke hente bakketyper:", err);
 		}
 	};
 
-	// Håndter ændringer i formularfelter
+	// Handle changes in form fields
 	const handleChange = (
 		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
 	) => {
 		const { name, value } = e.target;
-		// Opdater formData state, konverter amount til tal hvis nødvendigt
+		// Update the formData state, convert amount to a number if necessary
 		setFormData((prev) => ({
 			...prev,
 			[name]: name === "amount" ? +value : value,
 		}));
 	};
 
-	// Håndter indsendelse af ny batch
+	// Handle submission of form to create a new batch
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setIsLoading(true);
 		setError(null);
 
 		try {
-			// Send anmodning til backend for at oprette ny batch
+			// Send request (with token) to create a new batch
 			const response = await fetchWithAuth(endpoint + "/Batch", {
 				method: "POST",
 				headers: {
@@ -167,10 +173,10 @@ const BatchesPage = () => {
 				throw new Error(errorText || "Kunne ikke oprette batch");
 			}
 
-			// Genopfrisk batch-liste efter oprettelse
+			// Reload batch list after creation
 			await fetchBatches();
 
-			// Nulstil formular
+			// Reset form data
 			setFormData({
 				plantTypeId: "",
 				trayTypeId: "",
@@ -187,10 +193,10 @@ const BatchesPage = () => {
 	};
 
 	return (
-		<div className="p-8">
+		<div className="p-8 h-screen overflow-y-auto">
 			<h1 className="text-3xl font-bold mb-6 text-center">MARKER</h1>
 
-			{/* Fejlmeddelsesboks */}
+			{/* Show error message if an error occurred */}
 			{error && (
 				<div
 					className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
@@ -200,7 +206,7 @@ const BatchesPage = () => {
 				</div>
 			)}
 
-			{/* Formular til oprettelse af ny batch */}
+			{/* Form for creating a new batch */}
 			<form
 				className="bg-sidebarcolor p-6 rounded-lg shadow-xl mb-8 border"
 				onSubmit={handleSubmit}
@@ -209,7 +215,7 @@ const BatchesPage = () => {
 					OPRET EN NY BATCH AF MARKER
 				</h2>
 				<div className="grid grid-cols-3 gap-6">
-					{/* Valg af plantetype */}
+					{/* Select a plant type */}
 					<div className="flex-col">
 						<label className="font-semibold">Plantetype:</label>
 						<select
@@ -229,7 +235,7 @@ const BatchesPage = () => {
 						</select>
 					</div>
 
-					{/* Valg af bakketype */}
+					{/* Select af tray type*/}
 					<div className="flex-col">
 						<label className="font-semibold">Bakke type:</label>
 						<select
@@ -249,7 +255,7 @@ const BatchesPage = () => {
 						</select>
 					</div>
 
-					{/* Antal-input */}
+					{/* Select amount */}
 					<div className="flex-col">
 						<label className="font-semibold">Antal:</label>
 						<input
@@ -266,7 +272,7 @@ const BatchesPage = () => {
 					</div>
 				</div>
 
-				{/* Knap til oprettelse af batch */}
+				{/* Button to create a new batch */}
 				<button
 					type="submit"
 					className="transition w-full bg-colorprimary font-semibold hover:bg-green-700 text-white py-2 mt-4 rounded-2xl"
@@ -276,7 +282,7 @@ const BatchesPage = () => {
 				</button>
 			</form>
 
-			{/* Batches tabel */}
+			{/* Batches table */}
 			<div className="bg-sidebarcolor p-6 rounded-lg shadow-xl border mb-8">
 				<h2 className="text-lg font-semibold mb-6">BATCH OVERSIGT</h2>
 				<table className="w-full table-auto border">
@@ -300,7 +306,7 @@ const BatchesPage = () => {
 							</tr>
 						) : (
 							batches
-								.slice() // Logik for at sortere i omvendt rækkefølge
+								.slice() // Create a copy in opposite order
 								.sort((a, b) => b.batchId - a.batchId)
 								.map((batch) => (
 									<tr

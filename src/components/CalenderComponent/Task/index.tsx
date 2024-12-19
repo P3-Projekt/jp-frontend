@@ -18,37 +18,56 @@ export interface TaskProps {
 	taskId: number;
 	fields: number;
 	plantType: number;
-	category: "harvest" | "water" | "plant";
+	category: "Harvest" | "Water" | "Plant";
 	batchId: number;
 	dueDate: Date;
+	isPlaced: boolean;
+	completedAt: string | null;
+	completedBy: string | null;
 }
 
 const categoryDetails = {
-	harvest: {
-		type: "høst",
+	Harvest: {
+		type: "Høst",
 		taskIcon: <Scissors className="size-7 mt-0.5" />,
 		dialogTaskIcon: <Scissors className="size-12" />,
 		backgroundColor: "bg-green-500",
 	},
-	water: {
-		type: "vand",
+	Water: {
+		type: "Vanding",
 		taskIcon: <Droplets className="size-7 -mt-0.5" />,
 		dialogTaskIcon: <Droplets className="size-12" />,
 		backgroundColor: "bg-blue-500",
 	},
-	plant: {
-		type: "flyt",
+	Plant: {
+		type: "Plantning",
 		taskIcon: <MoveRight className="size-7 mt-0.5" />,
 		dialogTaskIcon: <MoveRight className="size-12 pt-1" />,
 		backgroundColor: "bg-orange-500",
 	},
 };
 
-const Task = ({ fields, plantType, category, batchId }: TaskProps) => {
+const Task = ({
+	fields,
+	plantType,
+	category,
+	batchId,
+	completedAt,
+	completedBy,
+	isPlaced,
+}: TaskProps) => {
 	const [openDialog, setOpenDialog] = useState(false);
 
 	const { type, taskIcon, dialogTaskIcon, backgroundColor } =
 		categoryDetails[category] || {};
+
+	function getStatus(completedAt: string | null, completedBy: string | null) {
+		if (completedAt && completedBy) {
+			return `Gennemført af ${completedBy} @ ${new Date(completedAt).toLocaleString()}`;
+		} else {
+			return "Ikke færdig";
+		}
+	}
 
 	return (
 		<>
@@ -98,27 +117,29 @@ const Task = ({ fields, plantType, category, batchId }: TaskProps) => {
 								{fields}
 							</span>
 							<br />
-							Reoler:{" "}
+							Status:{" "}
 							<span className="font-bold text-colorprimary cursor-text">
-								{/*{batchIdShelf}*/}
+								{getStatus(completedAt, completedBy)}
 							</span>
 							<br />
 						</DialogDescription>
 						<DialogFooter>
-							<div className="w-full flex flex-row justify-between gap-y-4 mt-2">
-								<Link
-									href={`/?id=${batchId}`}
-									className={buttonVariants({
-										variant: "black",
-									})}
-									onClick={() => {
-										// Send til kort
-										setOpenDialog(false);
-									}}
-								>
-									<p className="uppercase font-bold">vis lokation</p>
-								</Link>
-							</div>
+							{isPlaced ? (
+								<div className="w-full flex flex-row justify-between gap-y-4 mt-2">
+									<Link
+										href={`/?batchId=${batchId}`}
+										className={buttonVariants({
+											variant: "black",
+										})}
+										onClick={() => {
+											// Send til kort
+											setOpenDialog(false);
+										}}
+									>
+										<p className="uppercase font-bold">vis lokation</p>
+									</Link>
+								</div>
+							) : null}
 						</DialogFooter>
 					</DialogHeader>
 				</DialogContent>

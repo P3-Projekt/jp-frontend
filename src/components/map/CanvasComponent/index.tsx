@@ -12,6 +12,7 @@ import { ToastMessage } from "@/functions/ToastMessage/ToastMessage";
 import { useSearchParams } from "next/navigation";
 import { endpoint } from "@/config/config";
 import "./style.css";
+import { daysUntilDate } from "@/utils/tasks";
 
 export enum DisplayMode {
 	view,
@@ -89,27 +90,33 @@ const CanvasComponent = forwardRef<
 	const [loadingRacks, setLoadingRacks] = useState<Map<number, RackData>>(
 		new Map(),
 	);
-	const [highlightedRackId, setHighlightedRackId] = useState<string | null>(
-		null,
-	);
+	const [highlightedRacks, setHighlightedRacks] = useState<number[]>([]);
 
 	// Get search params
 	const searchParams = useSearchParams();
-	const highlightedId = searchParams.get("id");
+	const highlightedId = searchParams.get("batchId");
 
 	useEffect(() => {
 		if (highlightedId) {
-			setHighlightedRackId(highlightedId);
+			const highlightedRackIds = racks
+				.filter((rack) =>
+					rack.shelves.some((shelf) =>
+						shelf.batches.some((batch) => batch.id === Number(highlightedId)),
+					),
+				)
+				.map((rack) => rack.id);
+
+			setHighlightedRacks(highlightedRackIds);
 
 			const timer = setTimeout(() => {
-				setHighlightedRackId(null);
+				setHighlightedRacks([]);
 			}, 3000);
 
 			return () => clearTimeout(timer);
 		}
-	}, [highlightedId]);
+	}, [highlightedId, racks]);
 
-	// Fetch racks from the backend
+	// Fetch racks from the data server
 	useEffect((): void => {
 		fetchWithAuth(endpoint + "/Racks", {})
 			.then((response: Response) => {
@@ -127,6 +134,23 @@ const CanvasComponent = forwardRef<
 
 			// Set the boxes state to the racks
 			.then((racks): void => {
+				const isATaskOverdue = racks.some((rack: RackData) =>
+					rack.shelves.some((shelf) =>
+						shelf.batches.some(
+							(batch) => daysUntilDate(new Date(batch.nextTask.dueDate)) < 0,
+						),
+					),
+				);
+
+				if (isATaskOverdue) {
+					ToastMessage({
+						title: "Tjek opgaver!",
+						message:
+							"Du har opgaver, der skulle have været afsluttet tidligere, men som stadig ikke er færdige.",
+						type: "default",
+					});
+				}
+
 				setRacks(racks);
 			})
 
@@ -398,7 +422,9 @@ const CanvasComponent = forwardRef<
 							rackMouseDownHandler(index);
 						}}
 						className={
-							Number(highlightedRackId) === box.id ? "highlighted blink" : ""
+							highlightedRacks.includes(Number(box.id))
+								? "highlighted blink"
+								: ""
 						}
 						removeRack={() => {
 							removeRack(index);
