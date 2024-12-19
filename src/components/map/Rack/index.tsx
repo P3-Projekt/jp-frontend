@@ -313,7 +313,7 @@ const Rack: React.FC<RackProps> = ({
 								key={`${shelf.id}#${index}`}
 								rackId={rackData.id}
 								position={index}
-								id={shelf.id}
+								shelfId={shelf.id}
 							/>
 						),
 					)}

@@ -3,9 +3,14 @@ import {
 	getPlacedAmount,
 } from "@/app/pregermination/context";
 import { ToastMessage } from "@/functions/ToastMessage/ToastMessage";
-import { ShelfData } from "@/app/pregermination/page";
 
-const ShelfBox: React.FC<ShelfData> = ({ position, rackId, id: shelfId }) => {
+interface ShelfData {
+	rackId: number;
+	shelfId: number;
+	position: number;
+}
+
+const ShelfBox: React.FC<ShelfData> = ({ position, rackId, shelfId }) => {
 	const {
 		availableSpace,
 		activeBatchId,
